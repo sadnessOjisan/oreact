@@ -1,0 +1,40 @@
+{
+    "extends": [
+        "developit",
+        "prettier"
+    ],
+    "settings": {
+        "react": {
+            "pragma": "createElement"
+        }
+    },
+    "rules": {
+        "camelcase": [
+            1,
+            {
+                "allow": [
+                    "__test__*",
+                    "unstable_*",
+                    "UNSAFE_*"
+                ]
+            }
+        ],
+        "no-unused-vars": [
+            2,
+            {
+                "args": "none",
+                "varsIgnorePattern": "^h|React$"
+            }
+        ],
+        "prefer-rest-params": 0,
+        "prefer-spread": 0,
+        "no-cond-assign": 0,
+        "react/jsx-no-bind": 0,
+        "react/no-danger": "off",
+        "react/prefer-stateless-function": 0,
+        "react/sort-comp": 0,
+        "jest/valid-expect": 0,
+        "jest/no-disabled-tests": 0,
+        "react/no-find-dom-node": 0
+    }
+}

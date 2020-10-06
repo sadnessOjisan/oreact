@@ -1,10 +1,8 @@
 {
-	"name": "preact",
-	"amdName": "preact",
-	"version": "10.5.4",
-	"private": false,
-	"description": "Fast 3kb React-compatible Virtual DOM library.",
-	"main": "dist/preact.js",
+	"name": "@sadness_ojisan/oreact",
+  "version": "0.0.1",
+  "description": "preact を再実装する -俺の react-",
+  "main": "dist/preact.js",
 	"module": "dist/preact.module.js",
 	"umd:main": "dist/preact.umd.js",
 	"unpkg": "dist/preact.min.js",
@@ -18,118 +16,9 @@
 		},
 		"./package.json": "./package.json",
 		"./": "./"
-	},
-	"license": "MIT",
-	"types": "src/index.d.ts",
-	"scripts": {
-		"build": "npm-run-all --parallel build:*",
-		"build:core": "microbundle build --raw",
-		"build:core-min": "microbundle build --raw -f iife src/cjs.js -o dist/preact.min.js",
-		"dev": "microbundle watch --raw --format cjs",
-		"lint": "eslint src"
-	},
-	"eslintConfig": {
-		"extends": [
-			"developit",
-			"prettier"
-		],
-		"settings": {
-			"react": {
-				"pragma": "createElement"
-			}
-		},
-		"rules": {
-			"camelcase": [
-				1,
-				{
-					"allow": [
-						"__test__*",
-						"unstable_*",
-						"UNSAFE_*"
-					]
-				}
-			],
-			"no-unused-vars": [
-				2,
-				{
-					"args": "none",
-					"varsIgnorePattern": "^h|React$"
-				}
-			],
-			"prefer-rest-params": 0,
-			"prefer-spread": 0,
-			"no-cond-assign": 0,
-			"react/jsx-no-bind": 0,
-			"react/no-danger": "off",
-			"react/prefer-stateless-function": 0,
-			"react/sort-comp": 0,
-			"jest/valid-expect": 0,
-			"jest/no-disabled-tests": 0,
-			"react/no-find-dom-node": 0
-		}
-	},
-	"eslintIgnore": [
-		"test/fixtures",
-		"test/ts/",
-		"*.ts",
-		"dist"
-	],
-	"prettier": {
-		"singleQuote": true,
-		"trailingComma": "none",
-		"useTabs": true,
-		"tabWidth": 2
-	},
-	"lint-staged": {
-		"**/*.{js,jsx,ts,tsx,yml}": [
-			"prettier --write",
-			"git add"
-		]
-	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	},
-	"files": [
-		"src",
-		"dist",
-		"compat/dist",
-		"compat/src",
-		"compat/server.js",
-		"compat/package.json",
-		"debug/dist",
-		"debug/src",
-		"debug/package.json",
-		"devtools/dist",
-		"devtools/src",
-		"devtools/package.json",
-		"hooks/dist",
-		"hooks/src",
-		"hooks/package.json",
-		"jsx-runtime/dist",
-		"jsx-runtime/src",
-		"jsx-runtime/package.json",
-		"test-utils/src",
-		"test-utils/package.json",
-		"test-utils/dist"
-	],
-	"keywords": [
-		"preact",
-		"react",
-		"ui",
-		"user interface",
-		"virtual dom",
-		"vdom",
-		"components",
-		"dom diff"
-	],
-	"authors": [
-		"The Preact Authors (https://github.com/preactjs/preact/contributors)"
-	],
-	"repository": "preactjs/preact",
-	"bugs": "https://github.com/preactjs/preact/issues",
-	"homepage": "https://preactjs.com",
+  },
+  "types": "src/index.d.ts",
+  "dependencies": {},
 	"devDependencies": {
 		"@babel/core": "^7.7.0",
 		"@babel/plugin-proposal-object-rest-spread": "^7.6.2",
@@ -177,5 +66,26 @@
 		"sinon-chai": "^3.0.0",
 		"typescript": "3.5.3",
 		"webpack": "^4.3.0"
-	}
+  },
+  "files": [
+		"src",
+		"dist"
+	],
+  "scripts": {
+    "build": "npm-run-all --parallel build:*",
+		"build:core": "microbundle build --raw",
+		"build:core-min": "microbundle build --raw -f iife src/cjs.js -o dist/preact.min.js",
+		"dev": "microbundle watch --raw --format cjs",
+		"lint": "eslint src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sadnessOjisan/oreact.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sadnessOjisan/oreact/issues"
+  },
+  "homepage": "https://github.com/sadnessOjisan/oreact#readme"
 }
