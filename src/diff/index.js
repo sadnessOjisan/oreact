@@ -3,9 +3,13 @@ import { Component } from '../component';
 import { Fragment } from '../create-element';
 import { diffChildren, placeChild } from './children';
 import { diffProps, setProperty } from './props';
-import { assign, removeNode } from '../util';
+import {
+	assign
+	// removeNode
+} from '../util';
 import options from '../options';
 
+// NOTE: 必須
 function reorderChildren(newVNode, oldDom, parentDom) {
 	for (let tmp = 0; tmp < newVNode._children.length; tmp++) {
 		const vnode = newVNode._children[tmp];
@@ -459,66 +463,66 @@ function diffElementNodes(
 	return dom;
 }
 
-/**
- * Invoke or update a ref, depending on whether it is a function or object ref.
- * @param {object|function} ref
- * @param {any} value
- * @param {import('../internal').VNode} vnode
- */
-export function applyRef(ref, value, vnode) {
-	try {
-		if (typeof ref == 'function') ref(value);
-		else ref.current = value;
-	} catch (e) {
-		options._catchError(e, vnode);
-	}
-}
+// /**
+//  * Invoke or update a ref, depending on whether it is a function or object ref.
+//  * @param {object|function} ref
+//  * @param {any} value
+//  * @param {import('../internal').VNode} vnode
+//  */
+// export function applyRef(ref, value, vnode) {
+// 	try {
+// 		if (typeof ref == 'function') ref(value);
+// 		else ref.current = value;
+// 	} catch (e) {
+// 		options._catchError(e, vnode);
+// 	}
+// }
 
-/**
- * Unmount a virtual node from the tree and apply DOM changes
- * @param {import('../internal').VNode} vnode The virtual node to unmount
- * @param {import('../internal').VNode} parentVNode The parent of the VNode that
- * initiated the unmount
- * @param {boolean} [skipRemove] Flag that indicates that a parent node of the
- * current element is already detached from the DOM.
- */
-export function unmount(vnode, parentVNode, skipRemove) {
-	let r;
-	if (options.unmount) options.unmount(vnode);
+// /**
+//  * Unmount a virtual node from the tree and apply DOM changes
+//  * @param {import('../internal').VNode} vnode The virtual node to unmount
+//  * @param {import('../internal').VNode} parentVNode The parent of the VNode that
+//  * initiated the unmount
+//  * @param {boolean} [skipRemove] Flag that indicates that a parent node of the
+//  * current element is already detached from the DOM.
+//  */
+// export function unmount(vnode, parentVNode, skipRemove) {
+// 	let r;
+// 	if (options.unmount) options.unmount(vnode);
 
-	if ((r = vnode.ref)) {
-		if (!r.current || r.current === vnode._dom) applyRef(r, null, parentVNode);
-	}
+// 	if ((r = vnode.ref)) {
+// 		if (!r.current || r.current === vnode._dom) applyRef(r, null, parentVNode);
+// 	}
 
-	let dom;
-	if (!skipRemove && typeof vnode.type != 'function') {
-		skipRemove = (dom = vnode._dom) != null;
-	}
+// 	let dom;
+// 	if (!skipRemove && typeof vnode.type != 'function') {
+// 		skipRemove = (dom = vnode._dom) != null;
+// 	}
 
-	// Must be set to `undefined` to properly clean up `_nextDom`
-	// for which `null` is a valid value. See comment in `create-element.js`
-	vnode._dom = vnode._nextDom = undefined;
+// 	// Must be set to `undefined` to properly clean up `_nextDom`
+// 	// for which `null` is a valid value. See comment in `create-element.js`
+// 	vnode._dom = vnode._nextDom = undefined;
 
-	if ((r = vnode._component) != null) {
-		if (r.componentWillUnmount) {
-			try {
-				r.componentWillUnmount();
-			} catch (e) {
-				options._catchError(e, parentVNode);
-			}
-		}
+// 	if ((r = vnode._component) != null) {
+// 		if (r.componentWillUnmount) {
+// 			try {
+// 				r.componentWillUnmount();
+// 			} catch (e) {
+// 				options._catchError(e, parentVNode);
+// 			}
+// 		}
 
-		r.base = r._parentDom = null;
-	}
+// 		r.base = r._parentDom = null;
+// 	}
 
-	if ((r = vnode._children)) {
-		for (let i = 0; i < r.length; i++) {
-			if (r[i]) unmount(r[i], parentVNode, skipRemove);
-		}
-	}
+// 	if ((r = vnode._children)) {
+// 		for (let i = 0; i < r.length; i++) {
+// 			if (r[i]) unmount(r[i], parentVNode, skipRemove);
+// 		}
+// 	}
 
-	if (dom != null) removeNode(dom);
-}
+// 	if (dom != null) removeNode(dom);
+// }
 
 /** The `.render()` method for a PFC backing instance. */
 function doRender(props, state, context) {

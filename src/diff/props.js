@@ -1,4 +1,5 @@
-import { IS_NON_DIMENSIONAL } from '../constants';
+import //  IS_NON_DIMENSIONAL
+'../constants';
 import options from '../options';
 
 /**

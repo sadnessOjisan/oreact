@@ -2,6 +2,17 @@
 
 preact を再実装する -俺の react-
 
+## todo
+
+- [ ] render
+
+  - [ ] constans
+  - [ ] diff
+  - [ ] create-element
+  - [ ] options
+
+- [ ] h
+
 ## loadmap
 
 - [ ] preact を手元でビルド
