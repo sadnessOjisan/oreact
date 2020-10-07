@@ -52,22 +52,6 @@ Component.prototype.setState = function(update, callback) {
 };
 
 /**
- * Immediately perform a synchronous re-render of the component
- * @param {() => void} [callback] A function to be called after component is
- * re-rendered
- */
-Component.prototype.forceUpdate = function(callback) {
-	if (this._vnode) {
-		// Set render mode so that we can differentiate where the render request
-		// is coming from. We need this because forceUpdate should never call
-		// shouldComponentUpdate
-		this._force = true;
-		if (callback) this._renderCallbacks.push(callback);
-		enqueueRender(this);
-	}
-};
-
-/**
  * Accepts `props` and `state`, and returns a new Virtual DOM tree to build.
  * Virtual DOM is generally constructed via [JSX](http://jasonformat.com/wtf-is-jsx).
  * @param {object} props Props (eg: JSX attributes) received from parent
