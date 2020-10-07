@@ -1,12 +1,12 @@
 {
 	"name": "@sadness.ojisan/oreact",
-	"version": "0.0.3",
+	"version": "0.0.4",
 	"description": "preact を再実装する -俺の react-",
 	"main": "dist/preact.js",
 	"module": "dist/preact.module.js",
 	"umd:main": "dist/preact.umd.js",
 	"unpkg": "dist/preact.min.js",
-	"source": "src/index.js",
+	"source": "js/index.js",
 	"exports": {
 		".": {
 			"browser": "./dist/preact.module.js",
