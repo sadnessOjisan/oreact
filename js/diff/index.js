@@ -1,15 +1,10 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var constants_1 = require("../constants");
-var component_1 = require("../component");
-var create_element_1 = require("../create-element");
-var children_1 = require("./children");
-var props_1 = require("./props");
-var util_1 = require("../util");
-var options_1 = __importDefault(require("../options"));
+import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
+import { Component } from '../component';
+import { Fragment } from '../create-element';
+import { diffChildren, placeChild } from './children';
+import { diffProps, setProperty } from './props';
+import { assign, removeNode } from '../util';
+import options from '../options';
 // NOTE: 必須
 function reorderChildren(newVNode, oldDom, parentDom) {
     for (var tmp = 0; tmp < newVNode._children.length; tmp++) {
@@ -20,7 +15,7 @@ function reorderChildren(newVNode, oldDom, parentDom) {
                 if (typeof vnode.type == 'function' && vnode._children.length > 1) {
                     reorderChildren(vnode, oldDom, parentDom);
                 }
-                oldDom = children_1.placeChild(parentDom, vnode, vnode, newVNode._children, null, vnode._dom, oldDom);
+                oldDom = placeChild(parentDom, vnode, vnode, newVNode._children, null, vnode._dom, oldDom);
                 if (typeof newVNode.type == 'function') {
                     newVNode._nextDom = oldDom;
                 }
@@ -44,7 +39,7 @@ function reorderChildren(newVNode, oldDom, parentDom) {
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  * @param {boolean} [isHydrating] Whether or not we are in hydration
  */
-function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating) {
+export function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating) {
     var tmp, newType = newVNode.type;
     // When passing through createElement it assigns the object
     // constructor as undefined. This to prevent JSON-injection.
@@ -58,7 +53,7 @@ function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excessDomChil
         newVNode._hydrating = null;
         excessDomChildren = [oldDom];
     }
-    if ((tmp = options_1.default._diff))
+    if ((tmp = options._diff))
         tmp(newVNode);
     try {
         outer: if (typeof newType == 'function') {
@@ -84,7 +79,7 @@ function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excessDomChil
                     newVNode._component = c_1 = new newType(newProps, componentContext); // eslint-disable-line new-cap
                 }
                 else {
-                    newVNode._component = c_1 = new component_1.Component(newProps, componentContext);
+                    newVNode._component = c_1 = new Component(newProps, componentContext);
                     c_1.constructor = newType;
                     c_1.render = doRender;
                 }
@@ -104,9 +99,9 @@ function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excessDomChil
             }
             if (newType.getDerivedStateFromProps != null) {
                 if (c_1._nextState == c_1.state) {
-                    c_1._nextState = util_1.assign({}, c_1._nextState);
+                    c_1._nextState = assign({}, c_1._nextState);
                 }
-                util_1.assign(c_1._nextState, newType.getDerivedStateFromProps(newProps, c_1._nextState));
+                assign(c_1._nextState, newType.getDerivedStateFromProps(newProps, c_1._nextState));
             }
             oldProps_1 = c_1.props;
             oldState_1 = c_1.state;
@@ -156,7 +151,7 @@ function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excessDomChil
             c_1.context = componentContext;
             c_1.props = newProps;
             c_1.state = c_1._nextState;
-            if ((tmp = options_1.default._render))
+            if ((tmp = options._render))
                 tmp(newVNode);
             c_1._dirty = false;
             c_1._vnode = newVNode;
@@ -165,14 +160,14 @@ function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excessDomChil
             // Handle setState called in render, see #2553
             c_1.state = c_1._nextState;
             if (c_1.getChildContext != null) {
-                globalContext = util_1.assign(util_1.assign({}, globalContext), c_1.getChildContext());
+                globalContext = assign(assign({}, globalContext), c_1.getChildContext());
             }
             if (!isNew && c_1.getSnapshotBeforeUpdate != null) {
                 snapshot_1 = c_1.getSnapshotBeforeUpdate(oldProps_1, oldState_1);
             }
-            var isTopLevelFragment = tmp != null && tmp.type == create_element_1.Fragment && tmp.key == null;
+            var isTopLevelFragment = tmp != null && tmp.type == Fragment && tmp.key == null;
             var renderResult = isTopLevelFragment ? tmp.props.children : tmp;
-            children_1.diffChildren(parentDom, Array.isArray(renderResult) ? renderResult : [renderResult], newVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating);
+            diffChildren(parentDom, Array.isArray(renderResult) ? renderResult : [renderResult], newVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating);
             c_1.base = newVNode._dom;
             // We successfully rendered this VNode, unset any stored hydration/bailout state:
             newVNode._hydrating = null;
@@ -192,7 +187,7 @@ function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excessDomChil
         else {
             newVNode._dom = diffElementNodes(oldVNode._dom, newVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, isHydrating);
         }
-        if ((tmp = options_1.default.diffed))
+        if ((tmp = options.diffed))
             tmp(newVNode);
     }
     catch (e) {
@@ -205,19 +200,18 @@ function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excessDomChil
             // ^ could possibly be simplified to:
             // excessDomChildren.length = 0;
         }
-        options_1.default._catchError(e, newVNode, oldVNode);
+        options._catchError(e, newVNode, oldVNode);
     }
     return newVNode._dom;
 }
-exports.diff = diff;
 /**
  * @param {Array<import('../internal').Component>} commitQueue List of components
  * which have callbacks to invoke in commitRoot
  * @param {import('../internal').VNode} root
  */
-function commitRoot(commitQueue, root) {
-    if (options_1.default._commit)
-        options_1.default._commit(root, commitQueue);
+export function commitRoot(commitQueue, root) {
+    if (options._commit)
+        options._commit(root, commitQueue);
     commitQueue.some(function (c) {
         try {
             commitQueue = c._renderCallbacks;
@@ -227,11 +221,10 @@ function commitRoot(commitQueue, root) {
             });
         }
         catch (e) {
-            options_1.default._catchError(e, c._vnode);
+            options._catchError(e, c._vnode);
         }
     });
 }
-exports.commitRoot = commitRoot;
 /**
  * Diff two virtual nodes representing DOM element
  * @param {import('../internal').PreactElement} dom The DOM element representing
@@ -289,9 +282,9 @@ function diffElementNodes(dom, newVNode, oldVNode, globalContext, isSvg, excessD
     }
     else {
         if (excessDomChildren != null) {
-            excessDomChildren = constants_1.EMPTY_ARR.slice.call(dom.childNodes);
+            excessDomChildren = EMPTY_ARR.slice.call(dom.childNodes);
         }
-        oldProps = oldVNode.props || constants_1.EMPTY_OBJ;
+        oldProps = oldVNode.props || EMPTY_OBJ;
         var oldHtml = oldProps.dangerouslySetInnerHTML;
         var newHtml = newProps.dangerouslySetInnerHTML;
         // During hydration, props are not diffed at all (including dangerouslySetInnerHTML)
@@ -314,14 +307,14 @@ function diffElementNodes(dom, newVNode, oldVNode, globalContext, isSvg, excessD
                 }
             }
         }
-        props_1.diffProps(dom, newProps, oldProps, isSvg, isHydrating);
+        diffProps(dom, newProps, oldProps, isSvg, isHydrating);
         // If the new vnode didn't have dangerouslySetInnerHTML, diff its children
         if (newHtml) {
             newVNode._children = [];
         }
         else {
             i = newVNode.props.children;
-            children_1.diffChildren(dom, Array.isArray(i) ? i : [i], newVNode, oldVNode, globalContext, newVNode.type === 'foreignObject' ? false : isSvg, excessDomChildren, commitQueue, constants_1.EMPTY_OBJ, isHydrating);
+            diffChildren(dom, Array.isArray(i) ? i : [i], newVNode, oldVNode, globalContext, newVNode.type === 'foreignObject' ? false : isSvg, excessDomChildren, commitQueue, EMPTY_OBJ, isHydrating);
         }
         // (as above, don't diff props during hydration)
         if (!isHydrating) {
@@ -332,12 +325,12 @@ function diffElementNodes(dom, newVNode, oldVNode, globalContext, isSvg, excessD
                 // is missing the progress bar is treated as indeterminate.
                 // To fix that we'll always update it when it is 0 for progress elements
                 (i !== dom.value || (newVNode.type === 'progress' && !i))) {
-                props_1.setProperty(dom, 'value', i, oldProps.value, false);
+                setProperty(dom, 'value', i, oldProps.value, false);
             }
             if ('checked' in newProps &&
                 (i = newProps.checked) !== undefined &&
                 i !== dom.checked) {
-                props_1.setProperty(dom, 'checked', i, oldProps.checked, false);
+                setProperty(dom, 'checked', i, oldProps.checked, false);
             }
         }
     }
@@ -349,7 +342,7 @@ function diffElementNodes(dom, newVNode, oldVNode, globalContext, isSvg, excessD
  * @param {any} value
  * @param {import('../internal').VNode} vnode
  */
-function applyRef(ref, value, vnode) {
+export function applyRef(ref, value, vnode) {
     try {
         if (typeof ref == 'function')
             ref(value);
@@ -357,10 +350,9 @@ function applyRef(ref, value, vnode) {
             ref.current = value;
     }
     catch (e) {
-        options_1.default._catchError(e, vnode);
+        options._catchError(e, vnode);
     }
 }
-exports.applyRef = applyRef;
 /**
  * Unmount a virtual node from the tree and apply DOM changes
  * @param {import('../internal').VNode} vnode The virtual node to unmount
@@ -369,10 +361,10 @@ exports.applyRef = applyRef;
  * @param {boolean} [skipRemove] Flag that indicates that a parent node of the
  * current element is already detached from the DOM.
  */
-function unmount(vnode, parentVNode, skipRemove) {
+export function unmount(vnode, parentVNode, skipRemove) {
     var r;
-    if (options_1.default.unmount)
-        options_1.default.unmount(vnode);
+    if (options.unmount)
+        options.unmount(vnode);
     if ((r = vnode.ref)) {
         if (!r.current || r.current === vnode._dom)
             applyRef(r, null, parentVNode);
@@ -390,7 +382,7 @@ function unmount(vnode, parentVNode, skipRemove) {
                 r.componentWillUnmount();
             }
             catch (e) {
-                options_1.default._catchError(e, parentVNode);
+                options._catchError(e, parentVNode);
             }
         }
         r.base = r._parentDom = null;
@@ -402,9 +394,8 @@ function unmount(vnode, parentVNode, skipRemove) {
         }
     }
     if (dom != null)
-        util_1.removeNode(dom);
+        removeNode(dom);
 }
-exports.unmount = unmount;
 /** The `.render()` method for a PFC backing instance. */
 function doRender(props, state, context) {
     return this.constructor(props, context);

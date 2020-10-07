@@ -1,10 +1,5 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var constants_1 = require("../constants");
-var options_1 = __importDefault(require("../options"));
+import { IS_NON_DIMENSIONAL } from '../constants';
+import options from '../options';
 /**
  * Diff the old and new properties of a VNode and apply changes to the DOM node
  * @param {import('../internal').PreactElement} dom The DOM node to apply
@@ -14,7 +9,7 @@ var options_1 = __importDefault(require("../options"));
  * @param {boolean} isSvg Whether or not this node is an SVG node
  * @param {boolean} hydrate Whether or not we are in hydration mode
  */
-function diffProps(dom, newProps, oldProps, isSvg, hydrate) {
+export function diffProps(dom, newProps, oldProps, isSvg, hydrate) {
     var i;
     for (i in oldProps) {
         if (i !== 'children' && i !== 'key' && !(i in newProps)) {
@@ -32,7 +27,6 @@ function diffProps(dom, newProps, oldProps, isSvg, hydrate) {
         }
     }
 }
-exports.diffProps = diffProps;
 function setStyle(style, key, value) {
     if (key[0] === '-') {
         style.setProperty(key, value);
@@ -40,7 +34,7 @@ function setStyle(style, key, value) {
     else if (value == null) {
         style[key] = '';
     }
-    else if (typeof value != 'number' || constants_1.IS_NON_DIMENSIONAL.test(key)) {
+    else if (typeof value != 'number' || IS_NON_DIMENSIONAL.test(key)) {
         style[key] = value;
     }
     else {
@@ -55,7 +49,7 @@ function setStyle(style, key, value) {
  * @param {*} oldValue The old value the property had
  * @param {boolean} isSvg Whether or not this DOM node is an SVG node or not
  */
-function setProperty(dom, name, value, oldValue, isSvg) {
+export function setProperty(dom, name, value, oldValue, isSvg) {
     var useCapture, nameLower, proxy;
     if (isSvg && name == 'className')
         name = 'class';
@@ -143,15 +137,14 @@ function setProperty(dom, name, value, oldValue, isSvg) {
         }
     }
 }
-exports.setProperty = setProperty;
 /**
  * Proxy an event to hooked event handlers
  * @param {Event} e The event object from the browser
  * @private
  */
 function eventProxy(e) {
-    this._listeners[e.type + false](options_1.default.event ? options_1.default.event(e) : e);
+    this._listeners[e.type + false](options.event ? options.event(e) : e);
 }
 function eventProxyCapture(e) {
-    this._listeners[e.type + true](options_1.default.event ? options_1.default.event(e) : e);
+    this._listeners[e.type + true](options.event ? options.event(e) : e);
 }

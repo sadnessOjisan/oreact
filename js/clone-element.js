@@ -1,7 +1,5 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var util_1 = require("./util");
-var create_element_1 = require("./create-element");
+import { assign } from './util';
+import { createVNode } from './create-element';
 /**
  * Clones the given VNode, optionally adding attributes/props and replacing its children.
  * @param {import('./internal').VNode} vnode The virtual DOM element to clone
@@ -9,8 +7,8 @@ var create_element_1 = require("./create-element");
  * @param {Array<import('./index').ComponentChildren>} rest Any additional arguments will be used as replacement children.
  * @returns {import('./internal').VNode}
  */
-function cloneElement(vnode, props, children) {
-    var normalizedProps = util_1.assign({}, vnode.props), key, ref, i;
+export function cloneElement(vnode, props, children) {
+    var normalizedProps = assign({}, vnode.props), key, ref, i;
     for (i in props) {
         if (i == 'key')
             key = props[i];
@@ -28,6 +26,5 @@ function cloneElement(vnode, props, children) {
     if (children != null) {
         normalizedProps.children = children;
     }
-    return create_element_1.createVNode(vnode.type, normalizedProps, key || vnode.key, ref || vnode.ref, null);
+    return createVNode(vnode.type, normalizedProps, key || vnode.key, ref || vnode.ref, null);
 }
-exports.cloneElement = cloneElement;

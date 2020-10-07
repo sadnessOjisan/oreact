@@ -1,9 +1,4 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var options_1 = __importDefault(require("./options"));
+import options from './options';
 /**
  * Create an virtual node (used for JSX)
  * @param {import('./internal').VNode["type"]} type The node name or Component
@@ -12,7 +7,7 @@ var options_1 = __importDefault(require("./options"));
  * @param {Array<import('.').ComponentChildren>} [children] The children of the virtual node
  * @returns {import('./internal').VNode}
  */
-function createElement(type, props, children) {
+export function createElement(type, props, children) {
     var normalizedProps = {}, key, ref, i;
     for (i in props) {
         if (i == 'key')
@@ -43,7 +38,6 @@ function createElement(type, props, children) {
     }
     return createVNode(type, normalizedProps, key, ref, null);
 }
-exports.createElement = createElement;
 /**
  * Create a VNode (used internally by Preact)
  * @param {import('./internal').VNode["type"]} type The node name or Component
@@ -56,7 +50,7 @@ exports.createElement = createElement;
  * receive a reference to its created child
  * @returns {import('./internal').VNode}
  */
-function createVNode(type, props, key, ref, original) {
+export function createVNode(type, props, key, ref, original) {
     // V8 seems to be better at detecting type shapes if the object is allocated from the same call site
     // Do not inline into createElement and coerceToVNode!
     var vnode = {
@@ -80,18 +74,16 @@ function createVNode(type, props, key, ref, original) {
     };
     if (original == null)
         vnode._original = vnode;
-    if (options_1.default.vnode != null)
-        options_1.default.vnode(vnode);
+    if (options.vnode != null)
+        options.vnode(vnode);
     return vnode;
 }
-exports.createVNode = createVNode;
 // export function createRef() {
 // 	return { current: null };
 // }
-function Fragment(props) {
+export function Fragment(props) {
     return props.children;
 }
-exports.Fragment = Fragment;
 // /**
 //  * Check if a the argument is a valid Preact VNode.
 //  * @param {*} vnode

@@ -1,6 +1,4 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var catch_error_1 = require("./diff/catch-error");
+import { _catchError } from './diff/catch-error';
 /**
  * The `option` object can potentially contain callback functions
  * that are called during various stages of our renderer. This is the
@@ -11,6 +9,6 @@ var catch_error_1 = require("./diff/catch-error");
  * @type {import('./internal').Options}
  */
 var options = {
-    _catchError: catch_error_1._catchError
+    _catchError: _catchError
 };
-exports.default = options;
+export default options;

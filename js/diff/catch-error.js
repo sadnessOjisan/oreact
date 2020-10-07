@@ -1,6 +1,4 @@
-"use strict";
 // import { enqueueRender } from '../component';
-Object.defineProperty(exports, "__esModule", { value: true });
 /**
  * Find the closest error boundary to a thrown error and call it
  * @param {object} error The thrown value
@@ -8,7 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * the error that was caught (except for unmounting when this parameter
  * is the highest parent that was being unmounted)
  */
-function _catchError(error, vnode) {
+export function _catchError(error, vnode) {
     /** @type {import('../internal').Component} */
     var component, ctor, handled;
     var wasHydrating = vnode._hydrating;
@@ -37,4 +35,3 @@ function _catchError(error, vnode) {
     }
     throw error;
 }
-exports._catchError = _catchError;

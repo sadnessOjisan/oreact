@@ -1,12 +1,7 @@
-"use strict";
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-var util_1 = require("./util");
-var index_1 = require("./diff/index");
-var options_1 = __importDefault(require("./options"));
-var create_element_1 = require("./create-element");
+import { assign } from './util';
+import { diff, commitRoot } from './diff/index';
+import options from './options';
+import { Fragment } from './create-element';
 /**
  * Base Component class. Provides `setState()` and `forceUpdate()`, which
  * trigger rendering
@@ -14,11 +9,10 @@ var create_element_1 = require("./create-element");
  * @param {object} context The initial context from parent components'
  * getChildContext
  */
-function Component(props, context) {
+export function Component(props, context) {
     this.props = props;
     this.context = context;
 }
-exports.Component = Component;
 /**
  * Update component state and schedule a re-render.
  * @param {object | ((s: object, p: object) => object)} update A hash of state
@@ -34,15 +28,15 @@ Component.prototype.setState = function (update, callback) {
         s = this._nextState;
     }
     else {
-        s = this._nextState = util_1.assign({}, this.state);
+        s = this._nextState = assign({}, this.state);
     }
     if (typeof update == 'function') {
         // Some libraries like `immer` mark the current state as readonly,
         // preventing us from mutating it, so we need to clone it. See #2716
-        update = update(util_1.assign({}, s), this.props);
+        update = update(assign({}, s), this.props);
     }
     if (update) {
-        util_1.assign(s, update);
+        assign(s, update);
     }
     // Skip update if updater function returned null
     if (update == null)
@@ -63,12 +57,12 @@ Component.prototype.setState = function (update, callback) {
  * ancestor's `getChildContext()`
  * @returns {import('./index').ComponentChildren | void}
  */
-Component.prototype.render = create_element_1.Fragment;
+Component.prototype.render = Fragment;
 /**
  * @param {import('./internal').VNode} vnode
  * @param {number | null} [childIndex]
  */
-function getDomSibling(vnode, childIndex) {
+export function getDomSibling(vnode, childIndex) {
     if (childIndex == null) {
         // Use childIndex==null as a signal to resume the search from the vnode's sibling
         return vnode._parent
@@ -92,7 +86,6 @@ function getDomSibling(vnode, childIndex) {
     // the search)
     return typeof vnode.type == 'function' ? getDomSibling(vnode) : null;
 }
-exports.getDomSibling = getDomSibling;
 /**
  * Trigger in-place re-rendering of a component.
  * @param {import('./internal').Component} component The component to rerender
@@ -101,10 +94,10 @@ function renderComponent(component) {
     var vnode = component._vnode, oldDom = vnode._dom, parentDom = component._parentDom;
     if (parentDom) {
         var commitQueue = [];
-        var oldVNode = util_1.assign({}, vnode);
+        var oldVNode = assign({}, vnode);
         oldVNode._original = oldVNode;
-        var newDom = index_1.diff(parentDom, vnode, oldVNode, component._globalContext, parentDom.ownerSVGElement !== undefined, vnode._hydrating != null ? [oldDom] : null, commitQueue, oldDom == null ? getDomSibling(vnode) : oldDom, vnode._hydrating);
-        index_1.commitRoot(commitQueue, vnode);
+        var newDom = diff(parentDom, vnode, oldVNode, component._globalContext, parentDom.ownerSVGElement !== undefined, vnode._hydrating != null ? [oldDom] : null, commitQueue, oldDom == null ? getDomSibling(vnode) : oldDom, vnode._hydrating);
+        commitRoot(commitQueue, vnode);
         if (newDom != oldDom) {
             updateParentDomPointers(vnode);
         }
@@ -153,17 +146,16 @@ var prevDebounce;
  * Enqueue a rerender of a component
  * @param {import('./internal').Component} c The component to rerender
  */
-function enqueueRender(c) {
+export function enqueueRender(c) {
     if ((!c._dirty &&
         (c._dirty = true) &&
         rerenderQueue.push(c) &&
         !process._rerenderCount++) ||
-        prevDebounce !== options_1.default.debounceRendering) {
-        prevDebounce = options_1.default.debounceRendering;
+        prevDebounce !== options.debounceRendering) {
+        prevDebounce = options.debounceRendering;
         (prevDebounce || defer)(process);
     }
 }
-exports.enqueueRender = enqueueRender;
 /** Flush the render queue by rerendering all queued components */
 function process() {
     var queue;

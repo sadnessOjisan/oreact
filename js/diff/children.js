@@ -1,10 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var index_1 = require("./index");
-var create_element_1 = require("../create-element");
-var constants_1 = require("../constants");
-var util_1 = require("../util");
-var component_1 = require("../component");
+import { diff, unmount, applyRef } from './index';
+import { createVNode, Fragment } from '../create-element';
+import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
+import { removeNode } from '../util';
+import { getDomSibling } from '../component';
 /**
  * Diff the children of a virtual node
  * @param {import('../internal').PreactElement} parentDom The DOM element whose
@@ -25,22 +23,22 @@ var component_1 = require("../component");
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  * @param {boolean} isHydrating Whether or not we are in hydration
  */
-function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating) {
+export function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating) {
     var i, j, oldVNode, childVNode, newDom, firstChildDom, refs;
     // This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
     // as EMPTY_OBJ._children should be `undefined`.
-    var oldChildren = (oldParentVNode && oldParentVNode._children) || constants_1.EMPTY_ARR;
+    var oldChildren = (oldParentVNode && oldParentVNode._children) || EMPTY_ARR;
     var oldChildrenLength = oldChildren.length;
     // Only in very specific places should this logic be invoked (top level `render` and `diffElementNodes`).
     // I'm using `EMPTY_OBJ` to signal when `diffChildren` is invoked in these situations. I can't use `null`
     // for this purpose, because `null` is a valid value for `oldDom` which can mean to skip to this logic
     // (e.g. if mounting a new tree in which the old DOM should be ignored (usually for Fragments).
-    if (oldDom == constants_1.EMPTY_OBJ) {
+    if (oldDom == EMPTY_OBJ) {
         if (excessDomChildren != null) {
             oldDom = excessDomChildren[0];
         }
         else if (oldChildrenLength) {
-            oldDom = component_1.getDomSibling(oldParentVNode, 0);
+            oldDom = getDomSibling(oldParentVNode, 0);
         }
         else {
             oldDom = null;
@@ -56,13 +54,13 @@ function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, g
         // or we are rendering a component (e.g. setState) copy the oldVNodes so it can have
         // it's own DOM & etc. pointers
         else if (typeof childVNode == 'string' || typeof childVNode == 'number') {
-            childVNode = newParentVNode._children[i] = create_element_1.createVNode(null, childVNode, null, null, childVNode);
+            childVNode = newParentVNode._children[i] = createVNode(null, childVNode, null, null, childVNode);
         }
         else if (Array.isArray(childVNode)) {
-            childVNode = newParentVNode._children[i] = create_element_1.createVNode(create_element_1.Fragment, { children: childVNode }, null, null, null);
+            childVNode = newParentVNode._children[i] = createVNode(Fragment, { children: childVNode }, null, null, null);
         }
         else if (childVNode._dom != null || childVNode._component != null) {
-            childVNode = newParentVNode._children[i] = create_element_1.createVNode(childVNode.type, childVNode.props, childVNode.key, null, childVNode._original);
+            childVNode = newParentVNode._children[i] = createVNode(childVNode.type, childVNode.props, childVNode.key, null, childVNode._original);
         }
         else {
             childVNode = newParentVNode._children[i] = childVNode;
@@ -101,9 +99,9 @@ function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, g
                 oldVNode = null;
             }
         }
-        oldVNode = oldVNode || constants_1.EMPTY_OBJ;
+        oldVNode = oldVNode || EMPTY_OBJ;
         // Morph the old element into the new one, but don't append it to the dom yet
-        newDom = index_1.diff(parentDom, childVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating);
+        newDom = diff(parentDom, childVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating);
         if ((j = childVNode.ref) && oldVNode.ref != j) {
             if (!refs)
                 refs = [];
@@ -145,7 +143,7 @@ function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, g
             oldDom.parentNode != parentDom) {
             // The above condition is to handle null placeholders. See test in placeholder.test.js:
             // `efficiently replace null placeholders in parent rerenders`
-            oldDom = component_1.getDomSibling(oldVNode);
+            oldDom = getDomSibling(oldVNode);
         }
     }
     newParentVNode._dom = firstChildDom;
@@ -153,29 +151,28 @@ function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, g
     if (excessDomChildren != null && typeof newParentVNode.type != 'function') {
         for (i = excessDomChildren.length; i--;) {
             if (excessDomChildren[i] != null)
-                util_1.removeNode(excessDomChildren[i]);
+                removeNode(excessDomChildren[i]);
         }
     }
     // Remove remaining oldChildren if there are any.
     for (i = oldChildrenLength; i--;) {
         if (oldChildren[i] != null)
-            index_1.unmount(oldChildren[i], oldChildren[i]);
+            unmount(oldChildren[i], oldChildren[i]);
     }
     // Set refs only after unmount
     if (refs) {
         for (i = 0; i < refs.length; i++) {
-            index_1.applyRef(refs[i], refs[++i], refs[++i]);
+            applyRef(refs[i], refs[++i], refs[++i]);
         }
     }
 }
-exports.diffChildren = diffChildren;
 /**
  * Flatten and loop through the children of a virtual node
  * @param {import('../index').ComponentChildren} children The unflattened
  * children of a virtual node
  * @returns {import('../internal').VNode[]}
  */
-function toChildArray(children, out) {
+export function toChildArray(children, out) {
     out = out || [];
     if (children == null || typeof children == 'boolean') {
     }
@@ -189,8 +186,7 @@ function toChildArray(children, out) {
     }
     return out;
 }
-exports.toChildArray = toChildArray;
-function placeChild(parentDom, childVNode, oldVNode, oldChildren, excessDomChildren, newDom, oldDom) {
+export function placeChild(parentDom, childVNode, oldVNode, oldChildren, excessDomChildren, newDom, oldDom) {
     var nextDom;
     if (childVNode._nextDom !== undefined) {
         // Only Fragments or components that return Fragment like VNodes will
@@ -235,4 +231,3 @@ function placeChild(parentDom, childVNode, oldVNode, oldChildren, excessDomChild
     }
     return oldDom;
 }
-exports.placeChild = placeChild;
