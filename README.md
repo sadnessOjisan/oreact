@@ -7,11 +7,19 @@ npm i @sadness.ojisan/oreact
 ```
 
 ```tsx
-import { h, render } from '@sadness.ojisan/oreact';
+import { h, render, Component } from '@sadness.ojisan/oreact';
 
-const app = h('h1', null, 'Hello World!');
+class App extends Component {
+	state = {
+		age: 19
+	};
 
-render(app, document.body);
+	render() {
+		return h('h1', null, `${this.state.age}才`);
+	}
+}
+
+render(h(App, null, null), document.body);
 ```
 
 ## dev
