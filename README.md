@@ -2,6 +2,10 @@
 
 preact を再実装する -俺の react-
 
+```
+npm publish --access=public
+```
+
 ## todo
 
 - [ ] render
