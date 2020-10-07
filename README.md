@@ -4,15 +4,25 @@ preact を再実装する -俺の react-
 
 ```sh
 npm i @sadness.ojisan/oreact
+
+npx tsc
+
+npm run build
 ```
 
 ```tsx
 import { h, render, Component } from '@sadness.ojisan/oreact';
 
+console.log(Component.prototype);
+
 class App extends Component {
 	state = {
 		age: 19
 	};
+
+	componentDidMount() {
+		this.setState({ age: 12 });
+	}
 
 	render() {
 		return h('h1', null, `${this.state.age}才`);
@@ -41,8 +51,8 @@ npm publish --access=public
 
 ## loadmap
 
-- [ ] preact を手元でビルド
-- [ ] preact から h, render だけを取り出す
+- [x] preact を手元でビルド
+- [x] preact から h, render だけを取り出す
 - [ ] (microbundle からの脱却)
 - [ ] TS 化
 - [ ] UT 書く

@@ -1,12 +1,12 @@
 {
 	"name": "@sadness.ojisan/oreact",
-	"version": "0.0.3",
+	"version": "0.0.6",
 	"description": "preact を再実装する -俺の react-",
 	"main": "dist/preact.js",
 	"module": "dist/preact.module.js",
 	"umd:main": "dist/preact.umd.js",
 	"unpkg": "dist/preact.min.js",
-	"source": "src/index.js",
+	"source": "js/index.js",
 	"exports": {
 		".": {
 			"browser": "./dist/preact.module.js",
@@ -69,12 +69,13 @@
 	},
 	"files": [
 		"src",
+		"js",
 		"dist"
 	],
 	"scripts": {
 		"build": "npm-run-all --parallel build:*",
 		"build:core": "microbundle build --raw",
-		"build:core-min": "microbundle build --raw -f iife src/cjs.js -o dist/preact.min.js",
+		"build:core-min": "microbundle build --raw -f iife js/cjs.js -o dist/preact.min.js",
 		"dev": "microbundle watch --raw --format cjs",
 		"lint": "eslint src"
 	},
