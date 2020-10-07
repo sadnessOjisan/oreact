@@ -4,6 +4,10 @@ preact を再実装する -俺の react-
 
 ```sh
 npm i @sadness.ojisan/oreact
+
+npx tsc
+
+npm run build
 ```
 
 ```tsx
