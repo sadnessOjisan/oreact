@@ -1,5 +1,7 @@
 // import { enqueueRender } from '../component';
 
+import { VNode } from '../types/internal';
+
 /**
  * Find the closest error boundary to a thrown error and call it
  * @param {object} error The thrown value
@@ -7,7 +9,7 @@
  * the error that was caught (except for unmounting when this parameter
  * is the highest parent that was being unmounted)
  */
-export function _catchError(error, vnode) {
+export function _catchError(error: Object, vnode: VNode) {
 	/** @type {import('../internal').Component} */
 	let component, ctor, handled;
 

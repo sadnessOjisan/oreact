@@ -1,5 +1,6 @@
 import { IS_NON_DIMENSIONAL } from '../constants';
 import options from '../options';
+import { PreactElement } from '../types/internal';
 
 /**
  * Diff the old and new properties of a VNode and apply changes to the DOM node
@@ -10,7 +11,13 @@ import options from '../options';
  * @param {boolean} isSvg Whether or not this node is an SVG node
  * @param {boolean} hydrate Whether or not we are in hydration mode
  */
-export function diffProps(dom, newProps, oldProps, isSvg, hydrate) {
+export function diffProps(
+	dom: PreactElement,
+	newProps: Object,
+	oldProps: Object,
+	isSvg: boolean,
+	hydrate: boolean
+) {
 	let i;
 
 	for (i in oldProps) {
@@ -53,7 +60,13 @@ function setStyle(style, key, value) {
  * @param {*} oldValue The old value the property had
  * @param {boolean} isSvg Whether or not this DOM node is an SVG node or not
  */
-export function setProperty(dom, name, value, oldValue, isSvg) {
+export function setProperty(
+	dom: PreactElement,
+	name: string,
+	value: any,
+	oldValue: any,
+	isSvg: boolean
+) {
 	let useCapture, nameLower, proxy;
 
 	if (isSvg && name == 'className') name = 'class';
@@ -154,10 +167,10 @@ export function setProperty(dom, name, value, oldValue, isSvg) {
  * @param {Event} e The event object from the browser
  * @private
  */
-function eventProxy(e) {
+function eventProxy(e: Event) {
 	this._listeners[e.type + false](options.event ? options.event(e) : e);
 }
 
-function eventProxyCapture(e) {
+function eventProxyCapture(e: Event) {
 	this._listeners[e.type + true](options.event ? options.event(e) : e);
 }

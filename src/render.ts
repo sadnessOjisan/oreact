@@ -2,6 +2,8 @@ import { EMPTY_OBJ, EMPTY_ARR } from './constants';
 import { commitRoot, diff } from './diff/index';
 import { createElement, Fragment } from './create-element';
 import options from './options';
+import { ComponentChild } from './types/preact';
+import { PreactElement } from './types/internal';
 
 const IS_HYDRATE = EMPTY_OBJ;
 
@@ -13,7 +15,11 @@ const IS_HYDRATE = EMPTY_OBJ;
  * @param {Element | Text} [replaceNode] Optional: Attempt to re-use an
  * existing DOM tree rooted at `replaceNode`
  */
-export function render(vnode, parentDom, replaceNode) {
+export function render(
+	vnode: ComponentChild,
+	parentDom: PreactElement,
+	replaceNode: Element | Text
+) {
 	if (options._root) options._root(vnode, parentDom);
 
 	// We abuse the `replaceNode` parameter in `hydrate()` to signal if we

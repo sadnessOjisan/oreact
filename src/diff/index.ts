@@ -5,6 +5,12 @@ import { diffChildren, placeChild } from './children';
 import { diffProps, setProperty } from './props';
 import { assign, removeNode } from '../util';
 import options from '../options';
+import {
+	Component as ComponentType,
+	Component,
+	VNode,
+	PreactElement
+} from '../types/internal';
 
 // NOTE: 必須
 function reorderChildren(newVNode, oldDom, parentDom) {
@@ -53,15 +59,15 @@ function reorderChildren(newVNode, oldDom, parentDom) {
  * @param {boolean} [isHydrating] Whether or not we are in hydration
  */
 export function diff(
-	parentDom,
-	newVNode,
-	oldVNode,
-	globalContext,
-	isSvg,
-	excessDomChildren,
-	commitQueue,
-	oldDom,
-	isHydrating
+	parentDom: PreactElement,
+	newVNode: VNode,
+	oldVNode: VNode,
+	globalContext: Object,
+	isSvg: boolean,
+	excessDomChildren: PreactElement,
+	commitQueue: ComponentType,
+	oldDom: Element | Text,
+	isHydrating: boolean
 ) {
 	let tmp,
 		newType = newVNode.type;
@@ -289,14 +295,14 @@ export function diff(
  * which have callbacks to invoke in commitRoot
  * @param {import('../internal').VNode} root
  */
-export function commitRoot(commitQueue, root) {
+export function commitRoot(commitQueue: ComponentType, root: VNode) {
 	if (options._commit) options._commit(root, commitQueue);
 
-	commitQueue.some(c => {
+	commitQueue.some((c) => {
 		try {
 			commitQueue = c._renderCallbacks;
 			c._renderCallbacks = [];
-			commitQueue.some(cb => {
+			commitQueue.some((cb) => {
 				cb.call(c);
 			});
 		} catch (e) {

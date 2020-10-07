@@ -1,4 +1,7 @@
 import options from './options';
+import { PropsType } from './types';
+import { VNode } from './types/internal';
+import { ComponentChildren } from './types/preact';
 
 /**
  * Create an virtual node (used for JSX)
@@ -8,7 +11,11 @@ import options from './options';
  * @param {Array<import('.').ComponentChildren>} [children] The children of the virtual node
  * @returns {import('./internal').VNode}
  */
-export function createElement(type, props, children) {
+export function createElement(
+	type: VNode['type'],
+	props: PropsType,
+	children: ComponentChildren[]
+): VNode {
 	let normalizedProps = {},
 		key,
 		ref,
@@ -55,7 +62,14 @@ export function createElement(type, props, children) {
  * receive a reference to its created child
  * @returns {import('./internal').VNode}
  */
-export function createVNode(type, props, key, ref, original) {
+export function createVNode(
+	type: VNode['type'],
+	props: Object | string | number | null,
+	key: string | number | null,
+	ref: VNode['ref'],
+	// ここにvnodeが代入されているのでvnode型だと思う
+	original: VNode | null
+): VNode {
 	// V8 seems to be better at detecting type shapes if the object is allocated from the same call site
 	// Do not inline into createElement and coerceToVNode!
 	const vnode = {

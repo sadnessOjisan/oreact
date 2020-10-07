@@ -78,16 +78,6 @@ export function createVNode(type, props, key, ref, original) {
         options.vnode(vnode);
     return vnode;
 }
-// export function createRef() {
-// 	return { current: null };
-// }
 export function Fragment(props) {
     return props.children;
 }
-// /**
-//  * Check if a the argument is a valid Preact VNode.
-//  * @param {*} vnode
-//  * @returns {vnode is import('./internal').VNode}
-//  */
-// export const isValidElement = vnode =>
-// 	vnode != null && vnode.constructor === undefined;

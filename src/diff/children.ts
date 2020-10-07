@@ -3,6 +3,8 @@ import { createVNode, Fragment } from '../create-element';
 import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
 import { removeNode } from '../util';
 import { getDomSibling } from '../component';
+import { Component, PreactElement, VNode } from '../types/internal';
+import { ComponentChildren } from '../types/preact';
 
 /**
  * Diff the children of a virtual node
@@ -25,16 +27,16 @@ import { getDomSibling } from '../component';
  * @param {boolean} isHydrating Whether or not we are in hydration
  */
 export function diffChildren(
-	parentDom,
-	renderResult,
-	newParentVNode,
-	oldParentVNode,
-	globalContext,
-	isSvg,
-	excessDomChildren,
-	commitQueue,
-	oldDom,
-	isHydrating
+	parentDom: PreactElement,
+	renderResult: ComponentChildren[],
+	newParentVNode: VNode,
+	oldParentVNode: VNode,
+	globalContext: Object,
+	isSvg: boolean,
+	excessDomChildren: PreactElement[],
+	commitQueue: Component[],
+	oldDom: Node | Text,
+	isHydrating: boolean
 ) {
 	let i, j, oldVNode, childVNode, newDom, firstChildDom, refs;
 
@@ -234,11 +236,11 @@ export function diffChildren(
  * children of a virtual node
  * @returns {import('../internal').VNode[]}
  */
-export function toChildArray(children, out) {
+export function toChildArray(children: ComponentChildren, out: VNode[]) {
 	out = out || [];
 	if (children == null || typeof children == 'boolean') {
 	} else if (Array.isArray(children)) {
-		children.some(child => {
+		children.some((child) => {
 			toChildArray(child, out);
 		});
 	} else {
@@ -248,13 +250,13 @@ export function toChildArray(children, out) {
 }
 
 export function placeChild(
-	parentDom,
-	childVNode,
-	oldVNode,
-	oldChildren,
-	excessDomChildren,
-	newDom,
-	oldDom
+	parentDom: VNode,
+	childVNode: VNode,
+	oldVNode: VNode,
+	oldChildren: Array<VNode<any>> | null,
+	excessDomChildren: PreactElement,
+	newDom: PreactElement | null,
+	oldDom: PreactElement | null
 ) {
 	let nextDom;
 	if (childVNode._nextDom !== undefined) {
