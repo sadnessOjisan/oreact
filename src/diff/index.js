@@ -6,6 +6,7 @@ import { diffProps, setProperty } from './props';
 import { assign, removeNode } from '../util';
 import options from '../options';
 
+// NOTE: 必須
 function reorderChildren(newVNode, oldDom, parentDom) {
 	for (let tmp = 0; tmp < newVNode._children.length; tmp++) {
 		const vnode = newVNode._children[tmp];
