@@ -15,6 +15,7 @@ const IS_HYDRATE = EMPTY_OBJ;
  * @param {Element | Text} [replaceNode] Optional: Attempt to re-use an
  * existing DOM tree rooted at `replaceNode`
  */
+
 export function render(
 	vnode: ComponentChild,
 	parentDom: PreactElement,
@@ -39,11 +40,13 @@ export function render(
 
 	// List of effects that need to be called after diffing.
 	let commitQueue = [];
+	// 実行すると内部でcommitQueueにComponentがたくさん詰められていく
 	diff(
 		parentDom,
 		// Determine the new vnode tree and store it on the DOM element on
 		// our custom `_children` property.
 		((isHydrating ? parentDom : replaceNode || parentDom)._children = vnode),
+		// 初回レンダリングなので oldNode は存在しないので EMPTY
 		oldVNode || EMPTY_OBJ,
 		EMPTY_OBJ,
 		parentDom.ownerSVGElement !== undefined,
