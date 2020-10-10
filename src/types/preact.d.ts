@@ -229,16 +229,6 @@ declare namespace preact {
 		vnode: ComponentChild,
 		parent: Element | Document | ShadowRoot | DocumentFragment
 	): void;
-	function cloneElement(
-		vnode: VNode<any>,
-		props?: any,
-		...children: ComponentChildren[]
-	): VNode<any>;
-	function cloneElement<P>(
-		vnode: VNode<P>,
-		props?: any,
-		...children: ComponentChildren[]
-	): VNode<P>;
 
 	//
 	// Preact Built-in Components

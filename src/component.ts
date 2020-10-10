@@ -2,6 +2,7 @@ import { assign } from './util';
 import { diff, commitRoot } from './diff/index';
 import options from './options';
 import { Fragment } from './create-element';
+import { VNode } from './types/internal';
 
 /**
  * Base Component class. Provides `setState()` and `forceUpdate()`, which
@@ -64,18 +65,21 @@ Component.prototype.setState = function(update, callback) {
 Component.prototype.render = Fragment;
 
 /**
+ * 兄弟DOMを取得する
  * @param {import('./internal').VNode} vnode
  * @param {number | null} [childIndex]
  */
-export function getDomSibling(vnode, childIndex) {
+export function getDomSibling(vnode:VNode, childIndex?:number) {
 	if (childIndex == null) {
 		// Use childIndex==null as a signal to resume the search from the vnode's sibling
 		return vnode._parent
-			? getDomSibling(vnode._parent, vnode._parent._children.indexOf(vnode) + 1)
+			? getDomSibling(vnode._parent, vnode._parent._children.indexOf(vnode) + 1) // この+1がないと自分が対象になるから？
 			: null;
 	}
 
 	let sibling;
+
+	// 最初に見つかった兄弟要素を返す
 	for (; childIndex < vnode._children.length; childIndex++) {
 		sibling = vnode._children[childIndex];
 

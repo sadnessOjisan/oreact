@@ -7,7 +7,6 @@ import { assign, removeNode } from '../util';
 import options from '../options';
 import {
 	Component as ComponentType,
-	Component,
 	VNode,
 	PreactElement
 } from '../types/internal';
@@ -58,6 +57,19 @@ function reorderChildren(newVNode, oldDom, parentDom) {
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  * @param {boolean} [isHydrating] Whether or not we are in hydration
  */
+
+/**
+ * VNodeの差分をとって、変更すべきものをDOMに反映する
+ * @param parentDom
+ * @param newVNode
+ * @param oldVNode
+ * @param globalContext
+ * @param isSvg
+ * @param excessDomChildren
+ * @param commitQueue
+ * @param oldDom
+ * @param isHydrating
+ */
 export function diff(
 	parentDom: PreactElement,
 	newVNode: VNode,
@@ -88,12 +100,15 @@ export function diff(
 	if ((tmp = options._diff)) tmp(newVNode);
 
 	try {
+		// :はラベル
 		outer: if (typeof newType == 'function') {
-			let c, isNew, oldProps, oldState, snapshot, clearProcessingException;
+			let c, isNew, oldProps, oldState, snapshot;
+			let clearProcessingException:ComponentType<any, any> | null
 			let newProps = newVNode.props;
 
 			// Necessary for createContext api. Setting this property will pass
 			// the context value as `this.context` just for this component.
+			// FIXME: 最小構成としては消しても問題なさそう。
 			tmp = newType.contextType;
 			let provider = tmp && globalContext[tmp._id];
 			let componentContext = tmp
@@ -107,8 +122,12 @@ export function diff(
 				c = newVNode._component = oldVNode._component;
 				clearProcessingException = c._processingException = c._pendingError;
 			} else {
+				// oldVNodeが_componentを持たないとき
+				// FIXME: どういうときに持たないのか調べる
+
 				// Instantiate the new component
 				if ('prototype' in newType && newType.prototype.render) {
+					// type が function の場合、それはComponentFactory<P>であり、Componentを返す関数
 					newVNode._component = c = new newType(newProps, componentContext); // eslint-disable-line new-cap
 				} else {
 					newVNode._component = c = new Component(newProps, componentContext);
@@ -117,8 +136,9 @@ export function diff(
 				}
 				if (provider) provider.sub(c);
 
+				// oldVNode._component を使いまわしているとpropsがこの時点で更新されていないので新しいものに入れ替える
 				c.props = newProps;
-				if (!c.state) c.state = {};
+				if (!c.state) c.state = {}; // state になにも入っていなければ初期化
 				c.context = componentContext;
 				c._globalContext = globalContext;
 				isNew = c._dirty = true;
@@ -275,6 +295,7 @@ export function diff(
 
 		if ((tmp = options.diffed)) tmp(newVNode);
 	} catch (e) {
+		// try 節の中で書き換わった部分を元に戻す
 		newVNode._original = null;
 		// if hydrating or creating initial tree, bailout preserves DOM:
 		if (isHydrating || excessDomChildren != null) {
@@ -325,6 +346,18 @@ export function commitRoot(commitQueue: ComponentType[], root: VNode) {
  * @param {boolean} isHydrating Whether or not we are in hydration
  * @returns {import('../internal').PreactElement}
  */
+
+/**
+ * 差分をVNodeの差分を取る
+ * @param dom 
+ * @param newVNode 
+ * @param oldVNode 
+ * @param globalContext 
+ * @param isSvg 
+ * @param excessDomChildren 
+ * @param commitQueue 
+ * @param isHydrating 
+ */
 function diffElementNodes(
 	dom,
 	newVNode,
@@ -334,7 +367,7 @@ function diffElementNodes(
 	excessDomChildren,
 	commitQueue,
 	isHydrating
-) {
+): PreactElement {
 	let i;
 	let oldProps = oldVNode.props;
 	let newProps = newVNode.props;
@@ -489,7 +522,14 @@ export function applyRef(ref, value, vnode) {
  * @param {boolean} [skipRemove] Flag that indicates that a parent node of the
  * current element is already detached from the DOM.
  */
-export function unmount(vnode, parentVNode, skipRemove) {
+
+ /**
+  * TreeからVNodeを削除し、それをDOMにも反映させる
+  * @param vnode 
+  * @param parentVNode 
+  * @param skipRemove 
+  */
+export function unmount(vnode:VNode, parentVNode:VNode, skipRemove:boolean) {
 	let r;
 	if (options.unmount) options.unmount(vnode);
 
@@ -518,6 +558,7 @@ export function unmount(vnode, parentVNode, skipRemove) {
 		r.base = r._parentDom = null;
 	}
 
+	// FIXME: こういう if 文の中で代入して比較するメリットが何なのか調べる
 	if ((r = vnode._children)) {
 		for (let i = 0; i < r.length; i++) {
 			if (r[i]) unmount(r[i], parentVNode, skipRemove);
@@ -528,6 +569,7 @@ export function unmount(vnode, parentVNode, skipRemove) {
 }
 
 /** The `.render()` method for a PFC backing instance. */
+// FIXME: これを何に使うか調べる
 function doRender(props, state, context) {
 	return this.constructor(props, context);
 }

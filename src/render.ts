@@ -36,6 +36,9 @@ export function render(
 	let oldVNode = isHydrating
 		? null
 		: (replaceNode && replaceNode._children) || parentDom._children;
+
+	// ComponentChild だった vnode を VNode型に変換する
+	// _children も _parent もこの時点では null
 	vnode = createElement(Fragment, null, [vnode]);
 
 	// List of effects that need to be called after diffing.

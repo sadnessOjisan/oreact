@@ -3,13 +3,12 @@ import options from '../options';
 import { PreactElement } from '../types/internal';
 
 /**
- * Diff the old and new properties of a VNode and apply changes to the DOM node
- * @param {import('../internal').PreactElement} dom The DOM node to apply
- * changes to
- * @param {object} newProps The new props
- * @param {object} oldProps The old props
- * @param {boolean} isSvg Whether or not this node is an SVG node
- * @param {boolean} hydrate Whether or not we are in hydration mode
+ * VNodeの新旧propsの差分を取り、DOM nodeに変更を適用する
+ * @param dom 変更を適用させる対象のDOM
+ * @param newProps 新しいprops
+ * @param oldProps 古いprops
+ * @param isSvg 対象がSVGかどうか
+ * @param hydrate hydrate時に呼ばれたかどうかのフラグ
  */
 export function diffProps(
 	dom: PreactElement,
@@ -20,13 +19,16 @@ export function diffProps(
 ) {
 	let i;
 
+	// 旧propsのkeyを検査していく
 	for (i in oldProps) {
+		// children でも key でもなく、新しいpropsに存在しないものであるとき
 		if (i !== 'children' && i !== 'key' && !(i in newProps)) {
 			setProperty(dom, i, null, oldProps[i], isSvg);
 		}
 	}
 
 	for (i in newProps) {
+		// 新旧propsに差分があるとsetProperty
 		if (
 			(!hydrate || typeof newProps[i] == 'function') &&
 			i !== 'children' &&
@@ -40,7 +42,7 @@ export function diffProps(
 	}
 }
 
-function setStyle(style, key, value) {
+function setStyle(style: CSSStyleDeclaration, key, value) {
 	if (key[0] === '-') {
 		style.setProperty(key, value);
 	} else if (value == null) {
@@ -53,12 +55,12 @@ function setStyle(style, key, value) {
 }
 
 /**
- * Set a property value on a DOM node
- * @param {import('../internal').PreactElement} dom The DOM node to modify
- * @param {string} name The name of the property to set
- * @param {*} value The value to set the property to
- * @param {*} oldValue The old value the property had
- * @param {boolean} isSvg Whether or not this DOM node is an SVG node or not
+ * DOMにpropertyをセットする
+ * @param dom 更新対象のDOM
+ * @param name プロパティ名
+ * @param value プロパティの値
+ * @param oldValue そのプロパティが更新される前に持っていた値
+ * @param isSvg 対象がSVGかどうかのフラグ
  */
 export function setProperty(
 	dom: PreactElement,
@@ -69,21 +71,24 @@ export function setProperty(
 ) {
 	let useCapture, nameLower, proxy;
 
+	// 対象がSVGならclassnameではなくclassを使う
 	if (isSvg && name == 'className') name = 'class';
 
-	// if (isSvg) {
-	// 	if (name === 'className') name = 'class';
-	// } else if (name === 'class') name += 'Name';
-
+	// FIXME: 切り出し対象
+	// DOMにスタイルを適用する
 	if (name === 'style') {
 		if (typeof value == 'string') {
 			dom.style.cssText = value;
 		} else {
+			// スタイルの値が文字ならそのままcssTextに放り込む
+			// FYI: http://alphasis.info/2013/11/javascript-dom-styleobject-csstext/
 			if (typeof oldValue == 'string') {
 				dom.style.cssText = oldValue = '';
 			}
 
 			if (oldValue) {
+				// 旧valueのうち、新valueにあるものをスタイルリセット
+				// つまり差分がないものはそのまま残り続ける
 				for (name in oldValue) {
 					if (!(value && name in value)) {
 						setStyle(dom.style, name, '');
@@ -93,6 +98,7 @@ export function setProperty(
 
 			if (value) {
 				for (name in value) {
+					// 新旧valueに差分があるときにスタイル適用
 					if (!oldValue || value[name] !== oldValue[name]) {
 						setStyle(dom.style, name, value[name]);
 					}
@@ -101,6 +107,7 @@ export function setProperty(
 		}
 	}
 	// Benchmark for comparison: https://esbench.com/bench/574c954bdb965b9a00965ac6
+	// onXXX(イベントハンドラ)の反映.
 	else if (name[0] === 'o' && name[1] === 'n') {
 		useCapture = name !== (name = name.replace(/Capture$/, ''));
 		nameLower = name.toLowerCase();
@@ -117,6 +124,7 @@ export function setProperty(
 			dom.removeEventListener(name, proxy, useCapture);
 		}
 	} else if (
+		// DOM組み込み要素の内下記以外のものである場合(classとか？)
 		name !== 'list' &&
 		name !== 'tagName' &&
 		// HTMLButtonElement.form and HTMLInputElement.form are read-only but can be set using
@@ -129,9 +137,12 @@ export function setProperty(
 		!isSvg &&
 		name in dom
 	) {
+		// NOTE: propsの更新として本命
 		dom[name] = value == null ? '' : value;
 	} else if (typeof value != 'function' && name !== 'dangerouslySetInnerHTML') {
+		// dangerouslySetInnerHTML, function以外のもののうち...
 		if (name !== (name = name.replace(/xlink:?/, ''))) {
+			// xlinkを削っても一緒の場合
 			if (value == null || value === false) {
 				dom.removeAttributeNS(
 					'http://www.w3.org/1999/xlink',
@@ -155,8 +166,10 @@ export function setProperty(
 				// that other VDOM frameworks also always stringify `false`.
 				!/^ar/.test(name))
 		) {
+			// 値がnullやfalseのとき削除する。&& とかでpropsが条件分岐されていてもfalseが入らない秘訣
 			dom.removeAttribute(name);
 		} else {
+			// ブラウザのDOMが持ってる setAttribute, hrefやtypeとかをここで更新する
 			dom.setAttribute(name, value);
 		}
 	}
