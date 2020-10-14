@@ -1,29 +1,31 @@
 {
   "name": "example",
-  "version": "0.0.0",
-  "description": "> TODO: description",
-  "author": "sadness_ojisan <sadness.ojisan@gmail.com>",
-  "homepage": "https://github.com/sadnessOjisan/oreact#readme",
-  "license": "ISC",
-  "main": "lib/example.js",
-  "directories": {
-    "lib": "lib",
-    "test": "__tests__"
+  "version": "1.0.0",
+  "private": true,
+  "description": "svg animation の練習",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack-dev-server"
   },
-  "files": [
-    "lib"
-  ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/sadnessOjisan/oreact.git"
+    "url": "git+https://github.com/ojisan-toybox/svganimation.git"
   },
-  "scripts": {
-    "test": "echo \"Error: run tests from root\" && exit 1"
-  },
+  "author": "",
+  "license": "ISC",
   "bugs": {
-    "url": "https://github.com/sadnessOjisan/oreact/issues"
+    "url": "https://github.com/ojisan-toybox/svganimation/issues"
   },
+  "homepage": "https://github.com/ojisan-toybox/svganimation#readme",
   "devDependencies": {
-    "typescript": "^4.0.3"
+    "html-webpack-plugin": "^4.5.0",
+    "ts-loader": "^8.0.4",
+    "typescript": "^4.0.3",
+    "webpack": "^4.44.2",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "dependencies": {
+    "oreact": "^0.1.0"
   }
 }

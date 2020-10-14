@@ -10,23 +10,27 @@ lerna run --scope=oreact tsc
 lerna run --scope=oreact build:core
 ```
 
+```sh
+lerna run --scope=example dev
+```
+
 ```tsx
-import { h, render, Component } from "@sadness.ojisan/oreact";
+import { h, render, Component } from '@sadness.ojisan/oreact';
 
 console.log(Component.prototype);
 
 class App extends Component {
-  state = {
-    age: 19,
-  };
+	state = {
+		age: 19
+	};
 
-  componentDidMount() {
-    this.setState({ age: 12 });
-  }
+	componentDidMount() {
+		this.setState({ age: 12 });
+	}
 
-  render() {
-    return h("h1", null, `${this.state.age}才`);
-  }
+	render() {
+		return h('h1', null, `${this.state.age}才`);
+	}
 }
 
 render(h(App, null, null), document.body);
