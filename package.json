@@ -1,6 +1,6 @@
 {
 	"name": "@sadness.ojisan/oreact",
-	"version": "0.0.6",
+	"version": "0.0.8",
 	"description": "preact を再実装する -俺の react-",
 	"main": "dist/preact.js",
 	"module": "dist/preact.module.js",
@@ -19,54 +19,6 @@
 	},
 	"types": "src/index.d.ts",
 	"dependencies": {},
-	"devDependencies": {
-		"@babel/core": "^7.7.0",
-		"@babel/plugin-proposal-object-rest-spread": "^7.6.2",
-		"@babel/plugin-transform-react-jsx": "^7.7.0",
-		"@babel/plugin-transform-react-jsx-source": "^7.7.4",
-		"@babel/preset-env": "^7.7.1",
-		"@babel/register": "^7.7.0",
-		"@types/chai": "^4.1.2",
-		"@types/mocha": "^5.0.0",
-		"@types/node": "^10.5.2",
-		"babel-loader": "^8.0.6",
-		"babel-plugin-istanbul": "^6.0.0",
-		"babel-plugin-transform-async-to-promises": "^0.8.15",
-		"babel-plugin-transform-rename-properties": "0.0.3",
-		"benchmark": "^2.1.4",
-		"chai": "^4.1.2",
-		"check-export-map": "^1.0.1",
-		"coveralls": "^3.0.0",
-		"cross-env": "^5.2.0",
-		"diff": "^3.5.0",
-		"eslint": "5.15.1",
-		"eslint-config-developit": "^1.1.1",
-		"eslint-config-prettier": "^6.5.0",
-		"eslint-plugin-react": "7.12.4",
-		"husky": "^3.0.9",
-		"karma": "^3.0.0",
-		"karma-chai-sinon": "^0.1.5",
-		"karma-chrome-launcher": "^2.2.0",
-		"karma-coverage": "^2.0.1",
-		"karma-mocha": "^1.3.0",
-		"karma-mocha-reporter": "^2.2.5",
-		"karma-sauce-launcher": "^1.2.0",
-		"karma-sinon": "^1.0.5",
-		"karma-sourcemap-loader": "^0.3.7",
-		"karma-webpack": "^3.0.5",
-		"lint-staged": "^9.4.2",
-		"lodash": "^4.17.10",
-		"microbundle": "^0.11.0",
-		"mocha": "^5.2.0",
-		"npm-merge-driver-install": "^1.1.1",
-		"npm-run-all": "^4.0.0",
-		"prettier": "^1.18.2",
-		"prop-types": "^15.7.2",
-		"sinon": "^6.1.3",
-		"sinon-chai": "^3.0.0",
-		"typescript": "3.5.3",
-		"webpack": "^4.3.0"
-	},
 	"files": [
 		"src",
 		"js",
@@ -88,5 +40,9 @@
 	"bugs": {
 		"url": "https://github.com/sadnessOjisan/oreact/issues"
 	},
-	"homepage": "https://github.com/sadnessOjisan/oreact#readme"
+	"homepage": "https://github.com/sadnessOjisan/oreact#readme",
+	"devDependencies": {
+		"microbundle": "^0.12.4",
+		"typescript": "^4.0.3"
+	}
 }

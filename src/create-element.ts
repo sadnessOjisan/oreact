@@ -1,14 +1,20 @@
 import options from './options';
+import { VNode } from './types/internal';
+import { ComponentChildren } from './types/preact';
 
 /**
- * Create an virtual node (used for JSX)
- * @param {import('./internal').VNode["type"]} type The node name or Component
- * constructor for this virtual node
- * @param {object | null | undefined} [props] The properties of the virtual node
- * @param {Array<import('.').ComponentChildren>} [children] The children of the virtual node
- * @returns {import('./internal').VNode}
+ * VNODEオブジェクトを作る関数。propsにpropsと子を詰め込み、VNodeを作成する関数を呼び出す. babel や ユーザーはこれを呼び出す。
+ * いわばcreateVNodeを呼ぶためのpropsの整理をしているだけの関数
+ * @param type VNodeの名前、もしくはコンストラクタ関数
+ * @param props VNodeが持つprops
+ * @param children VNodeの子
  */
-export function createElement(type, props, children) {
+export function createElement(
+	type: VNode['type'],
+	props: PropsType,
+	children: ComponentChildren[]
+): VNode {
+	console.log('fire <createElement>', arguments)
 	let normalizedProps = {},
 		key,
 		ref,
@@ -19,6 +25,7 @@ export function createElement(type, props, children) {
 		else normalizedProps[i] = props[i];
 	}
 
+	// 引数の数が3つ超えたときに3に治るように最後のものを配列に押し込む
 	if (arguments.length > 3) {
 		children = [children];
 		// https://github.com/preactjs/preact/issues/1916
@@ -26,12 +33,15 @@ export function createElement(type, props, children) {
 			children.push(arguments[i]);
 		}
 	}
+
+	// childrenを持つならそれをpropsとして詰め込む
 	if (children != null) {
 		normalizedProps.children = children;
 	}
 
 	// If a Component VNode, check for and apply defaultProps
 	// Note: type may be undefined in development, must never error here.
+	// 対象のVNodeがdefault props を持つ場合それを取り出して新しいVNode propsに詰め込む
 	if (typeof type == 'function' && type.defaultProps != null) {
 		for (i in type.defaultProps) {
 			if (normalizedProps[i] === undefined) {
@@ -43,22 +53,27 @@ export function createElement(type, props, children) {
 	return createVNode(type, normalizedProps, key, ref, null);
 }
 
+type PropsType = Object | string | number | null;
+
 /**
- * Create a VNode (used internally by Preact)
- * @param {import('./internal').VNode["type"]} type The node name or Component
- * Constructor for this virtual node
- * @param {object | string | number | null} props The properties of this virtual node.
- * If this virtual node represents a text node, this is the text of the node (string or number).
- * @param {string | number | null} key The key for this virtual node, used when
- * diffing it against its children
- * @param {import('./internal').VNode["ref"]} ref The ref property that will
- * receive a reference to its created child
- * @returns {import('./internal').VNode}
+ * preact が内部で呼び出すVNode作成関数
+ * @param type VNodeの名前、もしくはコンストラクタ関数
+ * @param props VNodeのprops, このVNodeがText or Number を表すなら、propsはその number or string になる。
+ * @param key diff を取るときのidとなるkey
+ * @param ref he ref property that will receive a reference to its created child
+ * @param original
  */
-export function createVNode(type, props, key, ref, original) {
-	// V8 seems to be better at detecting type shapes if the object is allocated from the same call site
-	// Do not inline into createElement and coerceToVNode!
-	const vnode = {
+export function createVNode(
+	type: VNode['type'],
+	props: PropsType & { children: preact.ComponentChildren },
+	key: string | number | null,
+	ref: VNode['ref'],
+	// 呼び出し元の引数はこれを指定していないが、この関数の下の方でvnodeが代入されているのでvnode型だと思う
+	original: VNode | null
+): VNode {
+	console.log('fire <createVNode>', arguments)
+	// V8最適化のためこのように定義. 同じ形のオブジェクトを作ると最適化が聞き易い。createElement の中でインライン定義してはいけない。
+	const vnode: VNode<PropsType> = {
 		type,
 		props,
 		key,
@@ -84,18 +99,6 @@ export function createVNode(type, props, key, ref, original) {
 	return vnode;
 }
 
-// export function createRef() {
-// 	return { current: null };
-// }
-
 export function Fragment(props) {
 	return props.children;
 }
-
-// /**
-//  * Check if a the argument is a valid Preact VNode.
-//  * @param {*} vnode
-//  * @returns {vnode is import('./internal').VNode}
-//  */
-// export const isValidElement = vnode =>
-// 	vnode != null && vnode.constructor === undefined;

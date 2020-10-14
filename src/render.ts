@@ -2,6 +2,8 @@ import { EMPTY_OBJ, EMPTY_ARR } from './constants';
 import { commitRoot, diff } from './diff/index';
 import { createElement, Fragment } from './create-element';
 import options from './options';
+import { ComponentChild } from './types/preact';
+import { PreactElement } from './types/internal';
 
 const IS_HYDRATE = EMPTY_OBJ;
 
@@ -13,7 +15,13 @@ const IS_HYDRATE = EMPTY_OBJ;
  * @param {Element | Text} [replaceNode] Optional: Attempt to re-use an
  * existing DOM tree rooted at `replaceNode`
  */
-export function render(vnode, parentDom, replaceNode) {
+
+export function render(
+	vnode: ComponentChild,
+	parentDom: PreactElement,
+	replaceNode: Element | Text
+) {
+	console.log('fire <render>', arguments)
 	if (options._root) options._root(vnode, parentDom);
 
 	// We abuse the `replaceNode` parameter in `hydrate()` to signal if we
@@ -29,15 +37,20 @@ export function render(vnode, parentDom, replaceNode) {
 	let oldVNode = isHydrating
 		? null
 		: (replaceNode && replaceNode._children) || parentDom._children;
+
+	// ComponentChild だった vnode を VNode型に変換する
+	// _children も _parent もこの時点では null
 	vnode = createElement(Fragment, null, [vnode]);
 
 	// List of effects that need to be called after diffing.
 	let commitQueue = [];
+	// 実行すると内部でcommitQueueにComponentがたくさん詰められていく
 	diff(
 		parentDom,
 		// Determine the new vnode tree and store it on the DOM element on
 		// our custom `_children` property.
 		((isHydrating ? parentDom : replaceNode || parentDom)._children = vnode),
+		// 初回レンダリングなので oldNode は存在しないので EMPTY
 		oldVNode || EMPTY_OBJ,
 		EMPTY_OBJ,
 		parentDom.ownerSVGElement !== undefined,

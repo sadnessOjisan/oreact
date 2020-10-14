@@ -2,6 +2,7 @@ import { assign } from './util';
 import { diff, commitRoot } from './diff/index';
 import options from './options';
 import { Fragment } from './create-element';
+import { VNode } from './types/internal';
 
 /**
  * Base Component class. Provides `setState()` and `forceUpdate()`, which
@@ -11,6 +12,7 @@ import { Fragment } from './create-element';
  * getChildContext
  */
 export function Component(props, context) {
+	console.log('fire <Component>', arguments)
 	this.props = props;
 	this.context = context;
 }
@@ -24,6 +26,7 @@ export function Component(props, context) {
  * updated
  */
 Component.prototype.setState = function(update, callback) {
+	console.log('fire <setState>', arguments)
 	// only clone state when copying to nextState the first time.
 	let s;
 	if (this._nextState != null && this._nextState !== this.state) {
@@ -64,18 +67,22 @@ Component.prototype.setState = function(update, callback) {
 Component.prototype.render = Fragment;
 
 /**
+ * 兄弟DOMを取得する
  * @param {import('./internal').VNode} vnode
  * @param {number | null} [childIndex]
  */
-export function getDomSibling(vnode, childIndex) {
+export function getDomSibling(vnode:VNode, childIndex?:number) {
+	console.log('fire <getDomSibling>', arguments)
 	if (childIndex == null) {
 		// Use childIndex==null as a signal to resume the search from the vnode's sibling
 		return vnode._parent
-			? getDomSibling(vnode._parent, vnode._parent._children.indexOf(vnode) + 1)
+			? getDomSibling(vnode._parent, vnode._parent._children.indexOf(vnode) + 1) // この+1がないと自分が対象になるから？
 			: null;
 	}
 
 	let sibling;
+
+	// 最初に見つかった兄弟要素を返す
 	for (; childIndex < vnode._children.length; childIndex++) {
 		sibling = vnode._children[childIndex];
 
@@ -100,6 +107,7 @@ export function getDomSibling(vnode, childIndex) {
  * @param {import('./internal').Component} component The component to rerender
  */
 function renderComponent(component) {
+	console.log('fire <renderComponent>', arguments)
 	let vnode = component._vnode,
 		oldDom = vnode._dom,
 		parentDom = component._parentDom;
@@ -179,6 +187,7 @@ let prevDebounce;
  * @param {import('./internal').Component} c The component to rerender
  */
 export function enqueueRender(c) {
+	console.log('fire <enqueueRender>', arguments)
 	if (
 		(!c._dirty &&
 			(c._dirty = true) &&

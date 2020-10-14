@@ -1,3 +1,5 @@
+import { PreactElement } from "./types/internal";
+
 /**
  * Assign properties from `props` to `obj`
  * @template O, P The obj and props types
@@ -16,7 +18,12 @@ export function assign(obj, props) {
  * is smaller than including a dedicated polyfill.
  * @param {Node} node The node to remove
  */
-export function removeNode(node) {
+
+ /**
+  * 自分の親のNodeから自分をremoveしてもらう
+  * @param node 
+  */
+export function removeNode(node:PreactElement) {
 	let parentNode = node.parentNode;
 	if (parentNode) parentNode.removeChild(node);
 }

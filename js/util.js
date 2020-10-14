@@ -16,6 +16,10 @@ export function assign(obj, props) {
  * is smaller than including a dedicated polyfill.
  * @param {Node} node The node to remove
  */
+/**
+ * 自分の親のNodeから自分をremoveしてもらう
+ * @param node
+ */
 export function removeNode(node) {
     var parentNode = node.parentNode;
     if (parentNode)
