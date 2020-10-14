@@ -21,6 +21,7 @@ export function render(
 	parentDom: PreactElement,
 	replaceNode: Element | Text
 ) {
+	console.log('fire <render>', arguments)
 	if (options._root) options._root(vnode, parentDom);
 
 	// We abuse the `replaceNode` parameter in `hydrate()` to signal if we

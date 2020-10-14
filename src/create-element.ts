@@ -14,6 +14,7 @@ export function createElement(
 	props: PropsType,
 	children: ComponentChildren[]
 ): VNode {
+	console.log('fire <createElement>', arguments)
 	let normalizedProps = {},
 		key,
 		ref,
@@ -70,6 +71,7 @@ export function createVNode(
 	// 呼び出し元の引数はこれを指定していないが、この関数の下の方でvnodeが代入されているのでvnode型だと思う
 	original: VNode | null
 ): VNode {
+	console.log('fire <createVNode>', arguments)
 	// V8最適化のためこのように定義. 同じ形のオブジェクトを作ると最適化が聞き易い。createElement の中でインライン定義してはいけない。
 	const vnode: VNode<PropsType> = {
 		type,

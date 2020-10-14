@@ -23,6 +23,19 @@ import { getDomSibling } from '../component';
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  * @param {boolean} isHydrating Whether or not we are in hydration
  */
+/**
+ * VNodeの子供を比較する
+ * @param parentDom
+ * @param renderResult
+ * @param newParentVNode
+ * @param oldParentVNode
+ * @param globalContext
+ * @param isSvg
+ * @param excessDomChildren
+ * @param commitQueue
+ * @param oldDom
+ * @param isHydrating
+ */
 export function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating) {
     var i, j, oldVNode, childVNode, newDom, firstChildDom, refs;
     // This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
@@ -67,6 +80,7 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
         }
         // Terser removes the `continue` here and wraps the loop body
         // in a `if (childVNode) { ... } condition
+        // FIXME: terserの最適化に使えそう？
         if (childVNode == null) {
             continue;
         }
@@ -101,6 +115,7 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
         }
         oldVNode = oldVNode || EMPTY_OBJ;
         // Morph the old element into the new one, but don't append it to the dom yet
+        // childVNode に変更結果を埋め込むだけ
         newDom = diff(parentDom, childVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating);
         if ((j = childVNode.ref) && oldVNode.ref != j) {
             if (!refs)
@@ -149,6 +164,7 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
     newParentVNode._dom = firstChildDom;
     // Remove children that are not part of any vnode.
     if (excessDomChildren != null && typeof newParentVNode.type != 'function') {
+        // FIXME: こんな書き方ができるのか調べる
         for (i = excessDomChildren.length; i--;) {
             if (excessDomChildren[i] != null)
                 removeNode(excessDomChildren[i]);
@@ -186,9 +202,20 @@ export function toChildArray(children, out) {
     }
     return out;
 }
+/**
+ *
+ * @param parentDom
+ * @param childVNode
+ * @param oldVNode
+ * @param oldChildren
+ * @param excessDomChildren
+ * @param newDom
+ * @param oldDom
+ */
 export function placeChild(parentDom, childVNode, oldVNode, oldChildren, excessDomChildren, newDom, oldDom) {
     var nextDom;
     if (childVNode._nextDom !== undefined) {
+        // childVNodeに_nextDom があるときそれを取り出してchildVNodeの_nextDomにはundefinedを詰める
         // Only Fragments or components that return Fragment like VNodes will
         // have a non-undefined _nextDom. Continue the diff from the sibling
         // of last DOM child of this child VNode

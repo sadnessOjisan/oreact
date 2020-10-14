@@ -81,6 +81,7 @@ export function diff(
 	oldDom: Element | Text,
 	isHydrating: boolean
 ) {
+	console.log('fire <diff>', arguments)
 	let tmp,
 		newType = newVNode.type;
 
@@ -317,6 +318,7 @@ export function diff(
  * @param {import('../internal').VNode} root
  */
 export function commitRoot(commitQueue: ComponentType[], root: VNode) {
+	console.log('fire <commitRoot>')
 	if (options._commit) options._commit(root, commitQueue);
 
 	commitQueue.some((c) => {
