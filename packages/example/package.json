@@ -22,5 +22,8 @@
   },
   "bugs": {
     "url": "https://github.com/sadnessOjisan/oreact/issues"
+  },
+  "devDependencies": {
+    "typescript": "^4.0.3"
   }
 }
