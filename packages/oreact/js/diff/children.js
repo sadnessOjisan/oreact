@@ -37,6 +37,7 @@ import { getDomSibling } from '../component';
  * @param isHydrating
  */
 export function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating) {
+    console.log('fire <diffChildren>', arguments);
     var i, j, oldVNode, childVNode, newDom, firstChildDom, refs;
     // This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
     // as EMPTY_OBJ._children should be `undefined`.
@@ -181,6 +182,7 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
             applyRef(refs[i], refs[++i], refs[++i]);
         }
     }
+    console.log('exit <diffChildren>');
 }
 /**
  * Flatten and loop through the children of a virtual node

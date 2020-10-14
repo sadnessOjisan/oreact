@@ -15,6 +15,7 @@ export function createElement(
 	children: ComponentChildren[]
 ): VNode {
 	console.log('fire <createElement>', arguments)
+	console.log('fire <createElement> type', type)
 	let normalizedProps = {},
 		key,
 		ref,
@@ -43,6 +44,7 @@ export function createElement(
 	// Note: type may be undefined in development, must never error here.
 	// 対象のVNodeがdefault props を持つ場合それを取り出して新しいVNode propsに詰め込む
 	if (typeof type == 'function' && type.defaultProps != null) {
+		console.log('<createElement> type.defaultProps: ', type.defaultProps)
 		for (i in type.defaultProps) {
 			if (normalizedProps[i] === undefined) {
 				normalizedProps[i] = type.defaultProps[i];
@@ -50,7 +52,11 @@ export function createElement(
 		}
 	}
 
-	return createVNode(type, normalizedProps, key, ref, null);
+	const vnode = createVNode(type, normalizedProps, key, ref, null);
+	// 循環参照あるのでJSON.stringifyできない
+	console.log('<createElement> vnode: ', vnode)
+
+	return vnode
 }
 
 type PropsType = Object | string | number | null;
@@ -92,6 +98,7 @@ export function createVNode(
 		constructor: undefined,
 		_original: original
 	};
+	console.log('<createVNode> before option.vnode._component', vnode._component)
 
 	if (original == null) vnode._original = vnode;
 	if (options.vnode != null) options.vnode(vnode);

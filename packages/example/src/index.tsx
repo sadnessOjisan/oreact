@@ -1,19 +1,20 @@
 import { h, render, Component } from "oreact";
 
-console.log(Component.prototype);
-
 class App extends Component {
   state = {
     age: 19,
   };
 
   componentDidMount() {
-    this.setState({ age: 12 });
+    console.log('<<<FIRE componentdidmount>>>')
+    this.setState({ age: 13 });
   }
 
   render() {
+    console.log('<<<App Render>>>')
     return h("h1", null, `${this.state.age}才`);
   }
 }
 
+console.log('<<<Root Render>>>')
 render(h(App, null, null), document.body);

@@ -52,6 +52,7 @@ export function diffChildren(
 	oldDom: Node | Text,
 	isHydrating: boolean
 ): void {
+	console.log('fire <diffChildren>', arguments)
 	let i, j, oldVNode, childVNode, newDom, firstChildDom, refs;
 
 	// This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
@@ -75,6 +76,7 @@ export function diffChildren(
 	}
 
 	newParentVNode._children = [];
+	// renderResult は diff => diff.children => diff が再帰的に呼ばれる中 renderResult の個数が減っていき収束する
 	for (i = 0; i < renderResult.length; i++) {
 		childVNode = renderResult[i];
 
@@ -158,6 +160,7 @@ export function diffChildren(
 
 		// Morph the old element into the new one, but don't append it to the dom yet
 		// childVNode に変更結果を埋め込むだけ
+		// diff から diffChildrenが呼ばれるので、diffChildrend で diff を呼ぶとloopする。
 		newDom = diff(
 			parentDom,
 			childVNode,
@@ -245,6 +248,7 @@ export function diffChildren(
 			applyRef(refs[i], refs[++i], refs[++i]);
 		}
 	}
+	console.log('exit <diffChildren>')
 }
 
 /**

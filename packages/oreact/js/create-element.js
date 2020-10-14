@@ -8,6 +8,7 @@ import options from './options';
  */
 export function createElement(type, props, children) {
     console.log('fire <createElement>', arguments);
+    console.log('fire <createElement> type', type);
     var normalizedProps = {}, key, ref, i;
     for (i in props) {
         if (i == 'key')
@@ -33,13 +34,17 @@ export function createElement(type, props, children) {
     // Note: type may be undefined in development, must never error here.
     // 対象のVNodeがdefault props を持つ場合それを取り出して新しいVNode propsに詰め込む
     if (typeof type == 'function' && type.defaultProps != null) {
+        console.log('<createElement> type.defaultProps: ', type.defaultProps);
         for (i in type.defaultProps) {
             if (normalizedProps[i] === undefined) {
                 normalizedProps[i] = type.defaultProps[i];
             }
         }
     }
-    return createVNode(type, normalizedProps, key, ref, null);
+    var vnode = createVNode(type, normalizedProps, key, ref, null);
+    // 循環参照あるのでJSON.stringifyできない
+    console.log('<createElement> vnode: ', vnode);
+    return vnode;
 }
 /**
  * preact が内部で呼び出すVNode作成関数
@@ -73,6 +78,7 @@ original) {
         constructor: undefined,
         _original: original
     };
+    console.log('<createVNode> before option.vnode._component', vnode._component);
     if (original == null)
         vnode._original = vnode;
     if (options.vnode != null)

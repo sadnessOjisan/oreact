@@ -11,6 +11,7 @@ lerna run --scope=oreact build:core
 ```
 
 ```sh
+# consoleには見えないけどwebpack-dev-serverが起動している
 lerna run --scope=example dev
 ```
 
