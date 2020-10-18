@@ -5,9 +5,14 @@ preact を再実装する -俺の react-
 ```sh
 npm i @sadness.ojisan/oreact
 
-npx tsc
+lerna run --scope=oreact tsc
 
-npm run build
+lerna run --scope=oreact build:core
+```
+
+```sh
+# consoleには見えないけどwebpack-dev-serverが起動している
+lerna run --scope=example dev
 ```
 
 ```tsx

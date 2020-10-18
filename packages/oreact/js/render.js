@@ -33,6 +33,7 @@ export function render(vnode, parentDom, replaceNode) {
     // List of effects that need to be called after diffing.
     var commitQueue = [];
     // 実行すると内部でcommitQueueにComponentがたくさん詰められていく
+    // diffをコメントアウトすると初回のレンダリングが走らない
     diff(parentDom, 
     // Determine the new vnode tree and store it on the DOM element on
     // our custom `_children` property.

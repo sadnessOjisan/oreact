@@ -26,7 +26,7 @@ export function Component(props, context) {
  * updated
  */
 Component.prototype.setState = function(update, callback) {
-	console.log('fire <setState>', arguments)
+	console.log('fire [Component] <setState>', arguments)
 	// only clone state when copying to nextState the first time.
 	let s;
 	if (this._nextState != null && this._nextState !== this.state) {
