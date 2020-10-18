@@ -2,10 +2,9 @@ import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
 import { Component } from '../component';
 import { Fragment } from '../create-element';
 import { diffChildren, placeChild } from './children';
-import { diffProps, setProperty } from './props';
+import { diffProps, setProperty } from './props'; // DOMを直接弄れる関数
 import { assign, removeNode } from '../util';
 import options from '../options';
-// NOTE: 必須
 function reorderChildren(newVNode, oldDom, parentDom) {
     for (var tmp = 0; tmp < newVNode._children.length; tmp++) {
         var vnode = newVNode._children[tmp];
@@ -48,7 +47,7 @@ function reorderChildren(newVNode, oldDom, parentDom) {
  * @param isSvg
  * @param excessDomChildren
  * @param commitQueue
- * @param oldDom
+ * @param oldDom 初回レンダリングではHTML要素がそのまま渡される(bodyとかid=rootとか)
  * @param isHydrating
  */
 export function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating) {
@@ -134,7 +133,7 @@ export function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excess
                 }
                 if (c_1.componentDidMount != null) {
                     // 次のstateをここで詰め込む。
-                    console.log('c.componentDidMount', c_1.componentDidMount);
+                    console.log('<diff> c.componentDidMount', c_1.componentDidMount);
                     c_1._renderCallbacks.push(c_1.componentDidMount);
                 }
             }
@@ -195,6 +194,7 @@ export function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excess
             c_1.base = newVNode._dom;
             // We successfully rendered this VNode, unset any stored hydration/bailout state:
             newVNode._hydrating = null;
+            console.log('<diff> _render.Callbacks', c_1._renderCallbacks);
             if (c_1._renderCallbacks.length) {
                 commitQueue.push(c_1);
             }
@@ -228,6 +228,7 @@ export function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excess
         }
         options._catchError(e, newVNode, oldVNode);
     }
+    console.log('<diff> commitQueue', commitQueue);
     console.log('<diff> exit');
     return newVNode._dom;
 }
@@ -238,6 +239,12 @@ export function diff(parentDom, newVNode, oldVNode, globalContext, isSvg, excess
  */
 export function commitRoot(commitQueue, root) {
     console.log('fire <commitRoot>', arguments);
+    console.log('<commitRoot> commitQueue', commitQueue);
+    if (commitQueue.length > 0) {
+        console.log('<commitRoot> commitQueue_renderCallbacks', commitQueue[0]._renderCallbacks);
+    }
+    console.log('<commitRoot> options._commit', options._commit);
+    // 最小構成だとこのoptions._commitはundefined
     if (options._commit)
         options._commit(root, commitQueue);
     commitQueue.some(function (c) {
@@ -279,6 +286,7 @@ export function commitRoot(commitQueue, root) {
  * @param isHydrating
  */
 function diffElementNodes(dom, newVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, isHydrating) {
+    console.log('fire <diffElementNodes>', arguments);
     var i;
     var oldProps = oldVNode.props;
     var newProps = newVNode.props;
@@ -320,6 +328,7 @@ function diffElementNodes(dom, newVNode, oldVNode, globalContext, isSvg, excessD
         }
     }
     else {
+        // DOMをいじるdiffPropsはこの中に定義されている。そのため type が null のときはDOMが書き換わらない
         if (excessDomChildren != null) {
             excessDomChildren = EMPTY_ARR.slice.call(dom.childNodes);
         }
@@ -373,6 +382,8 @@ function diffElementNodes(dom, newVNode, oldVNode, globalContext, isSvg, excessD
             }
         }
     }
+    console.log('<diffElementNodes> exit');
+    // このdomはdiffPropsの中などでたくさんいじられている
     return dom;
 }
 /**

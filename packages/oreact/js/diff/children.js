@@ -59,6 +59,7 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
         }
     }
     newParentVNode._children = [];
+    // renderResult は diff => diff.children => diff が再帰的に呼ばれる中 renderResult の個数が減っていき収束する
     for (i = 0; i < renderResult.length; i++) {
         childVNode = renderResult[i];
         if (childVNode == null || typeof childVNode == 'boolean') {
@@ -117,6 +118,7 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
         oldVNode = oldVNode || EMPTY_OBJ;
         // Morph the old element into the new one, but don't append it to the dom yet
         // childVNode に変更結果を埋め込むだけ
+        // diff から diffChildrenが呼ばれるので、diffChildrend で diff を呼ぶとloopする。
         newDom = diff(parentDom, childVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating);
         if ((j = childVNode.ref) && oldVNode.ref != j) {
             if (!refs)

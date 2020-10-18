@@ -11,6 +11,13 @@ import {
 	PreactElement
 } from '../types/internal';
 
+/**
+ * children を並び替える。
+ * children の要素は vnodeで、それぞれがdomを持っている場合のみ
+ * @param newVNode 
+ * @param oldDom 
+ * @param parentDom 
+ */
 function reorderChildren(newVNode, oldDom, parentDom) {
 	for (let tmp = 0; tmp < newVNode._children.length; tmp++) {
 		const vnode = newVNode._children[tmp];
@@ -59,13 +66,14 @@ function reorderChildren(newVNode, oldDom, parentDom) {
 
 /**
  * VNodeの差分をとって、変更すべきものをDOMに反映する
+ * * commitQueue に _renderCallback があればそれを詰めていく
  * @param parentDom
- * @param newVNode
- * @param oldVNode
+ * @param newVNode 置き換えるべきvnode, renderから呼ばれるときは事前にcreateElementされている
+ * @param oldVNode 初回実行ならnullが渡されれる(hydrateされていないなら)
  * @param globalContext
- * @param isSvg
+ * @param isSvg SVG かどうかのフラグ
  * @param excessDomChildren
- * @param commitQueue
+ * @param commitQueue commitRoot時に実行されるcallbackを持つコンポーネントのリスト
  * @param oldDom 初回レンダリングではHTML要素がそのまま渡される(bodyとかid=rootとか)
  * @param isHydrating
  */
@@ -76,7 +84,7 @@ export function diff(
 	globalContext: Object,
 	isSvg: boolean,
 	excessDomChildren: PreactElement,
-	commitQueue: ComponentType,
+	commitQueue: ComponentType[],
 	oldDom: Element | Text,
 	isHydrating: boolean
 ) {
@@ -88,7 +96,9 @@ export function diff(
 	// constructor as undefined. This to prevent JSON-injection.
 	if (newVNode.constructor !== undefined) return null;
 
-	// If the previous diff bailed out, resume creating/hydrating.
+	// 再帰実行されるdiffでエラーが起きた時にcreate/hydrateを再開するための処理
+	// _hydrating に何かが詰められていたら実行される。
+	// _hydrating は _catchError で詰め込まれる
 	if (oldVNode._hydrating != null) {
 		isHydrating = oldVNode._hydrating;
 		oldDom = newVNode._dom = oldVNode._dom;
@@ -102,6 +112,7 @@ export function diff(
 	try {
 		// :はラベル
 		outer: if (typeof newType == 'function') {
+			// function は コンポーネントのとき(TextNodeじゃない)
 			let c, isNew, oldProps, oldState, snapshot;
 			let clearProcessingException:ComponentType<any, any> | null
 			let newProps = newVNode.props;
@@ -128,9 +139,9 @@ export function diff(
 				// Instantiate the new component
 				if ('prototype' in newType && newType.prototype.render) {
 					// type が function の場合、それはComponentFactory<P>であり、Componentを返す関数
-					newVNode._component = c = new newType(newProps, componentContext); // eslint-disable-line new-cap
-					console.log('new Type<diff> newVNode._component ',newVNode._component)
+					newVNode._component = c = new newType(newProps, componentContext);
 				} else {
+					// この時点でcomponentでないのならpropsを渡してcomponent化する
 					newVNode._component = c = new Component(newProps, componentContext);
 					c.constructor = newType;
 					c.render = doRender;
@@ -175,7 +186,7 @@ export function diff(
 
 				if (c.componentDidMount != null) {
 					// 次のstateをここで詰め込む。
-				console.log('c.componentDidMount', c.componentDidMount)
+				console.log('<diff> c.componentDidMount', c.componentDidMount)
 					c._renderCallbacks.push(c.componentDidMount);
 				}
 			} else {
@@ -188,6 +199,7 @@ export function diff(
 				}
 
 				if (
+					// shouldComponentUpdate が実装されているが false のときのみ
 					(!c._force &&
 						c.shouldComponentUpdate != null &&
 						c.shouldComponentUpdate(
@@ -267,7 +279,7 @@ export function diff(
 
 			// We successfully rendered this VNode, unset any stored hydration/bailout state:
 			newVNode._hydrating = null;
-
+			console.log('<diff> _renderCallbacks', c._renderCallbacks)
 			if (c._renderCallbacks.length) {
 				commitQueue.push(c);
 			}
@@ -311,6 +323,7 @@ export function diff(
 		}
 		options._catchError(e, newVNode, oldVNode);
 	}
+	console.log('<diff> commitQueue', commitQueue)
 	console.log('<diff> exit')
 	return newVNode._dom;
 }
@@ -322,10 +335,17 @@ export function diff(
  */
 export function commitRoot(commitQueue: ComponentType[], root: VNode) {
 	console.log('fire <commitRoot>', arguments)
+	console.log('<commitRoot> commitQueue', commitQueue)
+	if(commitQueue.length > 0 ){
+		console.log('<commitRoot> commitQueue_renderCallbacks', commitQueue[0]._renderCallbacks)
+	}
+	console.log('<commitRoot> options._commit', options._commit)
+	// 最小構成だとこのoptions._commitはundefined
 	if (options._commit) options._commit(root, commitQueue);
 
 	commitQueue.some((c) => {
 		try {
+			// componentDidMount などの関数が実行される
 			commitQueue = c._renderCallbacks;
 			c._renderCallbacks = [];
 			commitQueue.some((cb) => {
@@ -373,6 +393,7 @@ function diffElementNodes(
 	commitQueue,
 	isHydrating
 ): PreactElement {
+	console.log('fire <diffElementNodes>', arguments)
 	let i;
 	let oldProps = oldVNode.props;
 	let newProps = newVNode.props;
@@ -502,6 +523,7 @@ function diffElementNodes(
 		}
 	}
 
+	console.log('<diffElementNodes> exit')
 	// このdomはdiffPropsの中などでたくさんいじられている
 	return dom;
 }
@@ -577,7 +599,8 @@ export function unmount(vnode:VNode, parentVNode:VNode, skipRemove:boolean) {
 
 /** The `.render()` method for a PFC backing instance. */
 // FIXME: これを何に使うか調べる
-function doRender(props, state, context) {console.log('fire <doRender>', arguments)
+function doRender(props, state, context) {
+	console.log('fire <doRender>', arguments)
 	console.log('fire <doRender> this.constructor', this.constructor)
 	return this.constructor(props, context);
 }

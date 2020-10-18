@@ -271,7 +271,7 @@ export function toChildArray(children: ComponentChildren, out: VNode[]) {
 }
 
 /**
- * 
+ * (注)DOM操作あり
  * @param parentDom 
  * @param childVNode 
  * @param oldVNode 
@@ -297,10 +297,9 @@ export function placeChild(
 		// of last DOM child of this child VNode
 		nextDom = childVNode._nextDom;
 
-		// Eagerly cleanup _nextDom. We don't need to persist the value because
-		// it is only used by `diffChildren` to determine where to resume the diff after
-		// diffing Components and Fragments. Once we store it the nextDOM local var, we
-		// can clean up the property
+		// _nextDom は diffChildren で diff を再開させるための役割
+		// local変数に保存したいまそれは不要なのでundefinedでcleanupしてる
+		// FIXME: 早期cleanupのメリット調べる
 		childVNode._nextDom = undefined;
 	} else if (
 		excessDomChildren == oldVNode ||
@@ -310,7 +309,7 @@ export function placeChild(
 		// NOTE: excessDomChildren==oldVNode above:
 		// This is a compression of excessDomChildren==null && oldVNode==null!
 		// The values only have the same type when `null`.
-
+		// 比較対象がないとき、もしくは比較対象の親がそもそも変わったときはDOM追加
 		outer: if (oldDom == null || oldDom.parentNode !== parentDom) {
 			parentDom.appendChild(newDom);
 			nextDom = null;
@@ -325,14 +324,15 @@ export function placeChild(
 					break outer;
 				}
 			}
+			// ノードを参照ノードの前に、指定された親ノードの子として挿入
+			// https://developer.mozilla.org/ja/docs/Web/API/Node/insertBefore
 			parentDom.insertBefore(newDom, oldDom);
 			nextDom = oldDom;
 		}
 	}
 
 	// If we have pre-calculated the nextDOM node, use it. Else calculate it now
-	// Strictly check for `undefined` here cuz `null` is a valid value of `nextDom`.
-	// See more detail in create-element.js:createVNode
+	// nextDom はnullがありえるのでundefinedで厳格チェック
 	if (nextDom !== undefined) {
 		oldDom = nextDom;
 	} else {
