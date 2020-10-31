@@ -6,26 +6,6 @@ import { Component, PreactElement, VNode } from '../types/internal';
 import { ComponentChildren } from '../types/preact';
 
 /**
- * Diff the children of a virtual node
- * @param {import('../internal').PreactElement} parentDom The DOM element whose
- * children are being diffed
- * @param {import('../index').ComponentChildren[]} renderResult
- * @param {import('../internal').VNode} newParentVNode The new virtual
- * node whose children should be diff'ed against oldParentVNode
- * @param {import('../internal').VNode} oldParentVNode The old virtual
- * node whose children should be diff'ed against newParentVNode
- * @param {boolean} isSvg Whether or not this DOM node is an SVG node
- * @param {Array<import('../internal').PreactElement>} excessDomChildren
- * @param {Array<import('../internal').Component>} commitQueue List of components
- * which have callbacks to invoke in commitRoot
- * @param {Node | Text} oldDom The current attached DOM
- * element any new dom elements should be placed around. Likely `null` on first
- * render (except when hydrating). Can be a sibling DOM element when diffing
- * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
- * @param {boolean} isHydrating Whether or not we are in hydration
- */
-
-/**
  * VNodeの子供を比較する
  * @param parentDom
  * @param renderResult
@@ -68,17 +48,13 @@ export function diffChildren(
 	}
 
 	newParentVNode._children = [];
-	// renderResult は diff => diff.children => diff が再帰的に呼ばれる中 renderResult の個数が減っていき収束する
+
 	for (i = 0; i < renderResult.length; i++) {
 		childVNode = renderResult[i];
 
 		if (childVNode == null || typeof childVNode == 'boolean') {
 			childVNode = newParentVNode._children[i] = null;
-		}
-		// If this newVNode is being reused (e.g. <div>{reuse}{reuse}</div>) in the same diff,
-		// or we are rendering a component (e.g. setState) copy the oldVNodes so it can have
-		// it's own DOM & etc. pointers
-		else if (typeof childVNode == 'string' || typeof childVNode == 'number') {
+		} else if (typeof childVNode == 'string' || typeof childVNode == 'number') {
 			childVNode = newParentVNode._children[i] = createVNode(
 				null,
 				childVNode,
@@ -104,12 +80,6 @@ export function diffChildren(
 			);
 		} else {
 			childVNode = newParentVNode._children[i] = childVNode;
-		}
-
-		// Terser removes the `continue` here and wraps the loop body
-		// in a `if (childVNode) { ... } condition
-		if ('childVNode' == null) {
-			continue;
 		}
 
 		childVNode._parent = newParentVNode;

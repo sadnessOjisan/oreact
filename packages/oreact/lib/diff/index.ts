@@ -1,67 +1,15 @@
 import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
 import { Component } from '../component';
 import { Fragment } from '../create-element';
-import { diffChildren, placeChild } from './children';
+import { diffChildren } from './children';
 import { diffProps, setProperty } from './props'; // DOMを直接弄れる関数
-import { assign, removeNode } from '../util';
+import { removeNode } from '../util';
 import options from '../options';
 import {
 	Component as ComponentType,
 	VNode,
 	PreactElement
 } from '../types/internal';
-
-/**
- * children を並び替える。
- * children の要素は vnodeで、それぞれがdomを持っている場合のみ
- * @param newVNode
- * @param oldDom
- * @param parentDom
- */
-function reorderChildren(newVNode, oldDom, parentDom) {
-	for (let tmp = 0; tmp < newVNode._children.length; tmp++) {
-		const vnode = newVNode._children[tmp];
-		if (vnode) {
-			vnode._parent = newVNode;
-
-			if (vnode._dom) {
-				if (typeof vnode.type == 'function' && vnode._children.length > 1) {
-					reorderChildren(vnode, oldDom, parentDom);
-				}
-
-				oldDom = placeChild(
-					parentDom,
-					vnode,
-					vnode,
-					newVNode._children,
-					null,
-					vnode._dom,
-					oldDom
-				);
-
-				if (typeof newVNode.type == 'function') {
-					newVNode._nextDom = oldDom;
-				}
-			}
-		}
-	}
-}
-
-/**
- * Diff two virtual nodes and apply proper changes to the DOM
- * @param {import('../internal').PreactElement} parentDom The parent of the DOM element
- * @param {import('../internal').VNode} newVNode The new virtual node
- * @param {import('../internal').VNode} oldVNode The old virtual node
- * @param {boolean} isSvg Whether or not this element is an SVG node
- * @param {Array<import('../internal').PreactElement>} excessDomChildren
- * @param {Array<import('../internal').Component>} commitQueue List of components
- * which have callbacks to invoke in commitRoot
- * @param {Element | Text} oldDom The current attached DOM
- * element any new dom elements should be placed around. Likely `null` on first
- * render (except when hydrating). Can be a sibling DOM element when diffing
- * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
- * @param {boolean} [isHydrating] Whether or not we are in hydration
- */
 
 /**
  * VNodeの差分をとって、変更を適用したDOMを返す関数
@@ -274,20 +222,6 @@ export function commitRoot(commitQueue: ComponentType[], root: VNode) {
 		}
 	});
 }
-
-/**
- * Diff two virtual nodes representing DOM element
- * @param {import('../internal').PreactElement} dom The DOM element representing
- * the virtual nodes being diffed
- * @param {import('../internal').VNode} newVNode The new virtual node
- * @param {import('../internal').VNode} oldVNode The old virtual node
- * @param {boolean} isSvg Whether or not this DOM node is an SVG node
- * @param {*} excessDomChildren
- * @param {Array<import('../internal').Component>} commitQueue List of components
- * which have callbacks to invoke in commitRoot
- * @param {boolean} isHydrating Whether or not we are in hydration
- * @returns {import('../internal').PreactElement}
- */
 
 /**
  * VNodeの差分を取る
