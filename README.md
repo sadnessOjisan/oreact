@@ -21,48 +21,119 @@ lerna run --scope=oreact build:core
 lerna run --scope=example dev
 ```
 
-```tsx
-import { h, render, Component } from 'oreact';
+## 動かしたい例
 
+- state が変わると再レンダリング
+- data の追加
+- data の削除
+- data の修正
+
+```tsx
+import { h, Fragment, Component, render } from 'oreact';
 class App extends Component {
 	constructor() {
 		this.state = {
 			count: 10000000,
-			data: [{name: "taro"},{name: "hanako"}}]
+			data: []
 		};
 	}
 
 	componentDidMount() {
-		console.log('<<<FIRE componentdidmount>>>');
-		this.setState({ count: 0 });
+		this.setState({
+			...this.state,
+			count: 0,
+			data: [
+				{
+					name: 'taro'
+				},
+				{
+					name: 'hanako'
+				}
+			]
+		});
 	}
 
 	render() {
-		console.log('<<<App Render>>>');
 		return h(
 			'div',
 			null,
 			h(
-				'button',
-				{
-					onClick: () => {
-						this.setState({ count: this.state.count + 1 });
-					}
-				},
-				'add'
+				'section',
+				null,
+				h('h1', null, 'counting area'),
+				h('span', null, 'count: '),
+				h('span', null, this.state.count),
+				h(
+					'button',
+					{
+						onClick: () =>
+							this.setState({ ...this.state, count: this.state.count + 1 })
+					},
+					'add'
+				)
 			),
 			h(
-				'div',
+				'section',
 				null,
-				h('span', null, 'count: '),
-				h('span', null, this.state.count)
-			),
-			h("div",null,this.state.data.map(d=>h.name))
+				h('h1', null, 'user data area'),
+				h(
+					'ul',
+					null,
+					this.state.data.map((d, i) =>
+						h(
+							Fragment,
+							null,
+							h('li', null, d.name),
+							h(
+								'button',
+								{
+									onClick: () => {
+										this.setState({
+											...this.state,
+											data: this.state.data.filter((_, j) => {
+												return i !== j;
+											})
+										});
+									}
+								},
+								'delete'
+							)
+						)
+					)
+				),
+				h(
+					'form',
+					{
+						onSubmit: (e) => {
+							e.preventDefault();
+							const userName = e.target['name'].value;
+							this.setState({
+								...this.state,
+								data: [
+									...this.state.data,
+									{
+										name: userName
+									}
+								]
+							});
+						}
+					},
+					h('input', {
+						name: 'name'
+					}),
+					h(
+						'button',
+						{
+							type: 'submit'
+						},
+						'add'
+					)
+				)
+			)
 		);
 	}
 }
 
-console.log('<<<Root Render>>>');
 render(h(App, null, null), document.body);
 ```
 
