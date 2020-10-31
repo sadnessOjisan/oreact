@@ -45,8 +45,7 @@ export function diff(
 	if ((tmp = options._diff)) tmp(newVNode);
 
 	try {
-		// :はラベル
-		outer: if (typeof newType == 'function') {
+		if (typeof newType == 'function') {
 			// function は コンポーネントのとき(TextNodeじゃない)
 			let c, isNew, oldProps, oldState, snapshot;
 			let clearProcessingException: ComponentType<any, any> | null;
@@ -146,8 +145,6 @@ export function diff(
 				isHydrating
 			);
 
-			c.base = newVNode._dom;
-
 			// We successfully rendered this VNode, unset any stored hydration/bailout state:
 			newVNode._hydrating = null;
 			if (c._renderCallbacks.length) {
@@ -157,8 +154,6 @@ export function diff(
 			if (clearProcessingException) {
 				c._pendingError = c._processingException = null;
 			}
-
-			c._force = false;
 		} else if (
 			excessDomChildren == null &&
 			newVNode._original === oldVNode._original
