@@ -52,7 +52,6 @@ function reorderChildren(newVNode, oldDom, parentDom) {
  * @param {import('../internal').PreactElement} parentDom The parent of the DOM element
  * @param {import('../internal').VNode} newVNode The new virtual node
  * @param {import('../internal').VNode} oldVNode The old virtual node
- * @param {object} globalContext The current context object. Modified by getChildContext
  * @param {boolean} isSvg Whether or not this element is an SVG node
  * @param {Array<import('../internal').PreactElement>} excessDomChildren
  * @param {Array<import('../internal').Component>} commitQueue List of components
@@ -71,7 +70,6 @@ function reorderChildren(newVNode, oldDom, parentDom) {
  * @param parentDom マウント対象のDOM. このうえにVNodeを反映させていく. 初回実行では render から渡されたものが入るが、diff 自体は再帰的に呼ばれ parentDom も置き換えられたりするので様々な値が入りうる。
  * @param newVNode 置き換えに使うvnode, renderから呼ばれるときは事前にcreateElementされている
  * @param oldVNode 初回実行ならnullが渡されれる(hydrateされていないなら)
- * @param globalContext
  * @param isSvg SVG かどうかのフラグ
  * @param excessDomChildren
  * @param commitQueue commitRoot時に実行されるcallbackを持つコンポーネントのリスト
@@ -82,7 +80,6 @@ export function diff(
 	parentDom: PreactElement,
 	newVNode: VNode,
 	oldVNode: VNode,
-	globalContext: Object,
 	isSvg: boolean,
 	excessDomChildren: PreactElement,
 	commitQueue: ComponentType[],
@@ -134,7 +131,6 @@ export function diff(
 				c.props = newProps;
 				if (!c.state) c.state = {}; // state になにも入っていなければ初期化
 				c.context = componentContext;
-				c._globalContext = globalContext;
 				isNew = c._dirty = true;
 				c._renderCallbacks = [];
 			}
@@ -204,7 +200,6 @@ export function diff(
 				Array.isArray(renderResult) ? renderResult : [renderResult],
 				newVNode,
 				oldVNode,
-				globalContext,
 				isSvg,
 				excessDomChildren,
 				commitQueue,
@@ -239,7 +234,6 @@ export function diff(
 				oldVNode._dom,
 				newVNode,
 				oldVNode,
-				globalContext,
 				isSvg,
 				excessDomChildren,
 				commitQueue,
@@ -296,7 +290,6 @@ export function commitRoot(commitQueue: ComponentType[], root: VNode) {
  * the virtual nodes being diffed
  * @param {import('../internal').VNode} newVNode The new virtual node
  * @param {import('../internal').VNode} oldVNode The old virtual node
- * @param {object} globalContext The current context object
  * @param {boolean} isSvg Whether or not this DOM node is an SVG node
  * @param {*} excessDomChildren
  * @param {Array<import('../internal').Component>} commitQueue List of components
@@ -310,7 +303,6 @@ export function commitRoot(commitQueue: ComponentType[], root: VNode) {
  * @param dom
  * @param newVNode
  * @param oldVNode
- * @param globalContext
  * @param isSvg
  * @param excessDomChildren
  * @param commitQueue
@@ -320,7 +312,6 @@ function diffElementNodes(
 	dom,
 	newVNode,
 	oldVNode,
-	globalContext,
 	isSvg,
 	excessDomChildren,
 	commitQueue,
@@ -405,7 +396,6 @@ function diffElementNodes(
 			Array.isArray(i) ? i : [i],
 			newVNode,
 			oldVNode,
-			globalContext,
 			newVNode.type === 'foreignObject' ? false : isSvg,
 			excessDomChildren,
 			commitQueue,

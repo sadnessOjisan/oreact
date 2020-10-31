@@ -14,7 +14,6 @@ import { ComponentChildren } from '../types/preact';
  * node whose children should be diff'ed against oldParentVNode
  * @param {import('../internal').VNode} oldParentVNode The old virtual
  * node whose children should be diff'ed against newParentVNode
- * @param {object} globalContext The current context object - modified by getChildContext
  * @param {boolean} isSvg Whether or not this DOM node is an SVG node
  * @param {Array<import('../internal').PreactElement>} excessDomChildren
  * @param {Array<import('../internal').Component>} commitQueue List of components
@@ -32,7 +31,6 @@ import { ComponentChildren } from '../types/preact';
  * @param renderResult
  * @param newParentVNode
  * @param oldParentVNode
- * @param globalContext
  * @param isSvg
  * @param excessDomChildren
  * @param commitQueue
@@ -44,7 +42,6 @@ export function diffChildren(
 	renderResult: ComponentChildren[],
 	newParentVNode: VNode,
 	oldParentVNode: VNode,
-	globalContext: Object,
 	isSvg: boolean,
 	excessDomChildren: PreactElement[],
 	commitQueue: Component[],
@@ -160,7 +157,6 @@ export function diffChildren(
 			parentDom,
 			childVNode,
 			oldVNode,
-			globalContext,
 			isSvg,
 			excessDomChildren,
 			commitQueue,
