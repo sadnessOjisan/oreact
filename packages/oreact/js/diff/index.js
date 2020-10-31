@@ -134,8 +134,6 @@ export function diff(
 			c.props = newProps;
 			c.state = c._nextState;
 
-			if ((tmp = options._render)) tmp(newVNode);
-
 			c._dirty = false;
 			c._vnode = newVNode;
 			c._parentDom = parentDom;
@@ -202,8 +200,6 @@ export function diff(
 				false
 			);
 		}
-
-		if ((tmp = options.diffed)) tmp(newVNode);
 	} catch (e) {
 		newVNode._original = null;
 		// if hydrating or creating initial tree, bailout preserves DOM:
