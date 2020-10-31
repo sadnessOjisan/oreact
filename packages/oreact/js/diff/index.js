@@ -49,7 +49,6 @@ function reorderChildren(newVNode, oldDom, parentDom) {
  * element any new dom elements should be placed around. Likely `null` on first
  * render (except when hydrating). Can be a sibling DOM element when diffing
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
- * @param {boolean} [isHydrating] Whether or not we are in hydration
  */
 export function diff(
 	parentDom,
@@ -59,8 +58,7 @@ export function diff(
 	isSvg,
 	excessDomChildren,
 	commitQueue,
-	oldDom,
-	isHydrating
+	oldDom
 ) {
 	let tmp,
 		newType = newVNode.type;
@@ -71,7 +69,6 @@ export function diff(
 
 	// If the previous diff bailed out, resume creating/hydrating.
 	if (oldVNode._hydrating != null) {
-		isHydrating = oldVNode._hydrating;
 		oldDom = newVNode._dom = oldVNode._dom;
 		// if we resume, we want the tree to be "unlocked"
 		newVNode._hydrating = null;
@@ -248,7 +245,6 @@ export function commitRoot(commitQueue, root) {
  * @param {*} excessDomChildren
  * @param {Array<import('../internal').Component>} commitQueue List of components
  * which have callbacks to invoke in commitRoot
- * @param {boolean} isHydrating Whether or not we are in hydration
  * @returns {import('../internal').PreactElement}
  */
 function diffElementNodes(
@@ -258,8 +254,7 @@ function diffElementNodes(
 	globalContext,
 	isSvg,
 	excessDomChildren,
-	commitQueue,
-	isHydrating
+	commitQueue
 ) {
 	let i;
 	let oldProps = oldVNode.props;
@@ -302,8 +297,6 @@ function diffElementNodes(
 			  );
 		// we created a new parent, so none of the previously attached children can be reused:
 		excessDomChildren = null;
-		// we are creating a new node, so we can assume this is a new subtree (in case we are hydrating), this deopts the hydrate
-		isHydrating = false;
 	}
 
 	if (newVNode.type === null) {

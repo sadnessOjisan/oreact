@@ -22,7 +22,6 @@ import { getDomSibling } from '../component';
  * element any new dom elements should be placed around. Likely `null` on first
  * render (except when hydrating). Can be a sibling DOM element when diffing
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
- * @param {boolean} isHydrating Whether or not we are in hydration
  */
 export function diffChildren(
 	parentDom,
@@ -33,8 +32,7 @@ export function diffChildren(
 	isSvg,
 	excessDomChildren,
 	commitQueue,
-	oldDom,
-	isHydrating
+	oldDom
 ) {
 	let i, j, oldVNode, childVNode, newDom, firstChildDom, refs;
 
