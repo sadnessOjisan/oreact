@@ -109,28 +109,20 @@ export function diff(
 				c = newVNode._component = oldVNode._component;
 				clearProcessingException = c._processingException = c._pendingError;
 			} else {
-				// oldVNodeが_componentを持たないとき
-				// diffChildren から再起的に diff が呼ばれるとこの oldVNode は {} であり、_componentを持たない。
-				// FIXME: どういうときに持たないのか調べる
-
-				// Instantiate the new component
 				// newVNode をコンポーネントにする処理。newVNode の type(newType)の値でインスタンス化の方法が分岐
 				if ('prototype' in newType && newType.prototype.render) {
 					// type が function の場合、それはComponentFactory<P>であり、Componentを返す関数
-					// TODO: どういうときに type が function なのか調べておく
 					newVNode._component = c = new newType(newProps, componentContext);
 				} else {
 					// この時点でcomponentでないのならpropsを渡してcomponent化する
-					newVNode._component = c = new Component(newProps, componentContext);
+					newVNode._component = c = new Component(newProps);
 					c.constructor = newType;
 					c.render = doRender;
 				}
-				if (provider) provider.sub(c);
 
 				// oldVNode._component を使いまわしているとpropsがこの時点で更新されていないので新しいものに入れ替える
 				c.props = newProps;
 				if (!c.state) c.state = {}; // state になにも入っていなければ初期化
-				c.context = componentContext;
 				isNew = c._dirty = true;
 				c._renderCallbacks = [];
 			}
@@ -162,11 +154,11 @@ export function diff(
 					newProps !== oldProps &&
 					c.componentWillReceiveProps != null
 				) {
-					c.componentWillReceiveProps(newProps, componentContext);
+					c.componentWillReceiveProps(newProps);
 				}
 
 				if (c.componentWillUpdate != null) {
-					c.componentWillUpdate(newProps, c._nextState, componentContext);
+					c.componentWillUpdate(newProps, c._nextState);
 				}
 
 				if (c.componentDidUpdate != null) {
@@ -176,7 +168,6 @@ export function diff(
 				}
 			}
 
-			c.context = componentContext;
 			c.props = newProps;
 			c.state = c._nextState;
 
@@ -186,7 +177,7 @@ export function diff(
 			c._vnode = newVNode;
 			c._parentDom = parentDom;
 
-			tmp = c.render(c.props, c.state, c.context);
+			tmp = c.render(c.props, c.state);
 			console.log('<diff> tmp', tmp);
 			// Handle setState called in render, see #2553
 			c.state = c._nextState;
@@ -484,8 +475,8 @@ export function unmount(vnode: VNode, parentVNode: VNode, skipRemove: boolean) {
 
 /** The `.render()` method for a PFC backing instance. */
 // FIXME: これを何に使うか調べる
-function doRender(props, state, context) {
+function doRender(props, state) {
 	console.log('fire <doRender>', arguments);
 	console.log('fire <doRender> this.constructor', this.constructor);
-	return this.constructor(props, context);
+	return this.constructor(props);
 }
