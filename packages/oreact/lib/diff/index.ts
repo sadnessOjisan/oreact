@@ -139,22 +139,6 @@ export function diff(
 				c._renderCallbacks = [];
 			}
 
-			// getDerivedStateFromProps が定義されているときの処理
-			// 最小構成だと削除してもよさそう
-			if (c._nextState == null) {
-				c._nextState = c.state;
-			}
-			if (newType.getDerivedStateFromProps != null) {
-				if (c._nextState == c.state) {
-					c._nextState = assign({}, c._nextState);
-				}
-
-				assign(
-					c._nextState,
-					newType.getDerivedStateFromProps(newProps, c._nextState)
-				);
-			}
-
 			oldProps = c.props;
 			oldState = c.state;
 
