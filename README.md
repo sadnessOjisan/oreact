@@ -27,7 +27,8 @@ import { h, render, Component } from 'oreact';
 class App extends Component {
 	constructor() {
 		this.state = {
-			count: 10000000
+			count: 10000000,
+			data: [{name: "taro"},{name: "hanako"}}]
 		};
 	}
 
@@ -55,7 +56,8 @@ class App extends Component {
 				null,
 				h('span', null, 'count: '),
 				h('span', null, this.state.count)
-			)
+			),
+			h("div",null,this.state.data.map(d=>h.name))
 		);
 	}
 }

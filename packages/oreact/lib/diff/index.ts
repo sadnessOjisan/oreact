@@ -97,17 +97,6 @@ export function diff(
 	// constructor as undefined. This to prevent JSON-injection.
 	if (newVNode.constructor !== undefined) return null;
 
-	// 再帰実行されるdiffでエラーが起きた時にcreate/hydrateを再開するための処理
-	// _hydrating に何かが詰められていたら実行される。
-	// _hydrating は _catchError で詰め込まれる
-	if (oldVNode._hydrating != null) {
-		isHydrating = oldVNode._hydrating;
-		oldDom = newVNode._dom = oldVNode._dom;
-		// if we resume, we want the tree to be "unlocked"
-		newVNode._hydrating = null;
-		excessDomChildren = [oldDom];
-	}
-
 	if ((tmp = options._diff)) tmp(newVNode);
 
 	try {

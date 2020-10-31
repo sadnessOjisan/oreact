@@ -31,16 +31,7 @@ export function render(
 	console.log('fire <render>', arguments);
 	if (options._root) options._root(vnode, parentDom);
 
-	// We abuse the `replaceNode` parameter in `hydrate()` to signal if we
-	// are in hydration mode or not by passing `IS_HYDRATE` instead of a
-	// DOM element.
 	let isHydrating = replaceNode === IS_HYDRATE;
-
-	// To be able to support calling `render()` multiple times on the same
-	// DOM node, we need to obtain a reference to the previous tree. We do
-	// this by assigning a new `_children` property to DOM nodes which points
-	// to the last rendered tree. By default this property is not present, which
-	// means that we are mounting a new tree for the first time.
 
 	// 同一DOMノードからの複数回のrender呼び出しに対応するために、前の木への参照を持っておく必要がある。
 	// そのために、あたらしい _children プロパティを最後にレンダーした木をDOMノードに割り当てる。
