@@ -14,15 +14,13 @@ export function createElement(
 	props: PropsType,
 	children: ComponentChildren[]
 ): VNode {
-	console.log('fire <createElement>', arguments)
-	console.log('fire <createElement> type', type)
+	console.log('fire <createElement>', arguments);
+	console.log('fire <createElement> type', type);
 	let normalizedProps = {},
 		key,
-		ref,
 		i;
 	for (i in props) {
 		if (i == 'key') key = props[i];
-		else if (i == 'ref') ref = props[i];
 		else normalizedProps[i] = props[i];
 	}
 
@@ -44,7 +42,7 @@ export function createElement(
 	// Note: type may be undefined in development, must never error here.
 	// 対象のVNodeがdefault props を持つ場合それを取り出して新しいVNode propsに詰め込む
 	if (typeof type == 'function' && type.defaultProps != null) {
-		console.log('<createElement> type.defaultProps: ', type.defaultProps)
+		console.log('<createElement> type.defaultProps: ', type.defaultProps);
 		for (i in type.defaultProps) {
 			if (normalizedProps[i] === undefined) {
 				normalizedProps[i] = type.defaultProps[i];
@@ -54,9 +52,9 @@ export function createElement(
 
 	const vnode = createVNode(type, normalizedProps, key, ref, null);
 	// 循環参照あるのでJSON.stringifyできない
-	console.log('<createElement> vnode: ', vnode)
+	console.log('<createElement> vnode: ', vnode);
 
-	return vnode
+	return vnode;
 }
 
 type PropsType = Object | string | number | null;
@@ -77,7 +75,7 @@ export function createVNode(
 	// 呼び出し元の引数はこれを指定していないが、この関数の下の方でvnodeが代入されているのでvnode型だと思う
 	original: VNode | null
 ): VNode {
-	console.log('fire <createVNode>', arguments)
+	console.log('fire <createVNode>', arguments);
 	// V8最適化のためこのように定義. 同じ形のオブジェクトを作ると最適化が聞き易い。createElement の中でインライン定義してはいけない。
 	const vnode: VNode<PropsType> = {
 		type,
@@ -98,7 +96,7 @@ export function createVNode(
 		constructor: undefined,
 		_original: original
 	};
-	console.log('<createVNode> before option.vnode._component', vnode._component)
+	console.log('<createVNode> before option.vnode._component', vnode._component);
 
 	if (original == null) vnode._original = vnode;
 	if (options.vnode != null) options.vnode(vnode);
