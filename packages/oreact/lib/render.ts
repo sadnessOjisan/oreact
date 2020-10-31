@@ -2,7 +2,7 @@ import { EMPTY_OBJ, EMPTY_ARR } from './constants';
 import { commitRoot, diff } from './diff/index';
 import { createElement, Fragment } from './create-element';
 import options from './options';
-import { ComponentChild } from './types/preact';
+import { ComponentChild, ComponentType } from './types/preact';
 import { PreactElement } from './types/internal';
 
 const IS_HYDRATE = EMPTY_OBJ;
@@ -16,12 +16,19 @@ const IS_HYDRATE = EMPTY_OBJ;
  * existing DOM tree rooted at `replaceNode`
  */
 
+/**
+ *
+ * @param vnode
+ * @param parentDom
+ * @param replaceNode
+ * @example render(<Root></Root>, document.getElement('body'))
+ */
 export function render(
 	vnode: ComponentChild,
 	parentDom: PreactElement,
 	replaceNode: Element | Text
 ) {
-	console.log('fire <render>', arguments)
+	console.log('fire <render>', arguments);
 	if (options._root) options._root(vnode, parentDom);
 
 	// We abuse the `replaceNode` parameter in `hydrate()` to signal if we
@@ -34,6 +41,10 @@ export function render(
 	// this by assigning a new `_children` property to DOM nodes which points
 	// to the last rendered tree. By default this property is not present, which
 	// means that we are mounting a new tree for the first time.
+
+	// 同一DOMノードからの複数回のrender呼び出しに対応するために、前の木への参照を持っておく必要がある。
+	// そのために、あたらしい _children プロパティを最後にレンダーした木をDOMノードに割り当てる。
+	// ただし初回レンダリングでは新しい木をマウントするため普通はこの_children プロパティは存在しない。
 	let oldVNode = isHydrating
 		? null
 		: (replaceNode && replaceNode._children) || parentDom._children;
@@ -42,10 +53,12 @@ export function render(
 	// _children も _parent もこの時点では null
 	vnode = createElement(Fragment, null, [vnode]);
 
-	// List of effects that need to be called after diffing.
-	let commitQueue = [];
+	// 差分更新後に呼び出すべき effect を管理するリスト
+	// 中に詰め込まれるのはコンポーネントのリストではあるが、コンポーネントの _renderCallbacks が本命
+	let commitQueue: ComponentType[] = [];
+
 	// 実行すると内部でcommitQueueにComponentがたくさん詰められていく
-	// diffをコメントアウトすると初回のレンダリングが走らない
+	// ちなみにdiffをコメントアウトすると初回のレンダリングが走らない
 	diff(
 		parentDom,
 		// Determine the new vnode tree and store it on the DOM element on

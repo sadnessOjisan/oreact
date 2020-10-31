@@ -83,6 +83,7 @@ export interface VNode<P = {}> extends preact.VNode<P> {
 	_component: Component | null;
 	_hydrating: boolean | null;
 	constructor: undefined;
+	// 初回レンダリングでは与えられないが、renderComponent から詰め込まれていく
 	_original?: VNode | null;
 }
 
@@ -97,6 +98,7 @@ export interface Component<P = {}, S = {}> extends preact.Component<P, S> {
 	_renderCallbacks: Array<() => void>; // Only class components
 	_globalContext?: any;
 	_vnode?: VNode<P> | null;
+	// setStateが呼ばれるとこの値に置き換える
 	_nextState?: S | null; // Only class components
 	/** Only used in the devtools to later dirty check if state has changed */
 	_prevState?: S | null;
