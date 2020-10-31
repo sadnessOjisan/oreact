@@ -216,7 +216,6 @@ export function diff(
 
 			// We successfully rendered this VNode, unset any stored hydration/bailout state:
 			newVNode._hydrating = null;
-			console.log('<diff> _renderCallbacks', c._renderCallbacks);
 			if (c._renderCallbacks.length) {
 				commitQueue.push(c);
 			}
@@ -253,17 +252,8 @@ export function diff(
 		console.log('<diff> raise error', e);
 		// try 節の中で書き換わった部分を元に戻す
 		newVNode._original = null;
-		// if hydrating or creating initial tree, bailout preserves DOM:
-		if (isHydrating || excessDomChildren != null) {
-			newVNode._dom = oldDom;
-			newVNode._hydrating = !!isHydrating;
-			excessDomChildren[excessDomChildren.indexOf(oldDom)] = null;
-			// ^ could possibly be simplified to:
-			// excessDomChildren.length = 0;
-		}
 		options._catchError(e, newVNode, oldVNode);
 	}
-	console.log('<diff> commitQueue', commitQueue);
 	console.log('<diff> exit');
 	return newVNode._dom;
 }
