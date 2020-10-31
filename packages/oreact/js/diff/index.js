@@ -43,7 +43,7 @@ export function diff(
 			let c, isNew, oldProps, oldState, snapshot, clearProcessingException;
 			let newProps = newVNode.props;
 
-			let componentContext = globalContext;
+			let componentContext = EMPTY_OBJ;
 
 			// Get component and set it to `c`
 			if (oldVNode._component) {
@@ -52,16 +52,15 @@ export function diff(
 			} else {
 				// Instantiate the new component
 				if ('prototype' in newType && newType.prototype.render) {
-					newVNode._component = c = new newType(newProps, componentContext);
+					newVNode._component = c = new newType(newProps);
 				} else {
-					newVNode._component = c = new Component(newProps, componentContext);
+					newVNode._component = c = new Component(newProps);
 					c.constructor = newType;
 					c.render = doRender;
 				}
 
 				c.props = newProps;
 				if (!c.state) c.state = {};
-				c.context = componentContext;
 				c._globalContext = globalContext;
 				isNew = c._dirty = true;
 				c._renderCallbacks = [];
