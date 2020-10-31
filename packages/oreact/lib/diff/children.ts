@@ -53,7 +53,7 @@ export function diffChildren(
 	isHydrating: boolean
 ): void {
 	console.log('fire <diffChildren>', arguments);
-	let i, j, oldVNode, childVNode, newDom, firstChildDom, refs;
+	let i, j, oldVNode, childVNode, newDom, firstChildDom;
 
 	// This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
 	// as EMPTY_OBJ._children should be `undefined`.
@@ -225,25 +225,6 @@ export function diffChildren(
 	}
 
 	console.log('exit <diffChildren>');
-}
-
-/**
- * Flatten and loop through the children of a virtual node
- * @param {import('../index').ComponentChildren} children The unflattened
- * children of a virtual node
- * @returns {import('../internal').VNode[]}
- */
-export function toChildArray(children: ComponentChildren, out: VNode[]) {
-	out = out || [];
-	if (children == null || typeof children == 'boolean') {
-	} else if (Array.isArray(children)) {
-		children.some((child) => {
-			toChildArray(child, out);
-		});
-	} else {
-		out.push(children);
-	}
-	return out;
 }
 
 /**

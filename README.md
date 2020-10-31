@@ -162,3 +162,6 @@ npm publish --access=public
 - getDericedProps
 - shouldComponentUpdate
 - getSnapshotBeforeUpdate
+- ref
+- svg
+- dangerouslySetInnerHTML

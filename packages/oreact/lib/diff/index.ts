@@ -361,12 +361,10 @@ function diffElementNodes(
 			return document.createTextNode(newProps);
 		}
 
-		dom = isSvg
-			? document.createElementNS('http://www.w3.org/2000/svg', newVNode.type)
-			: document.createElement(
-					newVNode.type,
-					newProps.is && { is: newProps.is }
-			  );
+		dom = document.createElement(
+			newVNode.type,
+			newProps.is && { is: newProps.is }
+		);
 		// we created a new parent, so none of the previously attached children can be reused:
 		excessDomChildren = null;
 		// we are creating a new node, so we can assume this is a new subtree (in case we are hydrating), this deopts the hydrate
@@ -386,9 +384,6 @@ function diffElementNodes(
 
 		oldProps = oldVNode.props || EMPTY_OBJ;
 
-		let oldHtml = oldProps.dangerouslySetInnerHTML;
-		let newHtml = newProps.dangerouslySetInnerHTML;
-
 		// During hydration, props are not diffed at all (including dangerouslySetInnerHTML)
 		// @TODO we should warn in debug mode when props don't match here.
 		if (!isHydrating) {
@@ -400,39 +395,23 @@ function diffElementNodes(
 					oldProps[dom.attributes[i].name] = dom.attributes[i].value;
 				}
 			}
-
-			if (newHtml || oldHtml) {
-				// Avoid re-applying the same '__html' if it did not changed between re-render
-				if (
-					!newHtml ||
-					((!oldHtml || newHtml.__html != oldHtml.__html) &&
-						newHtml.__html !== dom.innerHTML)
-				) {
-					dom.innerHTML = (newHtml && newHtml.__html) || '';
-				}
-			}
 		}
 
 		diffProps(dom, newProps, oldProps, isSvg, isHydrating);
 
-		// If the new vnode didn't have dangerouslySetInnerHTML, diff its children
-		if (newHtml) {
-			newVNode._children = [];
-		} else {
-			i = newVNode.props.children;
-			diffChildren(
-				dom,
-				Array.isArray(i) ? i : [i],
-				newVNode,
-				oldVNode,
-				globalContext,
-				newVNode.type === 'foreignObject' ? false : isSvg,
-				excessDomChildren,
-				commitQueue,
-				EMPTY_OBJ,
-				isHydrating
-			);
-		}
+		i = newVNode.props.children;
+		diffChildren(
+			dom,
+			Array.isArray(i) ? i : [i],
+			newVNode,
+			oldVNode,
+			globalContext,
+			newVNode.type === 'foreignObject' ? false : isSvg,
+			excessDomChildren,
+			commitQueue,
+			EMPTY_OBJ,
+			isHydrating
+		);
 
 		// hydrateしているならpropsのdiffは反映しない
 		if (!isHydrating) {
