@@ -89,7 +89,6 @@ export function diff(
 				}
 			}
 
-			c.context = componentContext;
 			c.props = newProps;
 			c.state = c._nextState;
 
@@ -97,7 +96,7 @@ export function diff(
 			c._vnode = newVNode;
 			c._parentDom = parentDom;
 
-			tmp = c.render(c.props, c.state, c.context);
+			tmp = c.render(c.props);
 
 			// Handle setState called in render, see #2553
 			c.state = c._nextState;
@@ -390,6 +389,6 @@ export function unmount(vnode, parentVNode, skipRemove) {
 }
 
 /** The `.render()` method for a PFC backing instance. */
-function doRender(props, state, context) {
-	return this.constructor(props, context);
+function doRender(props) {
+	return this.constructor(props);
 }
