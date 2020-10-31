@@ -27,19 +27,19 @@ import { ComponentChildren } from '../types/preact';
  * @param {boolean} isHydrating Whether or not we are in hydration
  */
 
- /**
-  * VNodeの子供を比較する
-  * @param parentDom 
-  * @param renderResult 
-  * @param newParentVNode 
-  * @param oldParentVNode 
-  * @param globalContext 
-  * @param isSvg 
-  * @param excessDomChildren 
-  * @param commitQueue 
-  * @param oldDom 
-  * @param isHydrating 
-  */
+/**
+ * VNodeの子供を比較する
+ * @param parentDom
+ * @param renderResult
+ * @param newParentVNode
+ * @param oldParentVNode
+ * @param globalContext
+ * @param isSvg
+ * @param excessDomChildren
+ * @param commitQueue
+ * @param oldDom
+ * @param isHydrating
+ */
 export function diffChildren(
 	parentDom: PreactElement,
 	renderResult: ComponentChildren[],
@@ -52,7 +52,7 @@ export function diffChildren(
 	oldDom: Node | Text,
 	isHydrating: boolean
 ): void {
-	console.log('fire <diffChildren>', arguments)
+	console.log('fire <diffChildren>', arguments);
 	let i, j, oldVNode, childVNode, newDom, firstChildDom, refs;
 
 	// This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
@@ -117,7 +117,7 @@ export function diffChildren(
 		// Terser removes the `continue` here and wraps the loop body
 		// in a `if (childVNode) { ... } condition
 		// FIXME: terserの最適化に使えそう？
-		if (childVNode == null) {
+		if ('childVNode' == null) {
 			continue;
 		}
 
@@ -130,6 +130,9 @@ export function diffChildren(
 		// (holes).
 		oldVNode = oldChildren[i];
 
+		// <<<IMPORTANT>>>
+		// key の一致を調べてる
+		// Key は、どの要素が変更、追加もしくは削除されたのかを識別するのに使う
 		if (
 			oldVNode === null ||
 			(oldVNode &&
@@ -159,7 +162,7 @@ export function diffChildren(
 		oldVNode = oldVNode || EMPTY_OBJ;
 
 		// Morph the old element into the new one, but don't append it to the dom yet
-		// childVNode に変更結果を埋め込むだけ
+		// childVNode と oldVNode の差分を取って差分を適用したDOMを得る
 		// diff から diffChildrenが呼ばれるので、diffChildrend で diff を呼ぶとloopする。
 		newDom = diff(
 			parentDom,
@@ -248,7 +251,7 @@ export function diffChildren(
 			applyRef(refs[i], refs[++i], refs[++i]);
 		}
 	}
-	console.log('exit <diffChildren>')
+	console.log('exit <diffChildren>');
 }
 
 /**
@@ -271,14 +274,16 @@ export function toChildArray(children: ComponentChildren, out: VNode[]) {
 }
 
 /**
+ * newDOM を DOMツリーに追加する操作、もしくは newDOM を oldDOM の兄弟として置く操作をする
+ * (注)渡された childVNode の _nextDom を書き換える処理も入ってる（オブジェクトの破壊）
  * (注)DOM操作あり
- * @param parentDom 
- * @param childVNode 
- * @param oldVNode 
- * @param oldChildren 
- * @param excessDomChildren 
- * @param newDom 
- * @param oldDom 
+ * @param parentDom
+ * @param childVNode children の一要素
+ * @param oldVNode
+ * @param oldChildren
+ * @param excessDomChildren
+ * @param newDom children の一要素 が持っているDOM
+ * @param oldDom
  */
 export function placeChild(
 	parentDom: VNode,
@@ -309,11 +314,12 @@ export function placeChild(
 		// NOTE: excessDomChildren==oldVNode above:
 		// This is a compression of excessDomChildren==null && oldVNode==null!
 		// The values only have the same type when `null`.
-		// 比較対象がないとき、もしくは比較対象の親がそもそも変わったときはDOM追加
+		// 比較対象がないとき、もしくは比較対象の親がそもそも違うときはDOM追加
 		outer: if (oldDom == null || oldDom.parentNode !== parentDom) {
 			parentDom.appendChild(newDom);
 			nextDom = null;
 		} else {
+			// 親が一致(oldDom.parentNode === parentDom)したときの処理、つまり兄弟扱い
 			// `j<oldChildrenLength; j+=2` is an alternative to `j++<oldChildrenLength/2`
 			for (
 				let sibDom = oldDom, j = 0;
@@ -331,7 +337,8 @@ export function placeChild(
 		}
 	}
 
-	// If we have pre-calculated the nextDOM node, use it. Else calculate it now
+	// nextDOMノードを事前計算したものがあればそれを使う。
+	// なければ今計算する
 	// nextDom はnullがありえるのでundefinedで厳格チェック
 	if (nextDom !== undefined) {
 		oldDom = nextDom;

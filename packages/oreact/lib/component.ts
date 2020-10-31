@@ -12,7 +12,7 @@ import { VNode } from './types/internal';
  * getChildContext
  */
 export function Component(props, context) {
-	console.log('fire <Component>', arguments)
+	console.log('fire <Component>', arguments);
 	this.props = props;
 	this.context = context;
 }
@@ -25,8 +25,8 @@ export function Component(props, context) {
  * @param {() => void} [callback] A function to be called once component state is
  * updated
  */
-Component.prototype.setState = function(update, callback) {
-	console.log('fire [Component] <setState>', arguments)
+Component.prototype.setState = function (update, callback) {
+	console.log('fire [Component] <setState>', arguments);
 	// only clone state when copying to nextState the first time.
 	let s;
 	if (this._nextState != null && this._nextState !== this.state) {
@@ -71,8 +71,8 @@ Component.prototype.render = Fragment;
  * @param {import('./internal').VNode} vnode
  * @param {number | null} [childIndex]
  */
-export function getDomSibling(vnode:VNode, childIndex?:number) {
-	console.log('fire <getDomSibling>', arguments)
+export function getDomSibling(vnode: VNode, childIndex?: number) {
+	console.log('fire <getDomSibling>', arguments);
 	if (childIndex == null) {
 		// Use childIndex==null as a signal to resume the search from the vnode's sibling
 		return vnode._parent
@@ -107,7 +107,7 @@ export function getDomSibling(vnode:VNode, childIndex?:number) {
  * @param {import('./internal').Component} component The component to rerender
  */
 function renderComponent(component) {
-	console.log('fire <renderComponent>', arguments)
+	console.log('fire <renderComponent>', arguments);
 	let vnode = component._vnode,
 		oldDom = vnode._dom,
 		parentDom = component._parentDom;
@@ -187,7 +187,7 @@ let prevDebounce;
  * @param {import('./internal').Component} c The component to rerender
  */
 export function enqueueRender(c) {
-	console.log('fire <enqueueRender>', arguments)
+	console.log('fire <enqueueRender>', arguments);
 	if (
 		(!c._dirty &&
 			(c._dirty = true) &&
@@ -208,7 +208,7 @@ function process() {
 		rerenderQueue = [];
 		// Don't update `renderCount` yet. Keep its value non-zero to prevent unnecessary
 		// process() calls from getting scheduled while `queue` is still being consumed.
-		queue.some(c => {
+		queue.some((c) => {
 			if (c._dirty) renderComponent(c);
 		});
 	}

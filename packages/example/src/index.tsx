@@ -1,20 +1,40 @@
-import { h, render, Component } from "oreact";
+import { h, render, Component } from 'oreact';
 
 class App extends Component {
-  state = {
-    age: 19,
-  };
+	constructor() {
+		this.state = {
+			count: 10000000
+		};
+	}
 
-  componentDidMount() {
-    console.log('<<<FIRE componentdidmount>>>')
-    this.setState({ age: 13 });
-  }
+	componentDidMount() {
+		console.log('<<<FIRE componentdidmount>>>');
+		this.setState({ count: 0 });
+	}
 
-  render() {
-    console.log('<<<App Render>>>')
-    return h("h1", null, `${this.state.age}才`);
-  }
+	render() {
+		console.log('<<<App Render>>>');
+		return h(
+			'div',
+			null,
+			h(
+				'button',
+				{
+					onClick: () => {
+						this.setState({ count: this.state.count + 1 });
+					}
+				},
+				'add'
+			),
+			h(
+				'div',
+				null,
+				h('span', null, 'count: '),
+				h('span', null, this.state.count)
+			)
+		);
+	}
 }
 
-console.log('<<<Root Render>>>')
+console.log('<<<Root Render>>>');
 render(h(App, null, null), document.body);

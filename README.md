@@ -2,6 +2,12 @@
 
 preact を再実装する -俺の react-
 
+## abst
+
+教育用 preact です。state を書き換えると再レンダリングがされるというコアの部分だけを抜き出しています。
+
+## dev
+
 ```sh
 npm i @sadness.ojisan/oreact
 
@@ -16,24 +22,45 @@ lerna run --scope=example dev
 ```
 
 ```tsx
-import { h, render, Component } from '@sadness.ojisan/oreact';
-
-console.log(Component.prototype);
+import { h, render, Component } from 'oreact';
 
 class App extends Component {
-	state = {
-		age: 19
-	};
+	constructor() {
+		this.state = {
+			count: 10000000
+		};
+	}
 
 	componentDidMount() {
-		this.setState({ age: 12 });
+		console.log('<<<FIRE componentdidmount>>>');
+		this.setState({ count: 0 });
 	}
 
 	render() {
-		return h('h1', null, `${this.state.age}才`);
+		console.log('<<<App Render>>>');
+		return h(
+			'div',
+			null,
+			h(
+				'button',
+				{
+					onClick: () => {
+						this.setState({ count: this.state.count + 1 });
+					}
+				},
+				'add'
+			),
+			h(
+				'div',
+				null,
+				h('span', null, 'count: '),
+				h('span', null, this.state.count)
+			)
+		);
 	}
 }
 
+console.log('<<<Root Render>>>');
 render(h(App, null, null), document.body);
 ```
 
@@ -43,21 +70,6 @@ render(h(App, null, null), document.body);
 npm publish --access=public
 ```
 
-## todo
+## 意図的に消したもの
 
-- [ ] render
-
-  - [ ] constans
-  - [ ] diff
-  - [ ] create-element
-  - [ ] options
-
-- [ ] h
-
-## loadmap
-
-- [x] preact を手元でビルド
-- [x] preact から h, render だけを取り出す
-- [ ] (microbundle からの脱却)
-- [ ] TS 化
-- [ ] UT 書く
+- ref
