@@ -157,4 +157,8 @@ npm publish --access=public
 
 ## 意図的に消したもの
 
-- ref
+- hydrate
+- Context
+- getDericedProps
+- shouldComponentUpdate
+- getSnapshotBeforeUpdate
