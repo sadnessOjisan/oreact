@@ -1,4 +1,3 @@
-import { IS_NON_DIMENSIONAL } from '../constants';
 import options from '../options';
 
 /**
