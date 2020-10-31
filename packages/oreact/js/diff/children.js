@@ -152,12 +152,6 @@ export function diffChildren(
 			isHydrating
 		);
 
-		if ((j = childVNode.ref) && oldVNode.ref != j) {
-			if (!refs) refs = [];
-			if (oldVNode.ref) refs.push(oldVNode.ref, null, childVNode);
-			refs.push(j, childVNode._component || newDom, childVNode);
-		}
-
 		if (newDom != null) {
 			if (firstChildDom == null) {
 				firstChildDom = newDom;

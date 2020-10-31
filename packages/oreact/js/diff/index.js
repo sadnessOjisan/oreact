@@ -291,11 +291,11 @@ export function diff(
 export function commitRoot(commitQueue, root) {
 	if (options._commit) options._commit(root, commitQueue);
 
-	commitQueue.some(c => {
+	commitQueue.some((c) => {
 		try {
 			commitQueue = c._renderCallbacks;
 			c._renderCallbacks = [];
-			commitQueue.some(cb => {
+			commitQueue.some((cb) => {
 				cb.call(c);
 			});
 		} catch (e) {
@@ -460,21 +460,6 @@ function diffElementNodes(
 }
 
 /**
- * Invoke or update a ref, depending on whether it is a function or object ref.
- * @param {object|function} ref
- * @param {any} value
- * @param {import('../internal').VNode} vnode
- */
-export function applyRef(ref, value, vnode) {
-	try {
-		if (typeof ref == 'function') ref(value);
-		else ref.current = value;
-	} catch (e) {
-		options._catchError(e, vnode);
-	}
-}
-
-/**
  * Unmount a virtual node from the tree and apply DOM changes
  * @param {import('../internal').VNode} vnode The virtual node to unmount
  * @param {import('../internal').VNode} parentVNode The parent of the VNode that
@@ -485,10 +470,6 @@ export function applyRef(ref, value, vnode) {
 export function unmount(vnode, parentVNode, skipRemove) {
 	let r;
 	if (options.unmount) options.unmount(vnode);
-
-	if ((r = vnode.ref)) {
-		if (!r.current || r.current === vnode._dom) applyRef(r, null, parentVNode);
-	}
 
 	let dom;
 	if (!skipRemove && typeof vnode.type != 'function') {

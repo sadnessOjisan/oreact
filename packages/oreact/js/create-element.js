@@ -11,11 +11,9 @@ import options from './options';
 export function createElement(type, props, children) {
 	let normalizedProps = {},
 		key,
-		ref,
 		i;
 	for (i in props) {
 		if (i == 'key') key = props[i];
-		else if (i == 'ref') ref = props[i];
 		else normalizedProps[i] = props[i];
 	}
 
@@ -97,5 +95,5 @@ export function Fragment(props) {
  * @param {*} vnode
  * @returns {vnode is import('./internal').VNode}
  */
-export const isValidElement = vnode =>
+export const isValidElement = (vnode) =>
 	vnode != null && vnode.constructor === undefined;

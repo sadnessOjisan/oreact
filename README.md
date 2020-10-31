@@ -148,4 +148,5 @@ npm publish --access=public
 
 ## 意図的に消したもの
 
+- createContext
 - ref
