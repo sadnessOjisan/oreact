@@ -9,8 +9,6 @@ preact を再実装する -俺の react-
 ## dev
 
 ```sh
-npm i @sadness.ojisan/oreact
-
 lerna run --scope=oreact build:core
 ```
 

@@ -1,5 +1,7 @@
 import { h, render, Component, Fragment } from 'oreact';
 
+import { h, Fragment, Component } from 'preact';
+
 class App extends Component {
 	constructor() {
 		this.state = {
@@ -101,6 +103,11 @@ class App extends Component {
 }
 
 class ListItem extends Component {
+	componentWillReceiveProps(nextProps, prevProps) {
+		console.log('next.props:', nextProps);
+		console.log('next.props:', prevProps);
+	}
+
 	render() {
 		return h(
 			Fragment,
