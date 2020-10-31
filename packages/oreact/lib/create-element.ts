@@ -15,7 +15,6 @@ export function createElement(
 	children: ComponentChildren[]
 ): VNode {
 	console.log('fire <createElement>', arguments);
-	console.log('fire <createElement> type', type);
 	let normalizedProps = {},
 		key,
 		i;
@@ -38,8 +37,6 @@ export function createElement(
 		normalizedProps.children = children;
 	}
 
-	// If a Component VNode, check for and apply defaultProps
-	// Note: type may be undefined in development, must never error here.
 	// 対象のVNodeがdefault props を持つ場合それを取り出して新しいVNode propsに詰め込む
 	if (typeof type == 'function' && type.defaultProps != null) {
 		console.log('<createElement> type.defaultProps: ', type.defaultProps);
@@ -51,7 +48,6 @@ export function createElement(
 	}
 
 	const vnode = createVNode(type, normalizedProps, key, ref, null);
-	// 循環参照あるのでJSON.stringifyできない
 	console.log('<createElement> vnode: ', vnode);
 
 	return vnode;
@@ -76,7 +72,6 @@ export function createVNode(
 	original: VNode | null
 ): VNode {
 	console.log('fire <createVNode>', arguments);
-	// V8最適化のためこのように定義. 同じ形のオブジェクトを作ると最適化が聞き易い。createElement の中でインライン定義してはいけない。
 	const vnode: VNode<PropsType> = {
 		type,
 		props,
@@ -86,11 +81,7 @@ export function createVNode(
 		_parent: null,
 		_depth: 0,
 		_dom: null,
-		// _nextDom must be initialized to undefined b/c it will eventually
-		// be set to dom.nextSibling which can return `null` and it is important
-		// to be able to distinguish between an uninitialized _nextDom and
-		// a _nextDom that has been set to `null`
-		_nextDom: undefined,
+		_nextDom: undefined, // _nextDom は null の可能性があるので、nullなのかuninitializedなのかを識別するためにundefinedを使う
 		_component: null,
 		_hydrating: null,
 		constructor: undefined,

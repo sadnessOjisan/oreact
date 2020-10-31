@@ -5,17 +5,6 @@ import options from './options';
 import { ComponentChild, ComponentType } from './types/preact';
 import { PreactElement } from './types/internal';
 
-const IS_HYDRATE = EMPTY_OBJ;
-
-/**
- * Render a Preact virtual node into a DOM element
- * @param {import('./index').ComponentChild} vnode The virtual node to render
- * @param {import('./internal').PreactElement} parentDom The DOM element to
- * render into
- * @param {Element | Text} [replaceNode] Optional: Attempt to re-use an
- * existing DOM tree rooted at `replaceNode`
- */
-
 /**
  *
  * @param vnode
@@ -31,7 +20,7 @@ export function render(
 	console.log('fire <render>', arguments);
 	if (options._root) options._root(vnode, parentDom);
 
-	let isHydrating = replaceNode === IS_HYDRATE;
+	let isHydrating = false;
 
 	// 同一DOMノードからの複数回のrender呼び出しに対応するために、前の木への参照を持っておく必要がある。
 	// そのために、あたらしい _children プロパティを最後にレンダーした木をDOMノードに割り当てる。

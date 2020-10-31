@@ -27,25 +27,18 @@ export function Component(props, context) {
  */
 Component.prototype.setState = function (update, callback) {
 	console.log('fire [Component] <setState>', arguments);
-	// only clone state when copying to nextState the first time.
 	let s;
 	if (this._nextState != null && this._nextState !== this.state) {
 		s = this._nextState;
 	} else {
+		// 初回レンダリング時にcomponentに_nextStateを生やす
 		s = this._nextState = assign({}, this.state);
-	}
-
-	if (typeof update == 'function') {
-		// Some libraries like `immer` mark the current state as readonly,
-		// preventing us from mutating it, so we need to clone it. See #2716
-		update = update(assign({}, s), this.props);
 	}
 
 	if (update) {
 		assign(s, update);
 	}
 
-	// Skip update if updater function returned null
 	if (update == null) return;
 
 	if (this._vnode) {
@@ -54,16 +47,7 @@ Component.prototype.setState = function (update, callback) {
 	}
 };
 
-/**
- * Accepts `props` and `state`, and returns a new Virtual DOM tree to build.
- * Virtual DOM is generally constructed via [JSX](http://jasonformat.com/wtf-is-jsx).
- * @param {object} props Props (eg: JSX attributes) received from parent
- * element/component
- * @param {object} state The component's current state
- * @param {object} context Context object, as returned by the nearest
- * ancestor's `getChildContext()`
- * @returns {import('./index').ComponentChildren | void}
- */
+// render の基本は props.childrenを返すこと
 Component.prototype.render = Fragment;
 
 /**
@@ -74,9 +58,8 @@ Component.prototype.render = Fragment;
 export function getDomSibling(vnode: VNode, childIndex?: number) {
 	console.log('fire <getDomSibling>', arguments);
 	if (childIndex == null) {
-		// Use childIndex==null as a signal to resume the search from the vnode's sibling
 		return vnode._parent
-			? getDomSibling(vnode._parent, vnode._parent._children.indexOf(vnode) + 1) // この+1がないと自分が対象になるから？
+			? getDomSibling(vnode._parent, vnode._parent._children.indexOf(vnode) + 1)
 			: null;
 	}
 
@@ -87,24 +70,16 @@ export function getDomSibling(vnode: VNode, childIndex?: number) {
 		sibling = vnode._children[childIndex];
 
 		if (sibling != null && sibling._dom != null) {
-			// Since updateParentDomPointers keeps _dom pointer correct,
-			// we can rely on _dom to tell us if this subtree contains a
-			// rendered DOM node, and what the first rendered DOM node is
 			return sibling._dom;
 		}
 	}
 
-	// If we get here, we have not found a DOM node in this vnode's children.
-	// We must resume from this vnode's sibling (in it's parent _children array)
-	// Only climb up and search the parent if we aren't searching through a DOM
-	// VNode (meaning we reached the DOM parent of the original vnode that began
-	// the search)
 	return typeof vnode.type == 'function' ? getDomSibling(vnode) : null;
 }
 
 /**
- * Trigger in-place re-rendering of a component.
- * @param {import('./internal').Component} component The component to rerender
+ * 再レンダリングのトリガー
+ * @param component
  */
 function renderComponent(component) {
 	console.log('fire <renderComponent>', arguments);
@@ -179,7 +154,6 @@ const defer =
  * * [Designing APIs for Asynchrony](https://blog.izs.me/2013/08/designing-apis-for-asynchrony)
  * * [Callbacks synchronous and asynchronous](https://blog.ometer.com/2011/07/24/callbacks-synchronous-and-asynchronous/)
  */
-
 let prevDebounce;
 
 /**
