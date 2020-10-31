@@ -83,15 +83,7 @@ export function diff(
 			let c, isNew, oldProps, oldState, snapshot, clearProcessingException;
 			let newProps = newVNode.props;
 
-			// Necessary for createContext api. Setting this property will pass
-			// the context value as `this.context` just for this component.
-			tmp = newType.contextType;
-			let provider = tmp && globalContext[tmp._id];
-			let componentContext = tmp
-				? provider
-					? provider.props.value
-					: tmp._defaultValue
-				: globalContext;
+			let componentContext = globalContext;
 
 			// Get component and set it to `c`
 			if (oldVNode._component) {
@@ -100,13 +92,12 @@ export function diff(
 			} else {
 				// Instantiate the new component
 				if ('prototype' in newType && newType.prototype.render) {
-					newVNode._component = c = new newType(newProps, componentContext); // eslint-disable-line new-cap
+					newVNode._component = c = new newType(newProps, componentContext);
 				} else {
 					newVNode._component = c = new Component(newProps, componentContext);
 					c.constructor = newType;
 					c.render = doRender;
 				}
-				if (provider) provider.sub(c);
 
 				c.props = newProps;
 				if (!c.state) c.state = {};
