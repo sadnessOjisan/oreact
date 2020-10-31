@@ -230,7 +230,7 @@ export function diff(
 				excessDomChildren,
 				commitQueue,
 				oldDom,
-				isHydrating
+				false
 			);
 
 			c.base = newVNode._dom;
@@ -262,7 +262,7 @@ export function diff(
 				isSvg,
 				excessDomChildren,
 				commitQueue,
-				isHydrating
+				false
 			);
 		}
 
@@ -270,9 +270,9 @@ export function diff(
 	} catch (e) {
 		newVNode._original = null;
 		// if hydrating or creating initial tree, bailout preserves DOM:
-		if (isHydrating || excessDomChildren != null) {
+		if (false || excessDomChildren != null) {
 			newVNode._dom = oldDom;
-			newVNode._hydrating = !!isHydrating;
+			newVNode._hydrating = !!false;
 			excessDomChildren[excessDomChildren.indexOf(oldDom)] = null;
 			// ^ could possibly be simplified to:
 			// excessDomChildren.length = 0;
@@ -375,7 +375,7 @@ function diffElementNodes(
 
 	if (newVNode.type === null) {
 		// During hydration, we still have to split merged text from SSR'd HTML.
-		if (oldProps !== newProps && (!isHydrating || dom.data !== newProps)) {
+		if (oldProps !== newProps && (!false || dom.data !== newProps)) {
 			dom.data = newProps;
 		}
 	} else {
@@ -390,7 +390,7 @@ function diffElementNodes(
 
 		// During hydration, props are not diffed at all (including dangerouslySetInnerHTML)
 		// @TODO we should warn in debug mode when props don't match here.
-		if (!isHydrating) {
+		if (!false) {
 			// But, if we are in a situation where we are using existing DOM (e.g. replaceNode)
 			// we should read the existing DOM attributes to diff them
 			if (excessDomChildren != null) {
@@ -412,7 +412,7 @@ function diffElementNodes(
 			}
 		}
 
-		diffProps(dom, newProps, oldProps, isSvg, isHydrating);
+		diffProps(dom, newProps, oldProps, isSvg, false);
 
 		// If the new vnode didn't have dangerouslySetInnerHTML, diff its children
 		if (newHtml) {
@@ -429,12 +429,12 @@ function diffElementNodes(
 				excessDomChildren,
 				commitQueue,
 				EMPTY_OBJ,
-				isHydrating
+				false
 			);
 		}
 
 		// (as above, don't diff props during hydration)
-		if (!isHydrating) {
+		if (!false) {
 			if (
 				'value' in newProps &&
 				(i = newProps.value) !== undefined &&

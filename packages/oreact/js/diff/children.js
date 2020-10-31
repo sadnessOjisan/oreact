@@ -149,7 +149,7 @@ export function diffChildren(
 			excessDomChildren,
 			commitQueue,
 			oldDom,
-			isHydrating
+			false
 		);
 
 		if (newDom != null) {
@@ -177,7 +177,7 @@ export function diffChildren(
 			//
 			// To fix it we make sure to reset the inferred value, so that our own
 			// value check in `diff()` won't be skipped.
-			if (!isHydrating && newParentVNode.type == 'option') {
+			if (!false && newParentVNode.type == 'option') {
 				parentDom.value = '';
 			} else if (typeof newParentVNode.type == 'function') {
 				// Because the newParentVNode is Fragment-like, we need to set it's
