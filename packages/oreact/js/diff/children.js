@@ -189,14 +189,6 @@ export function diffChildren(
 				// node's nextSibling.
 				newParentVNode._nextDom = oldDom;
 			}
-		} else if (
-			oldDom &&
-			oldVNode._dom == oldDom &&
-			oldDom.parentNode != parentDom
-		) {
-			// The above condition is to handle null placeholders. See test in placeholder.test.js:
-			// `efficiently replace null placeholders in parent rerenders`
-			oldDom = getDomSibling(oldVNode);
 		}
 	}
 
