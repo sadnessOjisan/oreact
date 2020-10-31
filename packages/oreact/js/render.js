@@ -38,8 +38,7 @@ export function render(vnode, parentDom) {
 			? EMPTY_ARR.slice.call(parentDom.childNodes)
 			: null,
 		commitQueue,
-		EMPTY_OBJ,
-		false
+		EMPTY_OBJ
 	);
 
 	// Flush all queued effects

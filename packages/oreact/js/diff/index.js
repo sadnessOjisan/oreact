@@ -38,14 +38,6 @@ export function diff(
 	// constructor as undefined. This to prevent JSON-injection.
 	if (newVNode.constructor !== undefined) return null;
 
-	// If the previous diff bailed out, resume creating/hydrating.
-	if (oldVNode._hydrating != null) {
-		oldDom = newVNode._dom = oldVNode._dom;
-		// if we resume, we want the tree to be "unlocked"
-		newVNode._hydrating = null;
-		excessDomChildren = [oldDom];
-	}
-
 	try {
 		if (typeof newType == 'function') {
 			let c, isNew, oldProps, oldState, snapshot, clearProcessingException;
