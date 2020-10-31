@@ -61,10 +61,6 @@ export function diffChildren(
 
 	let oldChildrenLength = oldChildren.length;
 
-	// Only in very specific places should this logic be invoked (top level `render` and `diffElementNodes`).
-	// I'm using `EMPTY_OBJ` to signal when `diffChildren` is invoked in these situations. I can't use `null`
-	// for this purpose, because `null` is a valid value for `oldDom` which can mean to skip to this logic
-	// (e.g. if mounting a new tree in which the old DOM should be ignored (usually for Fragments).
 	if (oldDom == EMPTY_OBJ) {
 		if (excessDomChildren != null) {
 			oldDom = excessDomChildren[0];
@@ -116,7 +112,6 @@ export function diffChildren(
 
 		// Terser removes the `continue` here and wraps the loop body
 		// in a `if (childVNode) { ... } condition
-		// FIXME: terserの最適化に使えそう？
 		if ('childVNode' == null) {
 			continue;
 		}
@@ -145,8 +140,6 @@ export function diffChildren(
 			// so after this loop oldVNode == null or oldVNode is a valid value.
 			for (j = 0; j < oldChildrenLength; j++) {
 				oldVNode = oldChildren[j];
-				// If childVNode is unkeyed, we only match similarly unkeyed nodes, otherwise we match by key.
-				// We always match by type (in either case).
 				if (
 					oldVNode &&
 					childVNode.key == oldVNode.key &&
@@ -175,12 +168,6 @@ export function diffChildren(
 			oldDom,
 			isHydrating
 		);
-
-		if ((j = childVNode.ref) && oldVNode.ref != j) {
-			if (!refs) refs = [];
-			if (oldVNode.ref) refs.push(oldVNode.ref, null, childVNode);
-			refs.push(j, childVNode._component || newDom, childVNode);
-		}
 
 		if (newDom != null) {
 			if (firstChildDom == null) {
@@ -232,25 +219,11 @@ export function diffChildren(
 
 	newParentVNode._dom = firstChildDom;
 
-	// Remove children that are not part of any vnode.
-	if (excessDomChildren != null && typeof newParentVNode.type != 'function') {
-		// FIXME: こんな書き方ができるのか調べる
-		for (i = excessDomChildren.length; i--; ) {
-			if (excessDomChildren[i] != null) removeNode(excessDomChildren[i]);
-		}
-	}
-
 	// Remove remaining oldChildren if there are any.
 	for (i = oldChildrenLength; i--; ) {
 		if (oldChildren[i] != null) unmount(oldChildren[i], oldChildren[i]);
 	}
 
-	// Set refs only after unmount
-	if (refs) {
-		for (i = 0; i < refs.length; i++) {
-			applyRef(refs[i], refs[++i], refs[++i]);
-		}
-	}
 	console.log('exit <diffChildren>');
 }
 
