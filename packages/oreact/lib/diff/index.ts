@@ -107,17 +107,6 @@ export function diff(
 			let clearProcessingException: ComponentType<any, any> | null;
 			let newProps = newVNode.props;
 
-			// Necessary for createContext api. Setting this property will pass
-			// the context value as `this.context` just for this component.
-			// FIXME: 最小構成としては消しても問題なさそう。
-			tmp = newType.contextType;
-			let provider = tmp && globalContext[tmp._id];
-			let componentContext = tmp
-				? provider
-					? provider.props.value
-					: tmp._defaultValue
-				: globalContext;
-
 			// Get component and set it to `c`
 			if (oldVNode._component) {
 				c = newVNode._component = oldVNode._component;
