@@ -1,4 +1,5 @@
 import { _catchError } from './diff/catch-error';
+
 /**
  * The `option` object can potentially contain callback functions
  * that are called during various stages of our renderer. This is the
@@ -8,7 +9,8 @@ import { _catchError } from './diff/catch-error';
  * ctrl+click or cmd+click on mac the type definition below).
  * @type {import('./internal').Options}
  */
-var options = {
-    _catchError: _catchError
+const options = {
+	_catchError
 };
+
 export default options;
