@@ -101,10 +101,6 @@ export function diff(
 			// Handle setState called in render, see #2553
 			c.state = c._nextState;
 
-			if (c.getChildContext != null) {
-				globalContext = assign(assign({}, globalContext), c.getChildContext());
-			}
-
 			if (!isNew && c.getSnapshotBeforeUpdate != null) {
 				snapshot = c.getSnapshotBeforeUpdate(oldProps, oldState);
 			}
