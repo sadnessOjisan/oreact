@@ -14,14 +14,12 @@ const IS_HYDRATE = EMPTY_OBJ;
 export function render(vnode, parentDom) {
 	if (options._root) options._root(vnode, parentDom);
 
-	let isHydrating = false;
-
 	// To be able to support calling `render()` multiple times on the same
 	// DOM node, we need to obtain a reference to the previous tree. We do
 	// this by assigning a new `_children` property to DOM nodes which points
 	// to the last rendered tree. By default this property is not present, which
 	// means that we are mounting a new tree for the first time.
-	let oldVNode = isHydrating ? null : parentDom._children;
+	let oldVNode = parentDom._children;
 	vnode = createElement(Fragment, null, [vnode]);
 
 	// List of effects that need to be called after diffing.
@@ -30,7 +28,7 @@ export function render(vnode, parentDom) {
 		parentDom,
 		// Determine the new vnode tree and store it on the DOM element on
 		// our custom `_children` property.
-		((isHydrating ? parentDom : parentDom)._children = vnode),
+		(parentDom._children = vnode),
 		oldVNode || EMPTY_OBJ,
 		EMPTY_OBJ,
 		parentDom.ownerSVGElement !== undefined,
@@ -41,7 +39,7 @@ export function render(vnode, parentDom) {
 			: null,
 		commitQueue,
 		EMPTY_OBJ,
-		isHydrating
+		false
 	);
 
 	// Flush all queued effects
