@@ -125,7 +125,7 @@ export function diff(
 			c._vnode = newVNode;
 			c._parentDom = parentDom;
 
-			tmp = c.render(c.props, c.state);
+			tmp = c.render(c.props);
 			console.log('<diff> tmp', tmp);
 			// Handle setState called in render, see #2553
 			c.state = c._nextState;
@@ -358,15 +358,6 @@ function diffElementNodes(
 }
 
 /**
- * Unmount a virtual node from the tree and apply DOM changes
- * @param {import('../internal').VNode} vnode The virtual node to unmount
- * @param {import('../internal').VNode} parentVNode The parent of the VNode that
- * initiated the unmount
- * @param {boolean} [skipRemove] Flag that indicates that a parent node of the
- * current element is already detached from the DOM.
- */
-
-/**
  * TreeからVNodeを削除し、それをDOMにも反映させる
  * @param vnode
  * @param parentVNode
@@ -397,7 +388,6 @@ export function unmount(vnode: VNode, parentVNode: VNode, skipRemove: boolean) {
 		r.base = r._parentDom = null;
 	}
 
-	// FIXME: こういう if 文の中で代入して比較するメリットが何なのか調べる
 	if ((r = vnode._children)) {
 		for (let i = 0; i < r.length; i++) {
 			if (r[i]) unmount(r[i], parentVNode, skipRemove);
@@ -409,8 +399,6 @@ export function unmount(vnode: VNode, parentVNode: VNode, skipRemove: boolean) {
 
 /** The `.render()` method for a PFC backing instance. */
 // FIXME: これを何に使うか調べる
-function doRender(props, state) {
-	console.log('fire <doRender>', arguments);
-	console.log('fire <doRender> this.constructor', this.constructor);
+function doRender(props) {
 	return this.constructor(props);
 }
