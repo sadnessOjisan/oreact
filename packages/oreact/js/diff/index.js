@@ -159,7 +159,7 @@ export function diff(
 		// if hydrating or creating initial tree, bailout preserves DOM:
 		if (false || excessDomChildren != null) {
 			newVNode._dom = oldDom;
-			newVNode._hydrating = !!false;
+			newVNode._hydrating = false;
 			excessDomChildren[excessDomChildren.indexOf(oldDom)] = null;
 			// ^ could possibly be simplified to:
 			// excessDomChildren.length = 0;

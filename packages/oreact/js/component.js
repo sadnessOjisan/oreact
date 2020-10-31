@@ -130,10 +130,9 @@ function renderComponent(component) {
 			oldVNode,
 			component._globalContext,
 			parentDom.ownerSVGElement !== undefined,
-			vnode._hydrating != null ? [oldDom] : null,
+			null,
 			commitQueue,
-			oldDom == null ? getDomSibling(vnode) : oldDom,
-			vnode._hydrating
+			oldDom == null ? getDomSibling(vnode) : oldDom
 		);
 		commitRoot(commitQueue, vnode);
 
