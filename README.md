@@ -27,9 +27,12 @@ lerna run --scope=example dev
 - data の追加
 - data の削除
 - data の修正
+- Component の分割と prop の伝達
+- 子から親の Component 書き換え
 
 ```tsx
 import { h, Fragment, Component, render } from 'oreact';
+
 class App extends Component {
 	constructor() {
 		this.state = {
@@ -80,25 +83,17 @@ class App extends Component {
 					'ul',
 					null,
 					this.state.data.map((d, i) =>
-						h(
-							Fragment,
-							null,
-							h('li', null, d.name),
-							h(
-								'button',
-								{
-									onClick: () => {
-										this.setState({
-											...this.state,
-											data: this.state.data.filter((_, j) => {
-												return i !== j;
-											})
-										});
-									}
-								},
-								'delete'
-							)
-						)
+						h(ListItem, {
+							name: d.name,
+							handleDelete: () => {
+								this.setState({
+									...this.state,
+									data: this.state.data.filter((_, j) => {
+										return i !== j;
+									})
+								});
+							}
+						})
 					)
 				),
 				h(
@@ -129,6 +124,23 @@ class App extends Component {
 						'add'
 					)
 				)
+			)
+		);
+	}
+}
+
+class ListItem extends Component {
+	render() {
+		return h(
+			Fragment,
+			null,
+			h('li', null, this.props.name),
+			h(
+				'button',
+				{
+					onClick: () => this.props.handleDelete()
+				},
+				'delete'
 			)
 		);
 	}
