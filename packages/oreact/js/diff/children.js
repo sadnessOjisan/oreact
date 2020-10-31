@@ -1,4 +1,4 @@
-import { diff, unmount, applyRef } from './index';
+import { diff, unmount } from './index';
 import { createVNode, Fragment } from '../create-element';
 import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
 import { removeNode } from '../util';
@@ -212,13 +212,6 @@ export function diffChildren(
 	// Remove remaining oldChildren if there are any.
 	for (i = oldChildrenLength; i--; ) {
 		if (oldChildren[i] != null) unmount(oldChildren[i], oldChildren[i]);
-	}
-
-	// Set refs only after unmount
-	if (refs) {
-		for (i = 0; i < refs.length; i++) {
-			applyRef(refs[i], refs[++i], refs[++i]);
-		}
 	}
 }
 
