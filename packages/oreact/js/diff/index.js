@@ -78,8 +78,6 @@ export function diff(
 		excessDomChildren = [oldDom];
 	}
 
-	if ((tmp = options._diff)) tmp(newVNode);
-
 	try {
 		outer: if (typeof newType == 'function') {
 			let c, isNew, oldProps, oldState, snapshot, clearProcessingException;
