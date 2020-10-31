@@ -147,31 +147,6 @@ export function diff(
 					c.componentWillReceiveProps(newProps, componentContext);
 				}
 
-				if (
-					(!c._force &&
-						c.shouldComponentUpdate != null &&
-						c.shouldComponentUpdate(
-							newProps,
-							c._nextState,
-							componentContext
-						) === false) ||
-					newVNode._original === oldVNode._original
-				) {
-					c.props = newProps;
-					c.state = c._nextState;
-					// More info about this here: https://gist.github.com/JoviDeCroock/bec5f2ce93544d2e6070ef8e0036e4e8
-					if (newVNode._original !== oldVNode._original) c._dirty = false;
-					c._vnode = newVNode;
-					newVNode._dom = oldVNode._dom;
-					newVNode._children = oldVNode._children;
-					if (c._renderCallbacks.length) {
-						commitQueue.push(c);
-					}
-
-					reorderChildren(newVNode, oldDom, parentDom);
-					break outer;
-				}
-
 				if (c.componentWillUpdate != null) {
 					c.componentWillUpdate(newProps, c._nextState, componentContext);
 				}
