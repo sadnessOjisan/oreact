@@ -9,12 +9,12 @@ import options from '../options';
  * @param {boolean} isSvg Whether or not this node is an SVG node
  * @param {boolean} hydrate Whether or not we are in hydration mode
  */
-export function diffProps(dom, newProps, oldProps, isSvg, hydrate) {
+export function diffProps(dom, newProps, oldProps) {
 	let i;
 
 	for (i in oldProps) {
 		if (i !== 'children' && i !== 'key' && !(i in newProps)) {
-			setProperty(dom, i, null, oldProps[i], isSvg);
+			setProperty(dom, i, null, oldProps[i]);
 		}
 	}
 
@@ -26,7 +26,7 @@ export function diffProps(dom, newProps, oldProps, isSvg, hydrate) {
 			i !== 'checked' &&
 			oldProps[i] !== newProps[i]
 		) {
-			setProperty(dom, i, newProps[i], oldProps[i], isSvg);
+			setProperty(dom, i, newProps[i], oldProps[i]);
 		}
 	}
 }
@@ -51,7 +51,7 @@ function setStyle(style, key, value) {
  * @param {*} oldValue The old value the property had
  * @param {boolean} isSvg Whether or not this DOM node is an SVG node or not
  */
-export function setProperty(dom, name, value, oldValue, isSvg) {
+export function setProperty(dom, name, value, oldValue) {
 	let useCapture, nameLower, proxy;
 
 	if (name === 'style') {
@@ -105,7 +105,6 @@ export function setProperty(dom, name, value, oldValue, isSvg) {
 		name !== 'size' &&
 		name !== 'download' &&
 		name !== 'href' &&
-		!isSvg &&
 		name in dom
 	) {
 		dom[name] = value == null ? '' : value;
