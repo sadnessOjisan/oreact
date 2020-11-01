@@ -105,7 +105,7 @@ export interface Component<P = {}, S = {}> {
 
 	_dirty: boolean;
 	_force?: boolean;
-	_renderCallbacks: Array<() => void>; // Only class components
+	_renderCallbacks: Array<Component>; // Component は実質 () => void
 	_globalContext?: any;
 	_vnode?: VNode<P> | null;
 	// setStateが呼ばれるとこの値に置き換える

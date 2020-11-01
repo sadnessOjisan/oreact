@@ -27,8 +27,8 @@ import {
  */
 export function diff(
 	parentDom: PreactElement,
-	newVNode: VNode,
-	oldVNode: VNode,
+	newVNode: VNode<PropsType>,
+	oldVNode: VNode<PropsType>,
 	globalContext,
 	excessDomChildren: PreactElement[],
 	commitQueue: ComponentType[],
@@ -141,7 +141,7 @@ export function diff(
 			globalContext,
 			excessDomChildren,
 			commitQueue
-		);
+		) as PreactElement;
 	}
 
 	return newVNode._dom;
@@ -203,13 +203,15 @@ function diffElementNodes(
 	}
 
 	if (newVNode.type === null) {
-		if (oldProps !== newProps && dom.data !== newProps) {
-			dom.data = newProps;
+		const textNodeProps = (newProps as any) as string | number;
+		if (oldProps !== newProps && dom.data !== textNodeProps) {
+			dom.data = textNodeProps;
 		}
 	} else {
-		oldProps = oldVNode.props || EMPTY_OBJ;
+		const props: Partial<VNode<PropsType>['props']> =
+			oldVNode.props || EMPTY_OBJ;
 
-		diffProps(dom, newProps, oldProps);
+		diffProps(dom, newProps, props);
 
 		i = newVNode.props.children;
 		diffChildren(
@@ -222,25 +224,6 @@ function diffElementNodes(
 			commitQueue,
 			EMPTY_OBJ
 		);
-
-		if (
-			'value' in newProps &&
-			(i = newProps.value) !== undefined &&
-			// #2756 For the <progress>-element the initial value is 0,
-			// despite the attribute not being present. When the attribute
-			// is missing the progress bar is treated as indeterminate.
-			// To fix that we'll always update it when it is 0 for progress elements
-			(i !== dom.value || (newVNode.type === 'progress' && !i))
-		) {
-			setProperty(dom, 'value', i, oldProps.value);
-		}
-		if (
-			'checked' in newProps &&
-			(i = newProps.checked) !== undefined &&
-			i !== dom.checked
-		) {
-			setProperty(dom, 'checked', i, oldProps.checked);
-		}
 	}
 
 	return dom;

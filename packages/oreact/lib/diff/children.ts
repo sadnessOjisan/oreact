@@ -30,7 +30,7 @@ export function diffChildren(
 	globalContext: Object,
 	excessDomChildren: PreactElement,
 	commitQueue: Component[],
-	oldDom: Element | Text
+	oldDom: Element | Text | typeof EMPTY_OBJ
 ) {
 	let i, j, oldVNode, childVNode, newDom, firstChildDom;
 
