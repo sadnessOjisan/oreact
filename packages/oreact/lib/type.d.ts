@@ -46,6 +46,14 @@ interface Attributes {
 type RenderableProps<P, RefType = any> = P &
 	Readonly<Attributes & { children?: ComponentChildren }>;
 
+export interface FunctionalComponent<P = {}> extends FunctionComponent<P> {
+	// Define getDerivedStateFromProps as undefined on FunctionalComponent
+	// to get rid of some errors in `diff()`
+	getDerivedStateFromProps?: undefined;
+}
+
+export type ComponentFactory<P> = ComponentClass<P> | FunctionalComponent<P>;
+
 interface VNode<P = {}> {
 	key: Key;
 	/**
@@ -99,7 +107,7 @@ interface Provider<T>
 
 export interface Component<P = {}, S = {}> {
 	// When component is functional component, this is reset to functional component
-	constructor: preact.ComponentType<P>;
+	constructor: ComponentType<P>;
 	state: S; // Override Component["state"] to not be readonly for internal use, specifically Hooks
 	base?: PreactElement;
 

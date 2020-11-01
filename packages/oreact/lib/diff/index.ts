@@ -28,11 +28,11 @@ import {
 export function diff(
 	parentDom: PreactElement,
 	newVNode: VNode<PropsType>,
-	oldVNode: VNode<PropsType>,
-	globalContext,
+	oldVNode: VNode<PropsType> | typeof EMPTY_OBJ,
+	globalContext: typeof EMPTY_OBJ,
 	excessDomChildren: PreactElement[],
 	commitQueue: ComponentType[],
-	oldDom: Element | Text
+	oldDom: Element | Text | typeof EMPTY_OBJ
 ) {
 	let tmp,
 		newType = newVNode.type;
