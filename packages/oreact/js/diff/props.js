@@ -20,7 +20,6 @@ export function diffProps(dom, newProps, oldProps, isSvg, hydrate) {
 
 	for (i in newProps) {
 		if (
-			(!hydrate || typeof newProps[i] == 'function') &&
 			i !== 'children' &&
 			i !== 'key' &&
 			i !== 'value' &&
@@ -54,12 +53,6 @@ function setStyle(style, key, value) {
  */
 export function setProperty(dom, name, value, oldValue, isSvg) {
 	let useCapture, nameLower, proxy;
-
-	if (isSvg && name == 'className') name = 'class';
-
-	// if (isSvg) {
-	// 	if (name === 'className') name = 'class';
-	// } else if (name === 'class') name += 'Name';
 
 	if (name === 'style') {
 		if (typeof value == 'string') {

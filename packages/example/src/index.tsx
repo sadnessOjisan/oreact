@@ -32,7 +32,11 @@ class App extends Component {
 	render() {
 		return h(
 			'div',
-			null,
+			{
+				style: {
+					color: 'blue'
+				}
+			},
 			h(
 				'section',
 				null,
