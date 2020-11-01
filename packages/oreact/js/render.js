@@ -21,7 +21,6 @@ export function render(vnode, parentDom) {
 	// means that we are mounting a new tree for the first time.
 	let oldVNode = parentDom._children;
 	vnode = createElement(Fragment, null, [vnode]);
-
 	// List of effects that need to be called after diffing.
 	let commitQueue = [];
 	diff(

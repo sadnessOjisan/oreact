@@ -13,7 +13,7 @@ import options from '../options';
  * @param {import('../internal').VNode} oldVNode The old virtual node
  * @param {object} globalContext The current context object. Modified by getChildContext
  * @param {boolean} isSvg Whether or not this element is an SVG node
- * @param {Array<import('../internal').PreactElement>} excessDomChildren
+ * @param {Array<import('../internal').PreactElement>} excessDomChildren 初回レンダリングで[script]が入る、それ以降はnull
  * @param {Array<import('../internal').Component>} commitQueue List of components
  * which have callbacks to invoke in commitRoot
  * @param {Element | Text} oldDom The current attached DOM
@@ -220,27 +220,6 @@ function diffElementNodes(
 	// Tracks entering and exiting SVG namespace when descending through the tree.
 	isSvg = newVNode.type === 'svg' || isSvg;
 
-	if (excessDomChildren != null) {
-		for (i = 0; i < excessDomChildren.length; i++) {
-			const child = excessDomChildren[i];
-
-			// if newVNode matches an element in excessDomChildren or the `dom`
-			// argument matches an element in excessDomChildren, remove it from
-			// excessDomChildren so it isn't later removed in diffChildren
-			if (
-				child != null &&
-				((newVNode.type === null
-					? child.nodeType === 3
-					: child.localName === newVNode.type) ||
-					dom == child)
-			) {
-				dom = child;
-				excessDomChildren[i] = null;
-				break;
-			}
-		}
-	}
-
 	if (dom == null) {
 		if (newVNode.type === null) {
 			return document.createTextNode(newProps);
@@ -268,53 +247,30 @@ function diffElementNodes(
 
 		oldProps = oldVNode.props || EMPTY_OBJ;
 
-		let oldHtml = oldProps.dangerouslySetInnerHTML;
-		let newHtml = newProps.dangerouslySetInnerHTML;
-
-		// During hydration, props are not diffed at all (including dangerouslySetInnerHTML)
-		// @TODO we should warn in debug mode when props don't match here.
-		if (!false) {
-			// But, if we are in a situation where we are using existing DOM (e.g. replaceNode)
-			// we should read the existing DOM attributes to diff them
-			if (excessDomChildren != null) {
-				oldProps = {};
-				for (let i = 0; i < dom.attributes.length; i++) {
-					oldProps[dom.attributes[i].name] = dom.attributes[i].value;
-				}
-			}
-
-			if (newHtml || oldHtml) {
-				// Avoid re-applying the same '__html' if it did not changed between re-render
-				if (
-					!newHtml ||
-					((!oldHtml || newHtml.__html != oldHtml.__html) &&
-						newHtml.__html !== dom.innerHTML)
-				) {
-					dom.innerHTML = (newHtml && newHtml.__html) || '';
-				}
+		// But, if we are in a situation where we are using existing DOM (e.g. replaceNode)
+		// we should read the existing DOM attributes to diff them
+		if (excessDomChildren != null) {
+			oldProps = {};
+			for (let i = 0; i < dom.attributes.length; i++) {
+				oldProps[dom.attributes[i].name] = dom.attributes[i].value;
 			}
 		}
 
 		diffProps(dom, newProps, oldProps, isSvg, false);
 
-		// If the new vnode didn't have dangerouslySetInnerHTML, diff its children
-		if (newHtml) {
-			newVNode._children = [];
-		} else {
-			i = newVNode.props.children;
-			diffChildren(
-				dom,
-				Array.isArray(i) ? i : [i],
-				newVNode,
-				oldVNode,
-				globalContext,
-				newVNode.type === 'foreignObject' ? false : isSvg,
-				excessDomChildren,
-				commitQueue,
-				EMPTY_OBJ,
-				false
-			);
-		}
+		i = newVNode.props.children;
+		diffChildren(
+			dom,
+			Array.isArray(i) ? i : [i],
+			newVNode,
+			oldVNode,
+			globalContext,
+			newVNode.type === 'foreignObject' ? false : isSvg,
+			excessDomChildren,
+			commitQueue,
+			EMPTY_OBJ,
+			false
+		);
 
 		// (as above, don't diff props during hydration)
 		if (!false) {

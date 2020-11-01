@@ -150,3 +150,4 @@ npm publish --access=public
 
 - createContext
 - ref
+- dangerouslySetInnerHTML;
