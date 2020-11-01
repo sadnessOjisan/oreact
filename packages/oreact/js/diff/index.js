@@ -38,132 +38,119 @@ export function diff(
 	// constructor as undefined. This to prevent JSON-injection.
 	if (newVNode.constructor !== undefined) return null;
 
-	try {
-		if (typeof newType == 'function') {
-			let c, isNew, oldProps, oldState, snapshot, clearProcessingException;
-			let newProps = newVNode.props;
+	if (typeof newType == 'function') {
+		let c, isNew, oldProps, oldState, snapshot, clearProcessingException;
+		let newProps = newVNode.props;
 
-			let componentContext = EMPTY_OBJ;
+		let componentContext = EMPTY_OBJ;
 
-			// Get component and set it to `c`
-			if (oldVNode._component) {
-				c = newVNode._component = oldVNode._component;
-				clearProcessingException = c._processingException = c._pendingError;
+		// Get component and set it to `c`
+		if (oldVNode._component) {
+			c = newVNode._component = oldVNode._component;
+			clearProcessingException = c._processingException = c._pendingError;
+		} else {
+			// Instantiate the new component
+			if ('prototype' in newType && newType.prototype.render) {
+				newVNode._component = c = new newType(newProps);
 			} else {
-				// Instantiate the new component
-				if ('prototype' in newType && newType.prototype.render) {
-					newVNode._component = c = new newType(newProps);
-				} else {
-					newVNode._component = c = new Component(newProps);
-					c.constructor = newType;
-					c.render = doRender;
-				}
-
-				c.props = newProps;
-				if (!c.state) c.state = {};
-				c._globalContext = globalContext;
-				isNew = c._dirty = true;
-				c._renderCallbacks = [];
-			}
-
-			// Invoke getDerivedStateFromProps
-			if (c._nextState == null) {
-				c._nextState = c.state;
-			}
-
-			oldProps = c.props;
-			oldState = c.state;
-
-			// Invoke pre-render lifecycle methods
-			if (isNew) {
-				if (c.componentDidMount != null) {
-					c._renderCallbacks.push(c.componentDidMount);
-				}
-			} else {
-				if (
-					newType.getDerivedStateFromProps == null &&
-					newProps !== oldProps &&
-					c.componentWillReceiveProps != null
-				) {
-					c.componentWillReceiveProps(newProps, componentContext);
-				}
+				newVNode._component = c = new Component(newProps);
+				c.constructor = newType;
+				c.render = doRender;
 			}
 
 			c.props = newProps;
-			c.state = c._nextState;
+			if (!c.state) c.state = {};
+			c._globalContext = globalContext;
+			isNew = c._dirty = true;
+			c._renderCallbacks = [];
+		}
 
-			c._dirty = false;
-			c._vnode = newVNode;
-			c._parentDom = parentDom;
+		// Invoke getDerivedStateFromProps
+		if (c._nextState == null) {
+			c._nextState = c.state;
+		}
 
-			tmp = c.render(c.props);
+		oldProps = c.props;
+		oldState = c.state;
 
-			// Handle setState called in render, see #2553
-			c.state = c._nextState;
-
-			if (!isNew && c.getSnapshotBeforeUpdate != null) {
-				snapshot = c.getSnapshotBeforeUpdate(oldProps, oldState);
+		// Invoke pre-render lifecycle methods
+		if (isNew) {
+			if (c.componentDidMount != null) {
+				c._renderCallbacks.push(c.componentDidMount);
 			}
-
-			let isTopLevelFragment =
-				tmp != null && tmp.type == Fragment && tmp.key == null;
-			let renderResult = isTopLevelFragment ? tmp.props.children : tmp;
-
-			diffChildren(
-				parentDom,
-				Array.isArray(renderResult) ? renderResult : [renderResult],
-				newVNode,
-				oldVNode,
-				globalContext,
-				isSvg,
-				excessDomChildren,
-				commitQueue,
-				oldDom,
-				false
-			);
-
-			c.base = newVNode._dom;
-
-			// We successfully rendered this VNode, unset any stored hydration/bailout state:
-			newVNode._hydrating = null;
-
-			if (c._renderCallbacks.length) {
-				commitQueue.push(c);
-			}
-
-			if (clearProcessingException) {
-				c._pendingError = c._processingException = null;
-			}
-
-			c._force = false;
-		} else if (
-			excessDomChildren == null &&
-			newVNode._original === oldVNode._original
-		) {
-			newVNode._children = oldVNode._children;
-			newVNode._dom = oldVNode._dom;
 		} else {
-			newVNode._dom = diffElementNodes(
-				oldVNode._dom,
-				newVNode,
-				oldVNode,
-				globalContext,
-				isSvg,
-				excessDomChildren,
-				commitQueue,
-				false
-			);
+			if (
+				newType.getDerivedStateFromProps == null &&
+				newProps !== oldProps &&
+				c.componentWillReceiveProps != null
+			) {
+				c.componentWillReceiveProps(newProps, componentContext);
+			}
 		}
-	} catch (e) {
-		newVNode._original = null;
-		// if hydrating or creating initial tree, bailout preserves DOM:
-		if (false || excessDomChildren != null) {
-			newVNode._dom = oldDom;
-			newVNode._hydrating = false;
-			excessDomChildren[excessDomChildren.indexOf(oldDom)] = null;
-			// ^ could possibly be simplified to:
-			// excessDomChildren.length = 0;
+
+		c.props = newProps;
+		c.state = c._nextState;
+
+		c._dirty = false;
+		c._vnode = newVNode;
+		c._parentDom = parentDom;
+
+		tmp = c.render(c.props);
+
+		// Handle setState called in render, see #2553
+		c.state = c._nextState;
+
+		if (!isNew && c.getSnapshotBeforeUpdate != null) {
+			snapshot = c.getSnapshotBeforeUpdate(oldProps, oldState);
 		}
+
+		let isTopLevelFragment =
+			tmp != null && tmp.type == Fragment && tmp.key == null;
+		let renderResult = isTopLevelFragment ? tmp.props.children : tmp;
+
+		diffChildren(
+			parentDom,
+			Array.isArray(renderResult) ? renderResult : [renderResult],
+			newVNode,
+			oldVNode,
+			globalContext,
+			isSvg,
+			excessDomChildren,
+			commitQueue,
+			oldDom,
+			false
+		);
+
+		c.base = newVNode._dom;
+
+		// We successfully rendered this VNode, unset any stored hydration/bailout state:
+		newVNode._hydrating = null;
+
+		if (c._renderCallbacks.length) {
+			commitQueue.push(c);
+		}
+
+		if (clearProcessingException) {
+			c._pendingError = c._processingException = null;
+		}
+
+		c._force = false;
+	} else if (
+		excessDomChildren == null &&
+		newVNode._original === oldVNode._original
+	) {
+		newVNode._children = oldVNode._children;
+		newVNode._dom = oldVNode._dom;
+	} else {
+		newVNode._dom = diffElementNodes(
+			oldVNode._dom,
+			newVNode,
+			oldVNode,
+			globalContext,
+			isSvg,
+			excessDomChildren,
+			commitQueue
+		);
 	}
 
 	return newVNode._dom;

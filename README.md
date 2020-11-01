@@ -152,3 +152,5 @@ npm publish --access=public
 - ref
 - dangerouslySetInnerHTML;
 - svg サポート
+- xlink
+- catch_error
