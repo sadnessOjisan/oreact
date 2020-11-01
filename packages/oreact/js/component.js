@@ -1,7 +1,6 @@
 import { assign } from './util';
 import { diff, commitRoot } from './diff/index';
 import { Fragment } from './create-element';
-import { Component } from './type';
 /**
  * Base Component class. Provides `setState()` and `forceUpdate()`, which
  * trigger rendering

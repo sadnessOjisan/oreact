@@ -1,7 +1,7 @@
 import { assign } from './util';
 import { diff, commitRoot } from './diff/index';
 import { Fragment } from './create-element';
-import { Component, PropsType, VNode } from './type';
+import { Component as ComponentType, PropsType, VNode } from './type';
 
 /**
  * Base Component class. Provides `setState()` and `forceUpdate()`, which
@@ -89,7 +89,7 @@ export function getDomSibling(vnode: VNode, childIndex: number | null) {
  * Trigger in-place re-rendering of a component.
  * @param {import('./internal').Component} component The component to rerender
  */
-function renderComponent(component: Component) {
+function renderComponent(component: ComponentType) {
 	let vnode = component._vnode,
 		oldDom = vnode._dom,
 		parentDom = component._parentDom;
@@ -138,7 +138,7 @@ function updateParentDomPointers(vnode: VNode) {
  * The render queue
  * @type {Array<import('./internal').Component>}
  */
-let rerenderQueue: Component[] = [];
+let rerenderQueue: ComponentType[] = [];
 
 /**
  * Asynchronously schedule a callback
@@ -164,7 +164,7 @@ const defer: (cb: () => void) => void =
  * Enqueue a rerender of a component
  * @param {import('./internal').Component} c The component to rerender
  */
-export function enqueueRender(c: Component) {
+export function enqueueRender(c: ComponentType) {
 	if (
 		(!c._dirty &&
 			(c._dirty = true) &&
