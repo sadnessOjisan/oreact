@@ -199,9 +199,6 @@ function diffElementNodes(
 	let oldProps = oldVNode.props;
 	let newProps = newVNode.props;
 
-	// Tracks entering and exiting SVG namespace when descending through the tree.
-	isSvg = newVNode.type === 'svg' || isSvg;
-
 	if (dom == null) {
 		if (newVNode.type === null) {
 			return document.createTextNode(newProps);
@@ -223,7 +220,7 @@ function diffElementNodes(
 	} else {
 		oldProps = oldVNode.props || EMPTY_OBJ;
 
-		diffProps(dom, newProps, oldProps, isSvg, false);
+		diffProps(dom, newProps, oldProps);
 
 		i = newVNode.props.children;
 		diffChildren(

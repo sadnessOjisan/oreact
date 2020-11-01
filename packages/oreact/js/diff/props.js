@@ -6,8 +6,6 @@ import options from '../options';
  * changes to
  * @param {object} newProps The new props
  * @param {object} oldProps The old props
- * @param {boolean} isSvg Whether or not this node is an SVG node
- * @param {boolean} hydrate Whether or not we are in hydration mode
  */
 export function diffProps(dom, newProps, oldProps) {
 	let i;
@@ -49,7 +47,6 @@ function setStyle(style, key, value) {
  * @param {string} name The name of the property to set
  * @param {*} value The value to set the property to
  * @param {*} oldValue The old value the property had
- * @param {boolean} isSvg Whether or not this DOM node is an SVG node or not
  */
 export function setProperty(dom, name, value, oldValue) {
 	let useCapture, nameLower, proxy;
