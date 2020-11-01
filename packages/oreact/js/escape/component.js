@@ -1,5 +1,6 @@
 import { assign } from './util';
 import { diff, commitRoot } from './diff/index';
+import options from './options';
 import { Fragment } from './create-element';
 /**
  * Base Component class. Provides `setState()` and `forceUpdate()`, which
@@ -8,16 +9,21 @@ import { Fragment } from './create-element';
  * @param {object} context The initial context from parent components'
  * getChildContext
  */
-export function Component(props) {
+export function Component(props, context) {
+    console.log('fire <Component>', arguments);
     this.props = props;
+    this.context = context;
 }
 /**
  * Update component state and schedule a re-render.
  * @param {object | ((s: object, p: object) => object)} update A hash of state
  * properties to update with new values or a function that given the current
  * state and props returns a new partial state
+ * @param {() => void} [callback] A function to be called once component state is
+ * updated
  */
-Component.prototype.setState = function (update) {
+Component.prototype.setState = function (update, callback) {
+    console.log('fire [Component] <setState>', arguments);
     // only clone state when copying to nextState the first time.
     var s;
     if (this._nextState != null && this._nextState !== this.state) {
@@ -26,6 +32,11 @@ Component.prototype.setState = function (update) {
     else {
         s = this._nextState = assign({}, this.state);
     }
+    if (typeof update == 'function') {
+        // Some libraries like `immer` mark the current state as readonly,
+        // preventing us from mutating it, so we need to clone it. See #2716
+        update = update(assign({}, s), this.props);
+    }
     if (update) {
         assign(s, update);
     }
@@ -33,20 +44,6 @@ Component.prototype.setState = function (update) {
     if (update == null)
         return;
     if (this._vnode) {
-        enqueueRender(this);
-    }
-};
-/**
- * Immediately perform a synchronous re-render of the component
- * @param {() => void} [callback] A function to be called after component is
- * re-rendered
- */
-Component.prototype.forceUpdate = function (callback) {
-    if (this._vnode) {
-        // Set render mode so that we can differentiate where the render request
-        // is coming from. We need this because forceUpdate should never call
-        // shouldComponentUpdate
-        this._force = true;
         if (callback)
             this._renderCallbacks.push(callback);
         enqueueRender(this);
@@ -64,17 +61,20 @@ Component.prototype.forceUpdate = function (callback) {
  */
 Component.prototype.render = Fragment;
 /**
+ * 兄弟DOMを取得する
  * @param {import('./internal').VNode} vnode
  * @param {number | null} [childIndex]
  */
 export function getDomSibling(vnode, childIndex) {
+    console.log('fire <getDomSibling>', arguments);
     if (childIndex == null) {
         // Use childIndex==null as a signal to resume the search from the vnode's sibling
         return vnode._parent
-            ? getDomSibling(vnode._parent, vnode._parent._children.indexOf(vnode) + 1)
+            ? getDomSibling(vnode._parent, vnode._parent._children.indexOf(vnode) + 1) // この+1がないと自分が対象になるから？
             : null;
     }
     var sibling;
+    // 最初に見つかった兄弟要素を返す
     for (; childIndex < vnode._children.length; childIndex++) {
         sibling = vnode._children[childIndex];
         if (sibling != null && sibling._dom != null) {
@@ -96,12 +96,13 @@ export function getDomSibling(vnode, childIndex) {
  * @param {import('./internal').Component} component The component to rerender
  */
 function renderComponent(component) {
+    console.log('fire <renderComponent>', arguments);
     var vnode = component._vnode, oldDom = vnode._dom, parentDom = component._parentDom;
     if (parentDom) {
         var commitQueue = [];
         var oldVNode = assign({}, vnode);
         oldVNode._original = oldVNode;
-        var newDom = diff(parentDom, vnode, oldVNode, component._globalContext, null, commitQueue, oldDom == null ? getDomSibling(vnode) : oldDom);
+        var newDom = diff(parentDom, vnode, oldVNode, component._globalContext, parentDom.ownerSVGElement !== undefined, vnode._hydrating != null ? [oldDom] : null, commitQueue, oldDom == null ? getDomSibling(vnode) : oldDom, vnode._hydrating);
         commitRoot(commitQueue, vnode);
         if (newDom != oldDom) {
             updateParentDomPointers(vnode);
@@ -146,17 +147,20 @@ var defer = typeof Promise == 'function'
  * * [Designing APIs for Asynchrony](https://blog.izs.me/2013/08/designing-apis-for-asynchrony)
  * * [Callbacks synchronous and asynchronous](https://blog.ometer.com/2011/07/24/callbacks-synchronous-and-asynchronous/)
  */
+var prevDebounce;
 /**
  * Enqueue a rerender of a component
  * @param {import('./internal').Component} c The component to rerender
  */
 export function enqueueRender(c) {
+    console.log('fire <enqueueRender>', arguments);
     if ((!c._dirty &&
         (c._dirty = true) &&
         rerenderQueue.push(c) &&
         !process._rerenderCount++) ||
-        true) {
-        defer(process);
+        prevDebounce !== options.debounceRendering) {
+        prevDebounce = options.debounceRendering;
+        (prevDebounce || defer)(process);
     }
 }
 /** Flush the render queue by rerendering all queued components */

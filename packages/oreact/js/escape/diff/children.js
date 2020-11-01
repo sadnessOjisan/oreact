@@ -1,6 +1,7 @@
-import { diff, unmount } from './index';
+import { diff, unmount, applyRef } from './index';
 import { createVNode, Fragment } from '../create-element';
 import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
+import { removeNode } from '../util';
 import { getDomSibling } from '../component';
 /**
  * Diff the children of a virtual node
@@ -12,6 +13,7 @@ import { getDomSibling } from '../component';
  * @param {import('../internal').VNode} oldParentVNode The old virtual
  * node whose children should be diff'ed against newParentVNode
  * @param {object} globalContext The current context object - modified by getChildContext
+ * @param {boolean} isSvg Whether or not this DOM node is an SVG node
  * @param {Array<import('../internal').PreactElement>} excessDomChildren
  * @param {Array<import('../internal').Component>} commitQueue List of components
  * which have callbacks to invoke in commitRoot
@@ -19,9 +21,24 @@ import { getDomSibling } from '../component';
  * element any new dom elements should be placed around. Likely `null` on first
  * render (except when hydrating). Can be a sibling DOM element when diffing
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
+ * @param {boolean} isHydrating Whether or not we are in hydration
  */
-export function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, globalContext, excessDomChildren, commitQueue, oldDom) {
-    var i, j, oldVNode, childVNode, newDom, firstChildDom;
+/**
+ * VNodeの子供を比較する
+ * @param parentDom
+ * @param renderResult
+ * @param newParentVNode
+ * @param oldParentVNode
+ * @param globalContext
+ * @param isSvg
+ * @param excessDomChildren
+ * @param commitQueue
+ * @param oldDom
+ * @param isHydrating
+ */
+export function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating) {
+    console.log('fire <diffChildren>', arguments);
+    var i, j, oldVNode, childVNode, newDom, firstChildDom, refs;
     // This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
     // as EMPTY_OBJ._children should be `undefined`.
     var oldChildren = (oldParentVNode && oldParentVNode._children) || EMPTY_ARR;
@@ -31,7 +48,10 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
     // for this purpose, because `null` is a valid value for `oldDom` which can mean to skip to this logic
     // (e.g. if mounting a new tree in which the old DOM should be ignored (usually for Fragments).
     if (oldDom == EMPTY_OBJ) {
-        if (oldChildrenLength) {
+        if (excessDomChildren != null) {
+            oldDom = excessDomChildren[0];
+        }
+        else if (oldChildrenLength) {
             oldDom = getDomSibling(oldParentVNode, 0);
         }
         else {
@@ -39,6 +59,7 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
         }
     }
     newParentVNode._children = [];
+    // renderResult は diff => diff.children => diff が再帰的に呼ばれる中 renderResult の個数が減っていき収束する
     for (i = 0; i < renderResult.length; i++) {
         childVNode = renderResult[i];
         if (childVNode == null || typeof childVNode == 'boolean') {
@@ -61,7 +82,8 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
         }
         // Terser removes the `continue` here and wraps the loop body
         // in a `if (childVNode) { ... } condition
-        if (childVNode == null) {
+        // FIXME: terserの最適化に使えそう？
+        if ('childVNode' == null) {
             continue;
         }
         childVNode._parent = newParentVNode;
@@ -71,6 +93,9 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
         // We use `undefined`, as `null` is reserved for empty placeholders
         // (holes).
         oldVNode = oldChildren[i];
+        // <<<IMPORTANT>>>
+        // key の一致を調べてる
+        // Key は、どの要素が変更、追加もしくは削除されたのかを識別するのに使う
         if (oldVNode === null ||
             (oldVNode &&
                 childVNode.key == oldVNode.key &&
@@ -95,7 +120,16 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
         }
         oldVNode = oldVNode || EMPTY_OBJ;
         // Morph the old element into the new one, but don't append it to the dom yet
-        newDom = diff(parentDom, childVNode, oldVNode, globalContext, excessDomChildren, commitQueue, oldDom);
+        // childVNode と oldVNode の差分を取って差分を適用したDOMを得る
+        // diff から diffChildrenが呼ばれるので、diffChildrend で diff を呼ぶとloopする。
+        newDom = diff(parentDom, childVNode, oldVNode, globalContext, isSvg, excessDomChildren, commitQueue, oldDom, isHydrating);
+        if ((j = childVNode.ref) && oldVNode.ref != j) {
+            if (!refs)
+                refs = [];
+            if (oldVNode.ref)
+                refs.push(oldVNode.ref, null, childVNode);
+            refs.push(j, childVNode._component || newDom, childVNode);
+        }
         if (newDom != null) {
             if (firstChildDom == null) {
                 firstChildDom = newDom;
@@ -111,7 +145,7 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
             //
             // To fix it we make sure to reset the inferred value, so that our own
             // value check in `diff()` won't be skipped.
-            if (!false && newParentVNode.type == 'option') {
+            if (!isHydrating && newParentVNode.type == 'option') {
                 parentDom.value = '';
             }
             else if (typeof newParentVNode.type == 'function') {
@@ -125,25 +159,79 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
                 newParentVNode._nextDom = oldDom;
             }
         }
+        else if (oldDom &&
+            oldVNode._dom == oldDom &&
+            oldDom.parentNode != parentDom) {
+            // The above condition is to handle null placeholders. See test in placeholder.test.js:
+            // `efficiently replace null placeholders in parent rerenders`
+            oldDom = getDomSibling(oldVNode);
+        }
     }
     newParentVNode._dom = firstChildDom;
+    // Remove children that are not part of any vnode.
+    if (excessDomChildren != null && typeof newParentVNode.type != 'function') {
+        // FIXME: こんな書き方ができるのか調べる
+        for (i = excessDomChildren.length; i--;) {
+            if (excessDomChildren[i] != null)
+                removeNode(excessDomChildren[i]);
+        }
+    }
     // Remove remaining oldChildren if there are any.
     for (i = oldChildrenLength; i--;) {
         if (oldChildren[i] != null)
             unmount(oldChildren[i], oldChildren[i]);
     }
+    // Set refs only after unmount
+    if (refs) {
+        for (i = 0; i < refs.length; i++) {
+            applyRef(refs[i], refs[++i], refs[++i]);
+        }
+    }
+    console.log('exit <diffChildren>');
 }
+/**
+ * Flatten and loop through the children of a virtual node
+ * @param {import('../index').ComponentChildren} children The unflattened
+ * children of a virtual node
+ * @returns {import('../internal').VNode[]}
+ */
+export function toChildArray(children, out) {
+    out = out || [];
+    if (children == null || typeof children == 'boolean') {
+    }
+    else if (Array.isArray(children)) {
+        children.some(function (child) {
+            toChildArray(child, out);
+        });
+    }
+    else {
+        out.push(children);
+    }
+    return out;
+}
+/**
+ * newDOM を DOMツリーに追加する操作、もしくは newDOM を oldDOM の兄弟として置く操作をする
+ * (注)渡された childVNode の _nextDom を書き換える処理も入ってる（オブジェクトの破壊）
+ * (注)DOM操作あり
+ * @param parentDom
+ * @param childVNode children の一要素
+ * @param oldVNode
+ * @param oldChildren
+ * @param excessDomChildren
+ * @param newDom children の一要素 が持っているDOM
+ * @param oldDom
+ */
 export function placeChild(parentDom, childVNode, oldVNode, oldChildren, excessDomChildren, newDom, oldDom) {
     var nextDom;
     if (childVNode._nextDom !== undefined) {
+        // childVNodeに_nextDom があるときそれを取り出してchildVNodeの_nextDomにはundefinedを詰める
         // Only Fragments or components that return Fragment like VNodes will
         // have a non-undefined _nextDom. Continue the diff from the sibling
         // of last DOM child of this child VNode
         nextDom = childVNode._nextDom;
-        // Eagerly cleanup _nextDom. We don't need to persist the value because
-        // it is only used by `diffChildren` to determine where to resume the diff after
-        // diffing Components and Fragments. Once we store it the nextDOM local var, we
-        // can clean up the property
+        // _nextDom は diffChildren で diff を再開させるための役割
+        // local変数に保存したいまそれは不要なのでundefinedでcleanupしてる
+        // FIXME: 早期cleanupのメリット調べる
         childVNode._nextDom = undefined;
     }
     else if (excessDomChildren == oldVNode ||
@@ -152,24 +240,28 @@ export function placeChild(parentDom, childVNode, oldVNode, oldChildren, excessD
         // NOTE: excessDomChildren==oldVNode above:
         // This is a compression of excessDomChildren==null && oldVNode==null!
         // The values only have the same type when `null`.
+        // 比較対象がないとき、もしくは比較対象の親がそもそも違うときはDOM追加
         outer: if (oldDom == null || oldDom.parentNode !== parentDom) {
             parentDom.appendChild(newDom);
             nextDom = null;
         }
         else {
+            // 親が一致(oldDom.parentNode === parentDom)したときの処理、つまり兄弟扱い
             // `j<oldChildrenLength; j+=2` is an alternative to `j++<oldChildrenLength/2`
             for (var sibDom = oldDom, j = 0; (sibDom = sibDom.nextSibling) && j < oldChildren.length; j += 2) {
                 if (sibDom == newDom) {
                     break outer;
                 }
             }
+            // ノードを参照ノードの前に、指定された親ノードの子として挿入
+            // https://developer.mozilla.org/ja/docs/Web/API/Node/insertBefore
             parentDom.insertBefore(newDom, oldDom);
             nextDom = oldDom;
         }
     }
-    // If we have pre-calculated the nextDOM node, use it. Else calculate it now
-    // Strictly check for `undefined` here cuz `null` is a valid value of `nextDom`.
-    // See more detail in create-element.js:createVNode
+    // nextDOMノードを事前計算したものがあればそれを使う。
+    // なければ今計算する
+    // nextDom はnullがありえるのでundefinedで厳格チェック
     if (nextDom !== undefined) {
         oldDom = nextDom;
     }

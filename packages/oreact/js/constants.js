@@ -1,2 +1,2 @@
-export const EMPTY_OBJ = {};
-export const EMPTY_ARR = [];
+export var EMPTY_OBJ = {};
+export var EMPTY_ARR = [];

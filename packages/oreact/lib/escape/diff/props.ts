@@ -17,7 +17,7 @@ export function diffProps(
 	isSvg: boolean,
 	hydrate: boolean
 ) {
-	console.log('fire <diffProps>', arguments)
+	console.log('fire <diffProps>', arguments);
 	let i;
 
 	// 旧propsのkeyを検査していく
@@ -70,7 +70,7 @@ export function setProperty(
 	oldValue: any,
 	isSvg: boolean
 ) {
-	console.log('fire <setProperty>', arguments)
+	console.log('fire <setProperty>', arguments);
 	let useCapture, nameLower, proxy;
 
 	// 対象がSVGならclassnameではなくclassを使う
@@ -183,11 +183,11 @@ export function setProperty(
  * @private
  */
 function eventProxy(e: Event) {
-	console.log('fire <eventProxy>', arguments)
+	console.log('fire <eventProxy>', arguments);
 	this._listeners[e.type + false](options.event ? options.event(e) : e);
 }
 
 function eventProxyCapture(e: Event) {
-	console.log('fire <eventProxyCapture>', arguments)
+	console.log('fire <eventProxyCapture>', arguments);
 	this._listeners[e.type + true](options.event ? options.event(e) : e);
 }
