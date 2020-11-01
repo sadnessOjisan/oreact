@@ -47,9 +47,7 @@ export function diffChildren(
 	// for this purpose, because `null` is a valid value for `oldDom` which can mean to skip to this logic
 	// (e.g. if mounting a new tree in which the old DOM should be ignored (usually for Fragments).
 	if (oldDom == EMPTY_OBJ) {
-		if (excessDomChildren != null) {
-			oldDom = excessDomChildren[0];
-		} else if (oldChildrenLength) {
+		if (oldChildrenLength) {
 			oldDom = getDomSibling(oldParentVNode, 0);
 		} else {
 			oldDom = null;
@@ -191,13 +189,6 @@ export function diffChildren(
 	}
 
 	newParentVNode._dom = firstChildDom;
-
-	// Remove children that are not part of any vnode.
-	if (excessDomChildren != null && typeof newParentVNode.type != 'function') {
-		for (i = excessDomChildren.length; i--; ) {
-			if (excessDomChildren[i] != null) removeNode(excessDomChildren[i]);
-		}
-	}
 
 	// Remove remaining oldChildren if there are any.
 	for (i = oldChildrenLength; i--; ) {
