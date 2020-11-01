@@ -21,7 +21,7 @@ export interface ComponentClass<P = {}, S = {}> {
 
 export type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
 
-export type PropsType = VNode['props'];
+export type PropsType = { is?: string };
 
 export type Key = string | number | any;
 
