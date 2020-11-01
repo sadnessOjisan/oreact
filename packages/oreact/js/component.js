@@ -129,7 +129,6 @@ function renderComponent(component) {
 			vnode,
 			oldVNode,
 			component._globalContext,
-			parentDom.ownerSVGElement !== undefined,
 			null,
 			commitQueue,
 			oldDom == null ? getDomSibling(vnode) : oldDom

@@ -1,4 +1,4 @@
-import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
+import { EMPTY_OBJ } from '../constants';
 import { Component } from '../component';
 import { Fragment } from '../create-element';
 import { diffChildren } from './children';
@@ -228,14 +228,14 @@ function diffElementNodes(
 			// To fix that we'll always update it when it is 0 for progress elements
 			(i !== dom.value || (newVNode.type === 'progress' && !i))
 		) {
-			setProperty(dom, 'value', i, oldProps.value, false);
+			setProperty(dom, 'value', i, oldProps.value);
 		}
 		if (
 			'checked' in newProps &&
 			(i = newProps.checked) !== undefined &&
 			i !== dom.checked
 		) {
-			setProperty(dom, 'checked', i, oldProps.checked, false);
+			setProperty(dom, 'checked', i, oldProps.checked);
 		}
 	}
 
