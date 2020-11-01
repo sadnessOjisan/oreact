@@ -1,5 +1,3 @@
-import options from '../options';
-
 /**
  * Diff the old and new properties of a VNode and apply changes to the DOM node
  * @param {import('../internal').PreactElement} dom The DOM node to apply
@@ -116,9 +114,9 @@ export function setProperty(dom, name, value, oldValue) {
  * @private
  */
 function eventProxy(e) {
-	this._listeners[e.type + false](options.event ? options.event(e) : e);
+	this._listeners[e.type + false](e);
 }
 
 function eventProxyCapture(e) {
-	this._listeners[e.type + true](options.event ? options.event(e) : e);
+	this._listeners[e.type + true](e);
 }

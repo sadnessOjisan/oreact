@@ -1,5 +1,3 @@
-import options from './options';
-
 /**
  * Create an virtual node (used for JSX)
  * @param {import('./internal').VNode["type"]} type The node name or Component
@@ -77,7 +75,6 @@ export function createVNode(type, props, key, ref, original) {
 	};
 
 	if (original == null) vnode._original = vnode;
-	if (options.vnode != null) options.vnode(vnode);
 
 	return vnode;
 }

@@ -1,7 +1,6 @@
 import { EMPTY_OBJ, EMPTY_ARR } from './constants';
 import { commitRoot, diff } from './diff/index';
 import { createElement, Fragment } from './create-element';
-import options from './options';
 
 const IS_HYDRATE = EMPTY_OBJ;
 
@@ -12,8 +11,6 @@ const IS_HYDRATE = EMPTY_OBJ;
  * render into
  */
 export function render(vnode, parentDom) {
-	if (options._root) options._root(vnode, parentDom);
-
 	// To be able to support calling `render()` multiple times on the same
 	// DOM node, we need to obtain a reference to the previous tree. We do
 	// this by assigning a new `_children` property to DOM nodes which points

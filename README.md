@@ -155,3 +155,4 @@ npm publish --access=public
 - xlink
 - catch_error
 - getSnapShot
+- setState への関数わたし

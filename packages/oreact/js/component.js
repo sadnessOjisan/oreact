@@ -1,6 +1,5 @@
 import { assign } from './util';
 import { diff, commitRoot } from './diff/index';
-import options from './options';
 import { Fragment } from './create-element';
 
 /**
@@ -176,8 +175,6 @@ const defer =
  * * [Callbacks synchronous and asynchronous](https://blog.ometer.com/2011/07/24/callbacks-synchronous-and-asynchronous/)
  */
 
-let prevDebounce;
-
 /**
  * Enqueue a rerender of a component
  * @param {import('./internal').Component} c The component to rerender
@@ -188,10 +185,9 @@ export function enqueueRender(c) {
 			(c._dirty = true) &&
 			rerenderQueue.push(c) &&
 			!process._rerenderCount++) ||
-		prevDebounce !== options.debounceRendering
+		true
 	) {
-		prevDebounce = options.debounceRendering;
-		(prevDebounce || defer)(process);
+		defer(process);
 	}
 }
 

@@ -4,7 +4,6 @@ import { Fragment } from '../create-element';
 import { diffChildren } from './children';
 import { diffProps, setProperty } from './props';
 import { removeNode } from '../util';
-import options from '../options';
 
 /**
  * Diff two virtual nodes and apply proper changes to the DOM
@@ -149,8 +148,6 @@ export function diff(
  * @param {import('../internal').VNode} root
  */
 export function commitRoot(commitQueue, root) {
-	if (options._commit) options._commit(root, commitQueue);
-
 	commitQueue.some((c) => {
 		commitQueue = c._renderCallbacks;
 		c._renderCallbacks = [];
@@ -252,7 +249,6 @@ function diffElementNodes(
  */
 export function unmount(vnode, parentVNode, skipRemove) {
 	let r;
-	if (options.unmount) options.unmount(vnode);
 
 	let dom;
 	if (!skipRemove && typeof vnode.type != 'function') {
