@@ -129,7 +129,10 @@ function diffElementNodes(dom, newVNode, oldVNode, globalContext, excessDomChild
     var newProps = newVNode.props;
     if (dom == null) {
         if (newVNode.type === null) {
-            return document.createTextNode(newProps);
+            // primitive値であることが保証されているのでキャストする
+            // 3 も '3' も '3' として扱う
+            var value = String(newProps);
+            return document.createTextNode(value);
         }
         dom = document.createElement(newVNode.type, newProps.is && { is: newProps.is });
         // we created a new parent, so none of the previously attached children can be reused:

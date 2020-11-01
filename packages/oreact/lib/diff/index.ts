@@ -4,7 +4,12 @@ import { Fragment } from '../create-element';
 import { diffChildren } from './children';
 import { diffProps, setProperty } from './props';
 import { removeNode } from '../util';
-import { Component as ComponentType, PreactElement, VNode } from '../type';
+import {
+	Component as ComponentType,
+	PreactElement,
+	PropsType,
+	VNode
+} from '../type';
 
 /**
  * Diff two virtual nodes and apply proper changes to the DOM
@@ -171,8 +176,8 @@ export function commitRoot(commitQueue: ComponentType<any, any>[]) {
  */
 function diffElementNodes(
 	dom: PreactElement,
-	newVNode: VNode,
-	oldVNode: VNode,
+	newVNode: VNode<PropsType>,
+	oldVNode: VNode<PropsType>,
 	globalContext: Object,
 	excessDomChildren: any,
 	commitQueue: ComponentType[]
@@ -183,7 +188,10 @@ function diffElementNodes(
 
 	if (dom == null) {
 		if (newVNode.type === null) {
-			return document.createTextNode(newProps);
+			// primitive値であることが保証されているのでキャストする
+			// 3 も '3' も '3' として扱う
+			const value = String(newProps);
+			return document.createTextNode(value);
 		}
 
 		dom = document.createElement(
