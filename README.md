@@ -154,3 +154,4 @@ npm publish --access=public
 - svg サポート
 - xlink
 - catch_error
+- getSnapShot

@@ -37,7 +37,7 @@ export function diff(
 	if (newVNode.constructor !== undefined) return null;
 
 	if (typeof newType == 'function') {
-		let c, isNew, oldProps, oldState, snapshot, clearProcessingException;
+		let c, isNew, oldProps, oldState;
 		let newProps = newVNode.props;
 
 		let componentContext = EMPTY_OBJ;
@@ -45,7 +45,6 @@ export function diff(
 		// Get component and set it to `c`
 		if (oldVNode._component) {
 			c = newVNode._component = oldVNode._component;
-			clearProcessingException = c._processingException = c._pendingError;
 		} else {
 			// Instantiate the new component
 			if ('prototype' in newType && newType.prototype.render) {
@@ -121,10 +120,6 @@ export function diff(
 
 		if (c._renderCallbacks.length) {
 			commitQueue.push(c);
-		}
-
-		if (clearProcessingException) {
-			c._pendingError = c._processingException = null;
 		}
 
 		c._force = false;
