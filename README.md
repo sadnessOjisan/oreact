@@ -151,3 +151,4 @@ npm publish --access=public
 - createContext
 - ref
 - dangerouslySetInnerHTML;
+- svg サポート

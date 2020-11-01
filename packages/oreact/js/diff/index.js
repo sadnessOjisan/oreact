@@ -239,20 +239,7 @@ function diffElementNodes(
 			dom.data = newProps;
 		}
 	} else {
-		if (excessDomChildren != null) {
-			excessDomChildren = EMPTY_ARR.slice.call(dom.childNodes);
-		}
-
 		oldProps = oldVNode.props || EMPTY_OBJ;
-
-		// But, if we are in a situation where we are using existing DOM (e.g. replaceNode)
-		// we should read the existing DOM attributes to diff them
-		if (excessDomChildren != null) {
-			oldProps = {};
-			for (let i = 0; i < dom.attributes.length; i++) {
-				oldProps[dom.attributes[i].name] = dom.attributes[i].value;
-			}
-		}
 
 		diffProps(dom, newProps, oldProps, isSvg, false);
 
