@@ -16,7 +16,9 @@ export function createElement(type, props, children) {
     }
     if (arguments.length > 3) {
         children = [children];
-        // https://github.com/preactjs/preact/issues/1916
+        if (!Array.isArray(children)) {
+            throw new Error();
+        }
         for (i = 3; i < arguments.length; i++) {
             children.push(arguments[i]);
         }

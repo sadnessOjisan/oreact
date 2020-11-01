@@ -13,7 +13,7 @@ export function createElement(
 	props: PropsType,
 	children: ComponentChildren
 ) {
-	let normalizedProps = {},
+	let normalizedProps: { children?: ComponentChildren } = {},
 		key,
 		i;
 	for (i in props) {
@@ -23,7 +23,9 @@ export function createElement(
 
 	if (arguments.length > 3) {
 		children = [children];
-		// https://github.com/preactjs/preact/issues/1916
+		if (!Array.isArray(children)) {
+			throw new Error();
+		}
 		for (i = 3; i < arguments.length; i++) {
 			children.push(arguments[i]);
 		}
@@ -42,7 +44,13 @@ export function createElement(
 		}
 	}
 
-	return createVNode(type, normalizedProps, key, undefined, null);
+	return createVNode(
+		type,
+		normalizedProps as { children: ComponentChildren },
+		key,
+		undefined,
+		null
+	);
 }
 
 /**
@@ -59,14 +67,14 @@ export function createElement(
  */
 export function createVNode(
 	type: VNode['type'],
-	props: PropsType,
+	props: VNode<PropsType>['props'] | string | number,
 	key: Key,
 	ref: undefined,
-	original: VNode | null
+	original: VNode | null | string | number
 ) {
 	// V8 seems to be better at detecting type shapes if the object is allocated from the same call site
 	// Do not inline into createElement and coerceToVNode!
-	const vnode: VNode = {
+	const vnode: VNode<PropsType> = {
 		type,
 		props,
 		key,

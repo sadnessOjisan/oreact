@@ -112,6 +112,7 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
             // To fix it we make sure to reset the inferred value, so that our own
             // value check in `diff()` won't be skipped.
             if (!false && newParentVNode.type == 'option') {
+                // form なのでキャスト
                 parentDom.value = '';
             }
             else if (typeof newParentVNode.type == 'function') {
@@ -157,6 +158,9 @@ export function placeChild(parentDom, childVNode, oldVNode, oldChildren, excessD
             nextDom = null;
         }
         else {
+            if (!Array.isArray(oldChildren)) {
+                throw new Error('配列であるべき');
+            }
             // `j<oldChildrenLength; j+=2` is an alternative to `j++<oldChildrenLength/2`
             for (var sibDom = oldDom, j = 0; (sibDom = sibDom.nextSibling) && j < oldChildren.length; j += 2) {
                 if (sibDom == newDom) {

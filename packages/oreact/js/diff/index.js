@@ -139,8 +139,7 @@ function diffElementNodes(dom, newVNode, oldVNode, globalContext, excessDomChild
         excessDomChildren = null;
     }
     if (newVNode.type === null) {
-        // During hydration, we still have to split merged text from SSR'd HTML.
-        if (oldProps !== newProps && (!false || dom.data !== newProps)) {
+        if (oldProps !== newProps && dom.data !== newProps) {
             dom.data = newProps;
         }
     }

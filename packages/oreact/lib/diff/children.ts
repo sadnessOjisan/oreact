@@ -30,7 +30,7 @@ export function diffChildren(
 	globalContext: Object,
 	excessDomChildren: PreactElement,
 	commitQueue: Component[],
-	oldDom: Node | Text
+	oldDom: Element | Text
 ) {
 	let i, j, oldVNode, childVNode, newDom, firstChildDom;
 
@@ -170,7 +170,8 @@ export function diffChildren(
 			// To fix it we make sure to reset the inferred value, so that our own
 			// value check in `diff()` won't be skipped.
 			if (!false && newParentVNode.type == 'option') {
-				parentDom.value = '';
+				// form なのでキャスト
+				((parentDom as any) as HTMLInputElement).value = '';
 			} else if (typeof newParentVNode.type == 'function') {
 				// Because the newParentVNode is Fragment-like, we need to set it's
 				// _nextDom property to the nextSibling of its last child DOM node.
@@ -179,7 +180,7 @@ export function diffChildren(
 				// is a Fragment-like, then oldDom has already been set to that child's _nextDom.
 				// If the last child is a DOM VNode, then oldDom will be set to that DOM
 				// node's nextSibling.
-				newParentVNode._nextDom = oldDom;
+				newParentVNode._nextDom = oldDom as PreactElement;
 			}
 		}
 	}
@@ -200,7 +201,7 @@ export function placeChild(
 	excessDomChildren: ComponentChildren,
 	newDom: Node | Text,
 	oldDom: Node | Text
-) {
+): PreactElement {
 	let nextDom;
 	if (childVNode._nextDom !== undefined) {
 		// Only Fragments or components that return Fragment like VNodes will
@@ -226,6 +227,9 @@ export function placeChild(
 			parentDom.appendChild(newDom);
 			nextDom = null;
 		} else {
+			if (!Array.isArray(oldChildren)) {
+				throw new Error('配列であるべき');
+			}
 			// `j<oldChildrenLength; j+=2` is an alternative to `j++<oldChildrenLength/2`
 			for (
 				let sibDom = oldDom, j = 0;
@@ -250,5 +254,5 @@ export function placeChild(
 		oldDom = newDom.nextSibling;
 	}
 
-	return oldDom;
+	return oldDom as PreactElement;
 }

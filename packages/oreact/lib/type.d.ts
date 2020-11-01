@@ -21,7 +21,14 @@ export interface ComponentClass<P = {}, S = {}> {
 
 export type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
 
-export type PropsType = { is?: string };
+export type PropsType = {
+	// createElementのoption
+	is?: string;
+	// form
+	checked?: any;
+	// form
+	value?: any;
+};
 
 export type Key = string | number | any;
 
@@ -70,7 +77,7 @@ interface VNode<P = {}> {
 	_hydrating: boolean | null;
 	constructor: undefined;
 	// 初回レンダリングでは与えられないが、renderComponent から詰め込まれていく
-	_original?: VNode | null;
+	_original?: VNode | null | string | number;
 }
 
 interface Context<T> {
