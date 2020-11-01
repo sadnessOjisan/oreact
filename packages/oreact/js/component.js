@@ -19,22 +19,14 @@ export function Component(props) {
  * @param {object | ((s: object, p: object) => object)} update A hash of state
  * properties to update with new values or a function that given the current
  * state and props returns a new partial state
- * @param {() => void} [callback] A function to be called once component state is
- * updated
  */
-Component.prototype.setState = function (update, callback) {
+Component.prototype.setState = function (update) {
 	// only clone state when copying to nextState the first time.
 	let s;
 	if (this._nextState != null && this._nextState !== this.state) {
 		s = this._nextState;
 	} else {
 		s = this._nextState = assign({}, this.state);
-	}
-
-	if (typeof update == 'function') {
-		// Some libraries like `immer` mark the current state as readonly,
-		// preventing us from mutating it, so we need to clone it. See #2716
-		update = update(assign({}, s), this.props);
 	}
 
 	if (update) {
@@ -45,7 +37,6 @@ Component.prototype.setState = function (update, callback) {
 	if (update == null) return;
 
 	if (this._vnode) {
-		if (callback) this._renderCallbacks.push(callback);
 		enqueueRender(this);
 	}
 };
