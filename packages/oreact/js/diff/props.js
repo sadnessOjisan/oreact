@@ -1,3 +1,4 @@
+import { IS_NON_DIMENSIONAL } from '../constants';
 /**
  * Diff the old and new properties of a VNode and apply changes to the DOM node
  * @param {import('../internal').PreactElement} dom The DOM node to apply

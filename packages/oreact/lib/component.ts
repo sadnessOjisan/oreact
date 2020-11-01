@@ -1,6 +1,7 @@
 import { assign } from './util';
 import { diff, commitRoot } from './diff/index';
 import { Fragment } from './create-element';
+import { Component, PropsType, VNode } from './type';
 
 /**
  * Base Component class. Provides `setState()` and `forceUpdate()`, which
@@ -9,17 +10,17 @@ import { Fragment } from './create-element';
  * @param {object} context The initial context from parent components'
  * getChildContext
  */
-export function Component(props) {
+export function Component(props: PropsType) {
 	this.props = props;
 }
 
 /**
  * Update component state and schedule a re-render.
- * @param {object | ((s: object, p: object) => object)} update A hash of state
+ * @param {object } update A hash of state
  * properties to update with new values or a function that given the current
  * state and props returns a new partial state
  */
-Component.prototype.setState = function (update) {
+Component.prototype.setState = function (update: Object) {
 	// only clone state when copying to nextState the first time.
 	let s;
 	if (this._nextState != null && this._nextState !== this.state) {
@@ -41,22 +42,6 @@ Component.prototype.setState = function (update) {
 };
 
 /**
- * Immediately perform a synchronous re-render of the component
- * @param {() => void} [callback] A function to be called after component is
- * re-rendered
- */
-Component.prototype.forceUpdate = function (callback) {
-	if (this._vnode) {
-		// Set render mode so that we can differentiate where the render request
-		// is coming from. We need this because forceUpdate should never call
-		// shouldComponentUpdate
-		this._force = true;
-		if (callback) this._renderCallbacks.push(callback);
-		enqueueRender(this);
-	}
-};
-
-/**
  * Accepts `props` and `state`, and returns a new Virtual DOM tree to build.
  * Virtual DOM is generally constructed via [JSX](http://jasonformat.com/wtf-is-jsx).
  * @param {object} props Props (eg: JSX attributes) received from parent
@@ -72,7 +57,7 @@ Component.prototype.render = Fragment;
  * @param {import('./internal').VNode} vnode
  * @param {number | null} [childIndex]
  */
-export function getDomSibling(vnode, childIndex) {
+export function getDomSibling(vnode: VNode, childIndex: number | null) {
 	if (childIndex == null) {
 		// Use childIndex==null as a signal to resume the search from the vnode's sibling
 		return vnode._parent
@@ -104,7 +89,7 @@ export function getDomSibling(vnode, childIndex) {
  * Trigger in-place re-rendering of a component.
  * @param {import('./internal').Component} component The component to rerender
  */
-function renderComponent(component) {
+function renderComponent(component: Component) {
 	let vnode = component._vnode,
 		oldDom = vnode._dom,
 		parentDom = component._parentDom;
@@ -134,7 +119,7 @@ function renderComponent(component) {
 /**
  * @param {import('./internal').VNode} vnode
  */
-function updateParentDomPointers(vnode) {
+function updateParentDomPointers(vnode: VNode) {
 	if ((vnode = vnode._parent) != null && vnode._component != null) {
 		vnode._dom = vnode._component.base = null;
 		for (let i = 0; i < vnode._children.length; i++) {
@@ -153,7 +138,7 @@ function updateParentDomPointers(vnode) {
  * The render queue
  * @type {Array<import('./internal').Component>}
  */
-let rerenderQueue = [];
+let rerenderQueue: Component[] = [];
 
 /**
  * Asynchronously schedule a callback
@@ -161,7 +146,7 @@ let rerenderQueue = [];
  */
 /* istanbul ignore next */
 // Note the following line isn't tree-shaken by rollup cuz of rollup/rollup#2566
-const defer =
+const defer: (cb: () => void) => void =
 	typeof Promise == 'function'
 		? Promise.prototype.then.bind(Promise.resolve())
 		: setTimeout;
@@ -179,7 +164,7 @@ const defer =
  * Enqueue a rerender of a component
  * @param {import('./internal').Component} c The component to rerender
  */
-export function enqueueRender(c) {
+export function enqueueRender(c: Component) {
 	if (
 		(!c._dirty &&
 			(c._dirty = true) &&

@@ -1,3 +1,4 @@
+import { IS_NON_DIMENSIONAL } from '../constants';
 import { PreactElement, PropsType } from '../type';
 
 /**

@@ -1,6 +1,7 @@
 import { assign } from './util';
 import { diff, commitRoot } from './diff/index';
 import { Fragment } from './create-element';
+import { Component } from './type';
 /**
  * Base Component class. Provides `setState()` and `forceUpdate()`, which
  * trigger rendering
@@ -13,7 +14,7 @@ export function Component(props) {
 }
 /**
  * Update component state and schedule a re-render.
- * @param {object | ((s: object, p: object) => object)} update A hash of state
+ * @param {object } update A hash of state
  * properties to update with new values or a function that given the current
  * state and props returns a new partial state
  */
@@ -33,22 +34,6 @@ Component.prototype.setState = function (update) {
     if (update == null)
         return;
     if (this._vnode) {
-        enqueueRender(this);
-    }
-};
-/**
- * Immediately perform a synchronous re-render of the component
- * @param {() => void} [callback] A function to be called after component is
- * re-rendered
- */
-Component.prototype.forceUpdate = function (callback) {
-    if (this._vnode) {
-        // Set render mode so that we can differentiate where the render request
-        // is coming from. We need this because forceUpdate should never call
-        // shouldComponentUpdate
-        this._force = true;
-        if (callback)
-            this._renderCallbacks.push(callback);
         enqueueRender(this);
     }
 };
