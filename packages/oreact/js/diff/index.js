@@ -12,7 +12,6 @@ import options from '../options';
  * @param {import('../internal').VNode} newVNode The new virtual node
  * @param {import('../internal').VNode} oldVNode The old virtual node
  * @param {object} globalContext The current context object. Modified by getChildContext
- * @param {boolean} isSvg Whether or not this element is an SVG node
  * @param {Array<import('../internal').PreactElement>} excessDomChildren 初回レンダリングで[script]が入る、それ以降はnull
  * @param {Array<import('../internal').Component>} commitQueue List of components
  * which have callbacks to invoke in commitRoot
@@ -26,7 +25,6 @@ export function diff(
 	newVNode,
 	oldVNode,
 	globalContext,
-	isSvg,
 	excessDomChildren,
 	commitQueue,
 	oldDom
@@ -114,7 +112,6 @@ export function diff(
 			newVNode,
 			oldVNode,
 			globalContext,
-			isSvg,
 			excessDomChildren,
 			commitQueue,
 			oldDom,
@@ -147,7 +144,6 @@ export function diff(
 			newVNode,
 			oldVNode,
 			globalContext,
-			isSvg,
 			excessDomChildren,
 			commitQueue
 		);
@@ -180,7 +176,6 @@ export function commitRoot(commitQueue, root) {
  * @param {import('../internal').VNode} newVNode The new virtual node
  * @param {import('../internal').VNode} oldVNode The old virtual node
  * @param {object} globalContext The current context object
- * @param {boolean} isSvg Whether or not this DOM node is an SVG node
  * @param {*} excessDomChildren
  * @param {Array<import('../internal').Component>} commitQueue List of components
  * which have callbacks to invoke in commitRoot
@@ -191,7 +186,6 @@ function diffElementNodes(
 	newVNode,
 	oldVNode,
 	globalContext,
-	isSvg,
 	excessDomChildren,
 	commitQueue
 ) {
@@ -229,11 +223,9 @@ function diffElementNodes(
 			newVNode,
 			oldVNode,
 			globalContext,
-			newVNode.type === 'foreignObject' ? false : isSvg,
 			excessDomChildren,
 			commitQueue,
-			EMPTY_OBJ,
-			false
+			EMPTY_OBJ
 		);
 
 		if (

@@ -30,7 +30,6 @@ export function render(vnode, parentDom) {
 		(parentDom._children = vnode),
 		oldVNode || EMPTY_OBJ,
 		EMPTY_OBJ,
-		parentDom.ownerSVGElement !== undefined,
 		oldVNode
 			? null
 			: parentDom.childNodes.length
