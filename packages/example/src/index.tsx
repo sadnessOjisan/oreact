@@ -1,40 +1,131 @@
-import { h, render, Component } from 'oreact';
+import { h, render, Component, Fragment } from 'oreact';
+
+import { h, Fragment, Component } from 'preact';
 
 class App extends Component {
 	constructor() {
 		this.state = {
-			count: 10000000
+			count: 10000000,
+			data: []
 		};
 	}
 
 	componentDidMount() {
-		console.log('<<<FIRE componentdidmount>>>');
-		this.setState({ count: 0 });
+		this.setState({
+			...this.state,
+			count: 0,
+			data: [
+				{
+					name: 'taro'
+				},
+				{
+					name: 'hanako'
+				}
+			]
+		});
+	}
+
+	componentWillReceiveProps(next) {
+		console.log('next.props:', next.props);
 	}
 
 	render() {
-		console.log('<<<App Render>>>');
 		return h(
 			'div',
-			null,
+			{
+				style: {
+					color: 'blue'
+				}
+			},
 			h(
-				'button',
-				{
-					onClick: () => {
-						this.setState({ count: this.state.count + 1 });
-					}
-				},
-				'add'
+				'section',
+				null,
+				h('h1', null, 'counting area'),
+				h('span', null, 'count: '),
+				h('span', null, this.state.count),
+				h(
+					'button',
+					{
+						onClick: () =>
+							this.setState({ ...this.state, count: this.state.count + 1 })
+					},
+					'add'
+				)
 			),
 			h(
-				'div',
+				'section',
 				null,
-				h('span', null, 'count: '),
-				h('span', null, this.state.count)
+				h('h1', null, 'user data area'),
+				h(
+					'ul',
+					null,
+					this.state.data.map((d, i) =>
+						h(ListItem, {
+							name: d.name,
+							handleDelete: () => {
+								this.setState({
+									...this.state,
+									data: this.state.data.filter((_, j) => {
+										return i !== j;
+									})
+								});
+							}
+						})
+					)
+				),
+				h(
+					'form',
+					{
+						onSubmit: (e) => {
+							e.preventDefault();
+							const userName = e.target['name'].value;
+							this.setState({
+								...this.state,
+								data: [
+									...this.state.data,
+									{
+										name: userName
+									}
+								]
+							});
+						}
+					},
+					h('input', {
+						name: 'name'
+					}),
+					h(
+						'button',
+						{
+							type: 'submit'
+						},
+						'add'
+					)
+				)
 			)
 		);
 	}
 }
 
-console.log('<<<Root Render>>>');
+class ListItem extends Component {
+	componentWillReceiveProps(nextProps, prevProps) {
+		console.log('next.props:', nextProps);
+		console.log('next.props:', prevProps);
+	}
+
+	render() {
+		return h(
+			Fragment,
+			null,
+			h('li', null, this.props.name),
+			h(
+				'button',
+				{
+					onClick: () => this.props.handleDelete()
+				},
+				'delete'
+			)
+		);
+	}
+}
+
 render(h(App, null, null), document.body);
