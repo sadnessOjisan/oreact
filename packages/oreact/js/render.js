@@ -13,18 +13,14 @@ export function render(vnode, parentDom) {
     // this by assigning a new `_children` property to DOM nodes which points
     // to the last rendered tree. By default this property is not present, which
     // means that we are mounting a new tree for the first time.
-    var oldVNode = parentDom._children;
+    console.log(parentDom.childNodes);
     vnode = createElement(Fragment, null, [vnode]);
     // List of effects that need to be called after diffing.
     var commitQueue = [];
     diff(parentDom, 
     // Determine the new vnode tree and store it on the DOM element on
     // our custom `_children` property.
-    (parentDom._children = vnode), oldVNode || EMPTY_OBJ, EMPTY_OBJ, oldVNode
-        ? null
-        : parentDom.childNodes.length
-            ? EMPTY_ARR.slice.call(parentDom.childNodes)
-            : null, commitQueue, EMPTY_OBJ);
+    (parentDom._children = vnode), EMPTY_OBJ, EMPTY_OBJ, EMPTY_ARR.slice.call(parentDom.childNodes), commitQueue, EMPTY_OBJ);
     // Flush all queued effects
     commitRoot(commitQueue);
 }
