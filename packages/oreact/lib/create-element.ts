@@ -1,3 +1,5 @@
+import { ComponentChildren, Key, PropsType, VNode } from './type';
+
 /**
  * Create an virtual node (used for JSX)
  * @param {import('./internal').VNode["type"]} type The node name or Component
@@ -8,7 +10,7 @@
  */
 export function createElement(
 	type: VNode['type'],
-	props: Object | null,
+	props: PropsType,
 	children: ComponentChildren
 ) {
 	let normalizedProps = {},
@@ -55,10 +57,16 @@ export function createElement(
  * receive a reference to its created child
  * @returns {import('./internal').VNode}
  */
-export function createVNode(type, props, key, ref, original) {
+export function createVNode(
+	type: VNode['type'],
+	props: PropsType,
+	key: Key,
+	ref: undefined,
+	original: VNode | null
+) {
 	// V8 seems to be better at detecting type shapes if the object is allocated from the same call site
 	// Do not inline into createElement and coerceToVNode!
-	const vnode = {
+	const vnode: VNode = {
 		type,
 		props,
 		key,
@@ -83,11 +91,7 @@ export function createVNode(type, props, key, ref, original) {
 	return vnode;
 }
 
-export function createRef() {
-	return { current: null };
-}
-
-export function Fragment(props) {
+export function Fragment(props: VNode['props']) {
 	return props.children;
 }
 
@@ -96,5 +100,5 @@ export function Fragment(props) {
  * @param {*} vnode
  * @returns {vnode is import('./internal').VNode}
  */
-export const isValidElement = (vnode) =>
+export const isValidElement = (vnode: VNode) =>
 	vnode != null && vnode.constructor === undefined;

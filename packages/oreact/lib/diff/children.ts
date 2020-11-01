@@ -2,6 +2,7 @@ import { diff, unmount } from './index';
 import { createVNode, Fragment } from '../create-element';
 import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
 import { getDomSibling } from '../component';
+import { Component, ComponentChildren, PreactElement, VNode } from '../type';
 
 /**
  * Diff the children of a virtual node
@@ -22,14 +23,14 @@ import { getDomSibling } from '../component';
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
 export function diffChildren(
-	parentDom,
-	renderResult,
-	newParentVNode,
-	oldParentVNode,
-	globalContext,
-	excessDomChildren,
-	commitQueue,
-	oldDom
+	parentDom: PreactElement,
+	renderResult: ComponentChildren[],
+	newParentVNode: VNode,
+	oldParentVNode: VNode,
+	globalContext: Object,
+	excessDomChildren: PreactElement,
+	commitQueue: Component[],
+	oldDom: Node | Text
 ) {
 	let i, j, oldVNode, childVNode, newDom, firstChildDom;
 
@@ -192,13 +193,13 @@ export function diffChildren(
 }
 
 export function placeChild(
-	parentDom,
-	childVNode,
-	oldVNode,
-	oldChildren,
-	excessDomChildren,
-	newDom,
-	oldDom
+	parentDom: PreactElement,
+	childVNode: VNode,
+	oldVNode: VNode,
+	oldChildren: ComponentChildren,
+	excessDomChildren: ComponentChildren,
+	newDom: Node | Text,
+	oldDom: Node | Text
 ) {
 	let nextDom;
 	if (childVNode._nextDom !== undefined) {

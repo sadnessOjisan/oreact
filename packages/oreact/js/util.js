@@ -8,7 +8,7 @@
 export function assign(obj, props) {
     for (var i in props)
         obj[i] = props[i];
-    return /** @type {O & P} */ (obj);
+    return /** @type {O & P} */ obj;
 }
 /**
  * Remove a child node from its parent if attached. This is a workaround for

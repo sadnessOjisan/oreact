@@ -73,9 +73,6 @@ export function createVNode(type, props, key, ref, original) {
         vnode._original = vnode;
     return vnode;
 }
-export function createRef() {
-    return { current: null };
-}
 export function Fragment(props) {
     return props.children;
 }

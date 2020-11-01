@@ -1,3 +1,5 @@
+import { PreactElement, PropsType } from '../type';
+
 /**
  * Diff the old and new properties of a VNode and apply changes to the DOM node
  * @param {import('../internal').PreactElement} dom The DOM node to apply
@@ -5,7 +7,11 @@
  * @param {object} newProps The new props
  * @param {object} oldProps The old props
  */
-export function diffProps(dom, newProps, oldProps) {
+export function diffProps(
+	dom: PreactElement,
+	newProps: PropsType,
+	oldProps: PropsType
+) {
 	let i;
 
 	for (i in oldProps) {
@@ -27,7 +33,7 @@ export function diffProps(dom, newProps, oldProps) {
 	}
 }
 
-function setStyle(style, key, value) {
+function setStyle(style: CSSStyleDeclaration, key: string, value: any) {
 	if (key[0] === '-') {
 		style.setProperty(key, value);
 	} else if (value == null) {
@@ -46,7 +52,12 @@ function setStyle(style, key, value) {
  * @param {*} value The value to set the property to
  * @param {*} oldValue The old value the property had
  */
-export function setProperty(dom, name, value, oldValue) {
+export function setProperty(
+	dom: PreactElement,
+	name: string,
+	value: any,
+	oldValue: any
+) {
 	let useCapture, nameLower, proxy;
 
 	if (name === 'style') {

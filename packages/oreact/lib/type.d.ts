@@ -20,6 +20,9 @@ export interface ComponentClass<P = {}, S = {}> {
 }
 
 export type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
+
+export type PropsType = VNode['props'];
+
 export type Key = string | number | any;
 
 interface FunctionComponent<P = {}> {
@@ -37,8 +40,6 @@ type RenderableProps<P, RefType = any> = P &
 	Readonly<Attributes & { children?: ComponentChildren }>;
 
 interface VNode<P = {}> {
-	type: ComponentType<P> | string;
-	props: P & { children: ComponentChildren };
 	key: Key;
 	/**
 	 * The time this `vnode` started rendering. Will only be set when
@@ -52,6 +53,24 @@ interface VNode<P = {}> {
 	 * Default value: `-1`
 	 */
 	endTime?: number;
+	type: string | ComponentFactory<P>;
+	props: P & { children: ComponentChildren };
+	_children: Array<VNode<any>> | null;
+	_parent: VNode | null;
+	_depth: number | null;
+	/**
+	 * The [first (for Fragments)] DOM child of a VNode
+	 */
+	_dom: PreactElement | null;
+	/**
+	 * The last dom child of a Fragment, or components that return a Fragment
+	 */
+	_nextDom: PreactElement | null;
+	_component: Component | null;
+	_hydrating: boolean | null;
+	constructor: undefined;
+	// 初回レンダリングでは与えられないが、renderComponent から詰め込まれていく
+	_original?: VNode | null;
 }
 
 interface Context<T> {
@@ -71,50 +90,30 @@ interface Provider<T>
 		children: ComponentChildren;
 	}> {}
 
-export interface Component<P, S> {
-	constructor(props?: P, context?: any);
+export interface Component<P = {}, S = {}> {
+	// When component is functional component, this is reset to functional component
+	constructor: preact.ComponentType<P>;
+	state: S; // Override Component["state"] to not be readonly for internal use, specifically Hooks
+	base?: PreactElement;
 
-	displayName?: string;
-	defaultProps?: any;
-	contextType?: Context<any>;
-
-	// Static members cannot reference class type parameters. This is not
-	// supported in TypeScript. Reusing the same type arguments from `Component`
-	// will lead to an impossible state where one cannot satisfy the type
-	// constraint under no circumstances, see #1356.In general type arguments
-	// seem to be a bit buggy and not supported well at the time of this
-	// writing with TS 3.3.3333.
-	getDerivedStateFromProps?(
-		props: Readonly<object>,
-		state: Readonly<object>
-	): object | null;
-	getDerivedStateFromError?(error: any): object | null;
-
-	state: Readonly<S>;
-	props: RenderableProps<P>;
-	context: any;
-	base?: Element | Text;
-
-	// From https://github.com/DefinitelyTyped/DefinitelyTyped/blob/e836acc75a78cf0655b5dfdbe81d69fdd4d8a252/types/react/index.d.ts#L402
-	// // We MUST keep setState() as a unified signature because it allows proper checking of the method return type.
-	// // See: https://github.com/DefinitelyTyped/DefinitelyTyped/issues/18365#issuecomment-351013257
-	setState<K extends keyof S>(
-		state:
-			| ((
-					prevState: Readonly<S>,
-					props: Readonly<P>
-			  ) => Pick<S, K> | Partial<S> | null)
-			| (Pick<S, K> | Partial<S> | null),
-		callback?: () => void
-	): void;
-
-	forceUpdate(callback?: () => void): void;
-
-	render(
-		props?: RenderableProps<P>,
-		state?: Readonly<S>,
-		context?: any
-	): ComponentChild;
+	_dirty: boolean;
+	_force?: boolean;
+	_renderCallbacks: Array<() => void>; // Only class components
+	_globalContext?: any;
+	_vnode?: VNode<P> | null;
+	// setStateが呼ばれるとこの値に置き換える
+	_nextState?: S | null; // Only class components
+	/** Only used in the devtools to later dirty check if state has changed */
+	_prevState?: S | null;
+	/**
+	 * Pointer to the parent dom node. This is only needed for top-level Fragment
+	 * components or array returns.
+	 */
+	_parentDom?: PreactElement | null;
+	// Always read, set only when handling error
+	_processingException?: Component<any, any> | null;
+	// Always read, set only when handling error. This is used to indicate at diffTime to set _processingException
+	_pendingError?: Component<any, any> | null;
 }
 
 export interface PreactElement extends HTMLElement, Text {

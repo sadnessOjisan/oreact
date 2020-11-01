@@ -4,7 +4,7 @@ import { Fragment } from '../create-element';
 import { diffChildren } from './children';
 import { diffProps, setProperty } from './props';
 import { removeNode } from '../util';
-import { Component as ComponentType, VNode } from '../type';
+import { Component as ComponentType, PreactElement, VNode } from '../type';
 
 /**
  * Diff two virtual nodes and apply proper changes to the DOM
@@ -21,13 +21,13 @@ import { Component as ComponentType, VNode } from '../type';
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
 export function diff(
-	parentDom,
-	newVNode,
-	oldVNode,
+	parentDom: PreactElement,
+	newVNode: VNode,
+	oldVNode: VNode,
 	globalContext,
-	excessDomChildren,
-	commitQueue,
-	oldDom
+	excessDomChildren: PreactElement[],
+	commitQueue: ComponentType[],
+	oldDom: Element | Text
 ) {
 	let tmp,
 		newType = newVNode.type;
@@ -173,12 +173,12 @@ export function commitRoot(
  * @returns {import('../internal').PreactElement}
  */
 function diffElementNodes(
-	dom,
-	newVNode,
-	oldVNode,
-	globalContext,
-	excessDomChildren,
-	commitQueue
+	dom: PreactElement,
+	newVNode: VNode,
+	oldVNode: VNode,
+	globalContext: Object,
+	excessDomChildren: any,
+	commitQueue: ComponentType[]
 ) {
 	let i;
 	let oldProps = oldVNode.props;
