@@ -164,7 +164,6 @@ export function diff(
 			// ^ could possibly be simplified to:
 			// excessDomChildren.length = 0;
 		}
-		options._catchError(e, newVNode, oldVNode);
 	}
 
 	return newVNode._dom;
@@ -179,15 +178,11 @@ export function commitRoot(commitQueue, root) {
 	if (options._commit) options._commit(root, commitQueue);
 
 	commitQueue.some((c) => {
-		try {
-			commitQueue = c._renderCallbacks;
-			c._renderCallbacks = [];
-			commitQueue.some((cb) => {
-				cb.call(c);
-			});
-		} catch (e) {
-			options._catchError(e, c._vnode);
-		}
+		commitQueue = c._renderCallbacks;
+		c._renderCallbacks = [];
+		commitQueue.some((cb) => {
+			cb.call(c);
+		});
 	});
 }
 
@@ -303,11 +298,7 @@ export function unmount(vnode, parentVNode, skipRemove) {
 
 	if ((r = vnode._component) != null) {
 		if (r.componentWillUnmount) {
-			try {
-				r.componentWillUnmount();
-			} catch (e) {
-				options._catchError(e, parentVNode);
-			}
+			r.componentWillUnmount();
 		}
 
 		r.base = r._parentDom = null;
