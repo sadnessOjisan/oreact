@@ -225,12 +225,10 @@ function diffElementNodes(
 			return document.createTextNode(newProps);
 		}
 
-		dom = isSvg
-			? document.createElementNS('http://www.w3.org/2000/svg', newVNode.type)
-			: document.createElement(
-					newVNode.type,
-					newProps.is && { is: newProps.is }
-			  );
+		dom = document.createElement(
+			newVNode.type,
+			newProps.is && { is: newProps.is }
+		);
 		// we created a new parent, so none of the previously attached children can be reused:
 		excessDomChildren = null;
 	}
@@ -272,26 +270,23 @@ function diffElementNodes(
 			false
 		);
 
-		// (as above, don't diff props during hydration)
-		if (!false) {
-			if (
-				'value' in newProps &&
-				(i = newProps.value) !== undefined &&
-				// #2756 For the <progress>-element the initial value is 0,
-				// despite the attribute not being present. When the attribute
-				// is missing the progress bar is treated as indeterminate.
-				// To fix that we'll always update it when it is 0 for progress elements
-				(i !== dom.value || (newVNode.type === 'progress' && !i))
-			) {
-				setProperty(dom, 'value', i, oldProps.value, false);
-			}
-			if (
-				'checked' in newProps &&
-				(i = newProps.checked) !== undefined &&
-				i !== dom.checked
-			) {
-				setProperty(dom, 'checked', i, oldProps.checked, false);
-			}
+		if (
+			'value' in newProps &&
+			(i = newProps.value) !== undefined &&
+			// #2756 For the <progress>-element the initial value is 0,
+			// despite the attribute not being present. When the attribute
+			// is missing the progress bar is treated as indeterminate.
+			// To fix that we'll always update it when it is 0 for progress elements
+			(i !== dom.value || (newVNode.type === 'progress' && !i))
+		) {
+			setProperty(dom, 'value', i, oldProps.value, false);
+		}
+		if (
+			'checked' in newProps &&
+			(i = newProps.checked) !== undefined &&
+			i !== dom.checked
+		) {
+			setProperty(dom, 'checked', i, oldProps.checked, false);
 		}
 	}
 
