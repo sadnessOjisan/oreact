@@ -82,7 +82,9 @@ export function getDomSibling(vnode: VNode, childIndex: number | null) {
 	// Only climb up and search the parent if we aren't searching through a DOM
 	// VNode (meaning we reached the DOM parent of the original vnode that began
 	// the search)
-	return typeof vnode.type == 'function' ? getDomSibling(vnode) : null;
+	return typeof vnode.type == 'function'
+		? getDomSibling(vnode, undefined)
+		: null;
 }
 
 /**
@@ -96,7 +98,7 @@ function renderComponent(component: ComponentType) {
 
 	if (parentDom) {
 		let commitQueue = [];
-		const oldVNode = assign({}, vnode);
+		const oldVNode = assign({}, vnode) as VNode;
 		oldVNode._original = oldVNode;
 
 		let newDom = diff(
@@ -106,7 +108,7 @@ function renderComponent(component: ComponentType) {
 			component._globalContext,
 			null,
 			commitQueue,
-			oldDom == null ? getDomSibling(vnode) : oldDom
+			oldDom == null ? getDomSibling(vnode, undefined) : oldDom
 		);
 		commitRoot(commitQueue);
 
