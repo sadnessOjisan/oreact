@@ -3,7 +3,7 @@ import { Component } from '../component';
 import { Fragment } from '../create-element';
 import { diffChildren } from './children';
 import { diffProps, setProperty } from './props';
-import { assign, removeNode } from '../util';
+import { removeNode } from '../util';
 import options from '../options';
 
 /**
@@ -97,10 +97,6 @@ export function diff(
 
 		// Handle setState called in render, see #2553
 		c.state = c._nextState;
-
-		if (!isNew && c.getSnapshotBeforeUpdate != null) {
-			snapshot = c.getSnapshotBeforeUpdate(oldProps, oldState);
-		}
 
 		let isTopLevelFragment =
 			tmp != null && tmp.type == Fragment && tmp.key == null;

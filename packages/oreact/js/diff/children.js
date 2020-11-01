@@ -140,8 +140,7 @@ export function diffChildren(
 			globalContext,
 			excessDomChildren,
 			commitQueue,
-			oldDom,
-			false
+			oldDom
 		);
 
 		if (newDom != null) {
