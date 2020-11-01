@@ -32,7 +32,13 @@ export function diffChildren(
 	commitQueue: Component[],
 	oldDom: Element | Text | typeof EMPTY_OBJ
 ) {
-	let i, j, oldVNode, childVNode, newDom, firstChildDom;
+	let i,
+		j,
+		oldVNode,
+		childVNode,
+		newDom,
+		firstChildDom,
+		filteredOldDom: Element | Text | null;
 
 	// This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
 	// as EMPTY_OBJ._children should be `undefined`.
@@ -46,9 +52,9 @@ export function diffChildren(
 	// (e.g. if mounting a new tree in which the old DOM should be ignored (usually for Fragments).
 	if (oldDom == EMPTY_OBJ) {
 		if (oldChildrenLength) {
-			oldDom = getDomSibling(oldParentVNode, 0);
+			filteredOldDom = getDomSibling(oldParentVNode, 0);
 		} else {
-			oldDom = null;
+			filteredOldDom = null;
 		}
 	}
 
@@ -141,7 +147,7 @@ export function diffChildren(
 			globalContext,
 			excessDomChildren,
 			commitQueue,
-			oldDom
+			filteredOldDom
 		);
 
 		if (newDom != null) {
@@ -149,14 +155,14 @@ export function diffChildren(
 				firstChildDom = newDom;
 			}
 
-			oldDom = placeChild(
+			filteredOldDom = placeChild(
 				parentDom,
 				childVNode,
 				oldVNode,
 				oldChildren,
 				excessDomChildren,
 				newDom,
-				oldDom
+				filteredOldDom
 			);
 
 			// Browsers will infer an option's `value` from `textContent` when
@@ -176,11 +182,11 @@ export function diffChildren(
 				// Because the newParentVNode is Fragment-like, we need to set it's
 				// _nextDom property to the nextSibling of its last child DOM node.
 				//
-				// `oldDom` contains the correct value here because if the last child
-				// is a Fragment-like, then oldDom has already been set to that child's _nextDom.
-				// If the last child is a DOM VNode, then oldDom will be set to that DOM
+				// `filteredOldDom` contains the correct value here because if the last child
+				// is a Fragment-like, then filteredOldDom has already been set to that child's _nextDom.
+				// If the last child is a DOM VNode, then filteredOldDom will be set to that DOM
 				// node's nextSibling.
-				newParentVNode._nextDom = oldDom as PreactElement;
+				newParentVNode._nextDom = filteredOldDom as PreactElement;
 			}
 		}
 	}

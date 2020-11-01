@@ -21,7 +21,7 @@ import { getDomSibling } from '../component';
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
 export function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, globalContext, excessDomChildren, commitQueue, oldDom) {
-    var i, j, oldVNode, childVNode, newDom, firstChildDom;
+    var i, j, oldVNode, childVNode, newDom, firstChildDom, filteredOldDom;
     // This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
     // as EMPTY_OBJ._children should be `undefined`.
     var oldChildren = (oldParentVNode && oldParentVNode._children) || EMPTY_ARR;
@@ -32,10 +32,10 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
     // (e.g. if mounting a new tree in which the old DOM should be ignored (usually for Fragments).
     if (oldDom == EMPTY_OBJ) {
         if (oldChildrenLength) {
-            oldDom = getDomSibling(oldParentVNode, 0);
+            filteredOldDom = getDomSibling(oldParentVNode, 0);
         }
         else {
-            oldDom = null;
+            filteredOldDom = null;
         }
     }
     newParentVNode._children = [];
@@ -95,12 +95,12 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
         }
         oldVNode = oldVNode || EMPTY_OBJ;
         // Morph the old element into the new one, but don't append it to the dom yet
-        newDom = diff(parentDom, childVNode, oldVNode, globalContext, excessDomChildren, commitQueue, oldDom);
+        newDom = diff(parentDom, childVNode, oldVNode, globalContext, excessDomChildren, commitQueue, filteredOldDom);
         if (newDom != null) {
             if (firstChildDom == null) {
                 firstChildDom = newDom;
             }
-            oldDom = placeChild(parentDom, childVNode, oldVNode, oldChildren, excessDomChildren, newDom, oldDom);
+            filteredOldDom = placeChild(parentDom, childVNode, oldVNode, oldChildren, excessDomChildren, newDom, filteredOldDom);
             // Browsers will infer an option's `value` from `textContent` when
             // no value is present. This essentially bypasses our code to set it
             // later in `diff()`. It works fine in all browsers except for IE11
@@ -119,11 +119,11 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
                 // Because the newParentVNode is Fragment-like, we need to set it's
                 // _nextDom property to the nextSibling of its last child DOM node.
                 //
-                // `oldDom` contains the correct value here because if the last child
-                // is a Fragment-like, then oldDom has already been set to that child's _nextDom.
-                // If the last child is a DOM VNode, then oldDom will be set to that DOM
+                // `filteredOldDom` contains the correct value here because if the last child
+                // is a Fragment-like, then filteredOldDom has already been set to that child's _nextDom.
+                // If the last child is a DOM VNode, then filteredOldDom will be set to that DOM
                 // node's nextSibling.
-                newParentVNode._nextDom = oldDom;
+                newParentVNode._nextDom = filteredOldDom;
             }
         }
     }
