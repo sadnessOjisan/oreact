@@ -147,10 +147,7 @@ export function diff(
  * which have callbacks to invoke in commitRoot
  * @param {import('../internal').VNode} root
  */
-export function commitRoot(
-	commitQueue: ComponentType<any, any>[],
-	root: VNode
-) {
+export function commitRoot(commitQueue: ComponentType<any, any>[]) {
 	commitQueue.some((c) => {
 		commitQueue = c._renderCallbacks;
 		c._renderCallbacks = [];

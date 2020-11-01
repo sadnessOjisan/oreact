@@ -102,7 +102,7 @@ export function diff(parentDom, newVNode, oldVNode, globalContext, excessDomChil
  * which have callbacks to invoke in commitRoot
  * @param {import('../internal').VNode} root
  */
-export function commitRoot(commitQueue, root) {
+export function commitRoot(commitQueue) {
     commitQueue.some(function (c) {
         commitQueue = c._renderCallbacks;
         c._renderCallbacks = [];

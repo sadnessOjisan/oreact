@@ -36,5 +36,5 @@ export function render(vnode: ComponentChild, parentDom: PreactElement) {
 	);
 
 	// Flush all queued effects
-	commitRoot(commitQueue, vnode);
+	commitRoot(commitQueue);
 }

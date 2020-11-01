@@ -108,7 +108,7 @@ function renderComponent(component: Component) {
 			commitQueue,
 			oldDom == null ? getDomSibling(vnode) : oldDom
 		);
-		commitRoot(commitQueue, vnode);
+		commitRoot(commitQueue);
 
 		if (newDom != oldDom) {
 			updateParentDomPointers(vnode);

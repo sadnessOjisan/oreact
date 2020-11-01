@@ -87,7 +87,7 @@ function renderComponent(component) {
         var oldVNode = assign({}, vnode);
         oldVNode._original = oldVNode;
         var newDom = diff(parentDom, vnode, oldVNode, component._globalContext, null, commitQueue, oldDom == null ? getDomSibling(vnode) : oldDom);
-        commitRoot(commitQueue, vnode);
+        commitRoot(commitQueue);
         if (newDom != oldDom) {
             updateParentDomPointers(vnode);
         }

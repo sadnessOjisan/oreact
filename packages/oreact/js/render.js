@@ -26,5 +26,5 @@ export function render(vnode, parentDom) {
             ? EMPTY_ARR.slice.call(parentDom.childNodes)
             : null, commitQueue, EMPTY_OBJ);
     // Flush all queued effects
-    commitRoot(commitQueue, vnode);
+    commitRoot(commitQueue);
 }
