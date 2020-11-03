@@ -91,7 +91,6 @@ function renderComponent(component) {
             parentDom: parentDom,
             newVNode: vnode,
             oldVNode: oldVNode,
-            globalContext: component._globalContext,
             excessDomChildren: null,
             commitQueue: commitQueue,
             oldDom: oldDom == null ? getDomSibling(vnode, undefined) : oldDom

@@ -1,12 +1,7 @@
 import { EMPTY_OBJ, EMPTY_ARR } from './constants';
 import { commitRoot, diff } from './diff/index';
 import { createElement, Fragment } from './create-element';
-import {
-	Component,
-	ComponentChild,
-	ComponentClass,
-	PreactElement
-} from './type';
+import { ComponentChild, ComponentClass, PreactElement } from './type';
 
 /**
  * Render a Preact virtual node into a DOM element
@@ -20,7 +15,6 @@ export function render(vnode: ComponentChild, parentDom: PreactElement) {
 	// this by assigning a new `_children` property to DOM nodes which points
 	// to the last rendered tree. By default this property is not present, which
 	// means that we are mounting a new tree for the first time.
-	console.log(parentDom.childNodes);
 	const initialVnode = createElement(
 		(Fragment as any) as ComponentClass,
 		null,
