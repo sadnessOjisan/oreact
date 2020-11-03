@@ -80,7 +80,16 @@ export function diff(arg) {
         c.state = c._nextState;
         var isTopLevelFragment = tmp != null && tmp.type == Fragment && tmp.key == null;
         var renderResult = isTopLevelFragment ? tmp.props.children : tmp;
-        diffChildren(parentDom, Array.isArray(renderResult) ? renderResult : [renderResult], newVNode, oldVNode, globalContext, excessDomChildren, commitQueue, oldDom);
+        diffChildren({
+            parentDom: parentDom,
+            renderResult: Array.isArray(renderResult) ? renderResult : [renderResult],
+            newParentVNode: newVNode,
+            oldParentVNode: oldVNode,
+            globalContext: globalContext,
+            excessDomChildren: excessDomChildren,
+            commitQueue: commitQueue,
+            oldDom: oldDom
+        });
         c.base = newVNode._dom;
         // We successfully rendered this VNode, unset any stored hydration/bailout state:
         newVNode._hydrating = null;
@@ -150,7 +159,16 @@ function diffElementNodes(dom, newVNode, oldVNode, globalContext, excessDomChild
         var props = oldVNode.props || EMPTY_OBJ;
         diffProps(dom, newProps, props);
         i = newVNode.props.children;
-        diffChildren(dom, Array.isArray(i) ? i : [i], newVNode, oldVNode, globalContext, excessDomChildren, commitQueue, EMPTY_OBJ);
+        diffChildren({
+            parentDom: dom,
+            renderResult: Array.isArray(i) ? i : [i],
+            newParentVNode: newVNode,
+            oldParentVNode: oldVNode,
+            globalContext: globalContext,
+            excessDomChildren: excessDomChildren,
+            commitQueue: commitQueue,
+            oldDom: EMPTY_OBJ
+        });
     }
     return dom;
 }

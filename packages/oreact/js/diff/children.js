@@ -20,8 +20,8 @@ import { getDomSibling } from '../component';
  * render (except when hydrating). Can be a sibling DOM element when diffing
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
-export function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, globalContext, excessDomChildren, commitQueue, oldDom) {
-    console.log('<diffChildren> fire', arguments);
+export function diffChildren(arg) {
+    var parentDom = arg.parentDom, renderResult = arg.renderResult, newParentVNode = arg.newParentVNode, oldParentVNode = arg.oldParentVNode, globalContext = arg.globalContext, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
     var i, j, oldVNode, childVNode, newDom, firstChildDom, filteredOldDom;
     // This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
     // as EMPTY_OBJ._children should be `undefined`.

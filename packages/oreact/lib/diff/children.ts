@@ -4,6 +4,17 @@ import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
 import { getDomSibling } from '../component';
 import { Component, ComponentChildren, PreactElement, VNode } from '../type';
 
+type DiffChildrenArgType = {
+	parentDom: PreactElement;
+	renderResult: ComponentChildren[];
+	newParentVNode: VNode;
+	oldParentVNode: VNode;
+	globalContext: Object;
+	excessDomChildren: PreactElement;
+	commitQueue: Component[];
+	oldDom: Element | Text | typeof EMPTY_OBJ;
+};
+
 /**
  * Diff the children of a virtual node
  * @param {import('../internal').PreactElement} parentDom The DOM element whose
@@ -22,17 +33,17 @@ import { Component, ComponentChildren, PreactElement, VNode } from '../type';
  * render (except when hydrating). Can be a sibling DOM element when diffing
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
-export function diffChildren(
-	parentDom: PreactElement,
-	renderResult: ComponentChildren[],
-	newParentVNode: VNode,
-	oldParentVNode: VNode,
-	globalContext: Object,
-	excessDomChildren: PreactElement,
-	commitQueue: Component[],
-	oldDom: Element | Text | typeof EMPTY_OBJ
-) {
-	console.log('<diffChildren> fire', arguments);
+export function diffChildren(arg: DiffChildrenArgType) {
+	let {
+		parentDom,
+		renderResult,
+		newParentVNode,
+		oldParentVNode,
+		globalContext,
+		excessDomChildren,
+		commitQueue,
+		oldDom
+	} = arg;
 	let i,
 		j,
 		oldVNode,
