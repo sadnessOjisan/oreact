@@ -1,7 +1,8 @@
 import { assign } from './util';
 import { diff, commitRoot } from './diff/index';
+import options from './options';
 import { Fragment } from './create-element';
-import { Component as ComponentType, PropsType, VNode } from './type';
+import { VNode } from './types/internal';
 
 /**
  * Base Component class. Provides `setState()` and `forceUpdate()`, which
@@ -10,23 +11,34 @@ import { Component as ComponentType, PropsType, VNode } from './type';
  * @param {object} context The initial context from parent components'
  * getChildContext
  */
-export function Component(props: PropsType) {
+export function Component(props, context) {
+	console.log('fire <Component>', arguments);
 	this.props = props;
+	this.context = context;
 }
 
 /**
  * Update component state and schedule a re-render.
- * @param {object } update A hash of state
+ * @param {object | ((s: object, p: object) => object)} update A hash of state
  * properties to update with new values or a function that given the current
  * state and props returns a new partial state
+ * @param {() => void} [callback] A function to be called once component state is
+ * updated
  */
-Component.prototype.setState = function (update: Object) {
+Component.prototype.setState = function (update, callback) {
+	console.log('fire [Component] <setState>', arguments);
 	// only clone state when copying to nextState the first time.
 	let s;
 	if (this._nextState != null && this._nextState !== this.state) {
 		s = this._nextState;
 	} else {
 		s = this._nextState = assign({}, this.state);
+	}
+
+	if (typeof update == 'function') {
+		// Some libraries like `immer` mark the current state as readonly,
+		// preventing us from mutating it, so we need to clone it. See #2716
+		update = update(assign({}, s), this.props);
 	}
 
 	if (update) {
@@ -37,6 +49,7 @@ Component.prototype.setState = function (update: Object) {
 	if (update == null) return;
 
 	if (this._vnode) {
+		if (callback) this._renderCallbacks.push(callback);
 		enqueueRender(this);
 	}
 };
@@ -54,18 +67,22 @@ Component.prototype.setState = function (update: Object) {
 Component.prototype.render = Fragment;
 
 /**
+ * 兄弟DOMを取得する
  * @param {import('./internal').VNode} vnode
  * @param {number | null} [childIndex]
  */
-export function getDomSibling(vnode: VNode, childIndex: number | null) {
+export function getDomSibling(vnode: VNode, childIndex?: number) {
+	console.log('fire <getDomSibling>', arguments);
 	if (childIndex == null) {
 		// Use childIndex==null as a signal to resume the search from the vnode's sibling
 		return vnode._parent
-			? getDomSibling(vnode._parent, vnode._parent._children.indexOf(vnode) + 1)
+			? getDomSibling(vnode._parent, vnode._parent._children.indexOf(vnode) + 1) // この+1がないと自分が対象になるから？
 			: null;
 	}
 
 	let sibling;
+
+	// 最初に見つかった兄弟要素を返す
 	for (; childIndex < vnode._children.length; childIndex++) {
 		sibling = vnode._children[childIndex];
 
@@ -82,35 +99,36 @@ export function getDomSibling(vnode: VNode, childIndex: number | null) {
 	// Only climb up and search the parent if we aren't searching through a DOM
 	// VNode (meaning we reached the DOM parent of the original vnode that began
 	// the search)
-	return typeof vnode.type == 'function'
-		? getDomSibling(vnode, undefined)
-		: null;
+	return typeof vnode.type == 'function' ? getDomSibling(vnode) : null;
 }
 
 /**
  * Trigger in-place re-rendering of a component.
  * @param {import('./internal').Component} component The component to rerender
  */
-function renderComponent(component: ComponentType) {
+function renderComponent(component) {
+	console.log('fire <renderComponent>', arguments);
 	let vnode = component._vnode,
 		oldDom = vnode._dom,
 		parentDom = component._parentDom;
 
 	if (parentDom) {
 		let commitQueue = [];
-		const oldVNode = assign({}, vnode) as VNode;
+		const oldVNode = assign({}, vnode);
 		oldVNode._original = oldVNode;
 
-		let newDom = diff({
-			parentDom: parentDom,
-			newVNode: vnode,
-			oldVNode: oldVNode,
-			excessDomChildren: null,
-			commitQueue: commitQueue,
-			oldDom: oldDom == null ? getDomSibling(vnode, undefined) : oldDom
-		});
-
-		commitRoot(commitQueue);
+		let newDom = diff(
+			parentDom,
+			vnode,
+			oldVNode,
+			component._globalContext,
+			parentDom.ownerSVGElement !== undefined,
+			vnode._hydrating != null ? [oldDom] : null,
+			commitQueue,
+			oldDom == null ? getDomSibling(vnode) : oldDom,
+			vnode._hydrating
+		);
+		commitRoot(commitQueue, vnode);
 
 		if (newDom != oldDom) {
 			updateParentDomPointers(vnode);
@@ -121,8 +139,7 @@ function renderComponent(component: ComponentType) {
 /**
  * @param {import('./internal').VNode} vnode
  */
-function updateParentDomPointers(vnode: VNode) {
-	console.log('<updateParentDomPointers> fire', arguments);
+function updateParentDomPointers(vnode) {
 	if ((vnode = vnode._parent) != null && vnode._component != null) {
 		vnode._dom = vnode._component.base = null;
 		for (let i = 0; i < vnode._children.length; i++) {
@@ -141,7 +158,7 @@ function updateParentDomPointers(vnode: VNode) {
  * The render queue
  * @type {Array<import('./internal').Component>}
  */
-let rerenderQueue: ComponentType[] = [];
+let rerenderQueue = [];
 
 /**
  * Asynchronously schedule a callback
@@ -149,7 +166,7 @@ let rerenderQueue: ComponentType[] = [];
  */
 /* istanbul ignore next */
 // Note the following line isn't tree-shaken by rollup cuz of rollup/rollup#2566
-const defer: (cb: () => void) => void =
+const defer =
 	typeof Promise == 'function'
 		? Promise.prototype.then.bind(Promise.resolve())
 		: setTimeout;
@@ -163,19 +180,23 @@ const defer: (cb: () => void) => void =
  * * [Callbacks synchronous and asynchronous](https://blog.ometer.com/2011/07/24/callbacks-synchronous-and-asynchronous/)
  */
 
+let prevDebounce;
+
 /**
  * Enqueue a rerender of a component
  * @param {import('./internal').Component} c The component to rerender
  */
-export function enqueueRender(c: ComponentType) {
+export function enqueueRender(c) {
+	console.log('fire <enqueueRender>', arguments);
 	if (
 		(!c._dirty &&
 			(c._dirty = true) &&
 			rerenderQueue.push(c) &&
 			!process._rerenderCount++) ||
-		true
+		prevDebounce !== options.debounceRendering
 	) {
-		defer(process);
+		prevDebounce = options.debounceRendering;
+		(prevDebounce || defer)(process);
 	}
 }
 

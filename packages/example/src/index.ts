@@ -1,9 +1,8 @@
 import { h, render, Component, Fragment } from 'oreact';
 
-import { h, Fragment, Component } from 'preact';
-
 class App extends Component {
 	constructor() {
+		super();
 		this.state = {
 			count: 10000000,
 			data: []
