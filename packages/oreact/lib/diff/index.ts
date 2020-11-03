@@ -146,14 +146,14 @@ export function diff(arg: DiffArgType) {
 		newVNode._children = oldVNode._children;
 		newVNode._dom = oldVNode._dom;
 	} else {
-		newVNode._dom = diffElementNodes(
-			oldVNode._dom,
-			newVNode,
-			oldVNode,
-			globalContext,
-			excessDomChildren,
-			commitQueue
-		) as PreactElement;
+		newVNode._dom = diffElementNodes({
+			dom: oldVNode._dom,
+			newVNode: newVNode,
+			oldVNode: oldVNode,
+			globalContext: globalContext,
+			excessDomChildren: excessDomChildren,
+			commitQueue: commitQueue
+		}) as PreactElement;
 	}
 
 	return newVNode._dom;
@@ -174,6 +174,15 @@ export function commitRoot(commitQueue: ComponentType<any, any>[]) {
 	});
 }
 
+type DiffElementArgType = {
+	dom: PreactElement;
+	newVNode: VNode<PropsType>;
+	oldVNode: VNode<PropsType>;
+	globalContext: Object;
+	excessDomChildren: any;
+	commitQueue: ComponentType[];
+};
+
 /**
  * Diff two virtual nodes representing DOM element
  * @param {import('../internal').PreactElement} dom The DOM element representing
@@ -186,14 +195,15 @@ export function commitRoot(commitQueue: ComponentType<any, any>[]) {
  * which have callbacks to invoke in commitRoot
  * @returns {import('../internal').PreactElement}
  */
-function diffElementNodes(
-	dom: PreactElement,
-	newVNode: VNode<PropsType>,
-	oldVNode: VNode<PropsType>,
-	globalContext: Object,
-	excessDomChildren: any,
-	commitQueue: ComponentType[]
-) {
+function diffElementNodes(arg: DiffElementArgType) {
+	let {
+		dom,
+		newVNode,
+		oldVNode,
+		globalContext,
+		excessDomChildren,
+		commitQueue
+	} = arg;
 	let i;
 	let oldProps = oldVNode.props;
 	let newProps = newVNode.props;

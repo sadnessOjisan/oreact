@@ -104,7 +104,14 @@ export function diff(arg) {
         newVNode._dom = oldVNode._dom;
     }
     else {
-        newVNode._dom = diffElementNodes(oldVNode._dom, newVNode, oldVNode, globalContext, excessDomChildren, commitQueue);
+        newVNode._dom = diffElementNodes({
+            dom: oldVNode._dom,
+            newVNode: newVNode,
+            oldVNode: oldVNode,
+            globalContext: globalContext,
+            excessDomChildren: excessDomChildren,
+            commitQueue: commitQueue
+        });
     }
     return newVNode._dom;
 }
@@ -134,7 +141,8 @@ export function commitRoot(commitQueue) {
  * which have callbacks to invoke in commitRoot
  * @returns {import('../internal').PreactElement}
  */
-function diffElementNodes(dom, newVNode, oldVNode, globalContext, excessDomChildren, commitQueue) {
+function diffElementNodes(arg) {
+    var dom = arg.dom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, globalContext = arg.globalContext, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue;
     var i;
     var oldProps = oldVNode.props;
     var newProps = newVNode.props;
