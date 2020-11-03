@@ -13,7 +13,6 @@ export function render(vnode, parentDom) {
     // this by assigning a new `_children` property to DOM nodes which points
     // to the last rendered tree. By default this property is not present, which
     // means that we are mounting a new tree for the first time.
-    console.log(parentDom.childNodes);
     var initialVnode = createElement(Fragment, null, [vnode]);
     // List of effects that need to be called after diffing.
     var commitQueue = [];
