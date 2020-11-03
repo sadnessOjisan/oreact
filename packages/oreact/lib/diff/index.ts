@@ -73,7 +73,6 @@ export function diff(arg: DiffArgType) {
 
 			c.props = newProps;
 			if (!c.state) c.state = {};
-			c._globalContext = globalContext;
 			isNew = c._dirty = true;
 			c._renderCallbacks = [];
 		}
@@ -122,7 +121,6 @@ export function diff(arg: DiffArgType) {
 			renderResult: Array.isArray(renderResult) ? renderResult : [renderResult],
 			newParentVNode: newVNode,
 			oldParentVNode: oldVNode,
-			globalContext: globalContext,
 			excessDomChildren: excessDomChildren,
 			commitQueue: commitQueue,
 			oldDom: oldDom
@@ -149,7 +147,6 @@ export function diff(arg: DiffArgType) {
 			dom: oldVNode._dom,
 			newVNode: newVNode,
 			oldVNode: oldVNode,
-			globalContext: globalContext,
 			excessDomChildren: excessDomChildren,
 			commitQueue: commitQueue
 		}) as PreactElement;
@@ -177,7 +174,6 @@ type DiffElementArgType = {
 	dom: PreactElement;
 	newVNode: VNode<PropsType>;
 	oldVNode: VNode<PropsType>;
-	globalContext: Object;
 	excessDomChildren: any;
 	commitQueue: ComponentType[];
 };
@@ -195,14 +191,7 @@ type DiffElementArgType = {
  * @returns {import('../internal').PreactElement}
  */
 function diffElementNodes(arg: DiffElementArgType) {
-	let {
-		dom,
-		newVNode,
-		oldVNode,
-		globalContext,
-		excessDomChildren,
-		commitQueue
-	} = arg;
+	let { dom, newVNode, oldVNode, excessDomChildren, commitQueue } = arg;
 	let i;
 	let oldProps = oldVNode.props;
 	let newProps = newVNode.props;
@@ -240,7 +229,6 @@ function diffElementNodes(arg: DiffElementArgType) {
 			renderResult: Array.isArray(i) ? i : [i],
 			newParentVNode: newVNode,
 			oldParentVNode: oldVNode,
-			globalContext: globalContext,
 			excessDomChildren: excessDomChildren,
 			commitQueue: commitQueue,
 			oldDom: EMPTY_OBJ

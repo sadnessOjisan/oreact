@@ -21,7 +21,7 @@ import { getDomSibling } from '../component';
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
 export function diffChildren(arg) {
-    var parentDom = arg.parentDom, renderResult = arg.renderResult, newParentVNode = arg.newParentVNode, oldParentVNode = arg.oldParentVNode, globalContext = arg.globalContext, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
+    var parentDom = arg.parentDom, renderResult = arg.renderResult, newParentVNode = arg.newParentVNode, oldParentVNode = arg.oldParentVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
     var i, j, oldVNode, childVNode, newDom, firstChildDom, filteredOldDom;
     // This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
     // as EMPTY_OBJ._children should be `undefined`.
@@ -100,7 +100,6 @@ export function diffChildren(arg) {
             parentDom: parentDom,
             newVNode: childVNode,
             oldVNode: oldVNode,
-            globalContext: globalContext,
             excessDomChildren: excessDomChildren,
             commitQueue: commitQueue,
             oldDom: filteredOldDom
@@ -109,7 +108,15 @@ export function diffChildren(arg) {
             if (firstChildDom == null) {
                 firstChildDom = newDom;
             }
-            filteredOldDom = placeChild(parentDom, childVNode, oldVNode, oldChildren, excessDomChildren, newDom, filteredOldDom);
+            filteredOldDom = placeChild({
+                parentDom: parentDom,
+                childVNode: childVNode,
+                oldVNode: oldVNode,
+                oldChildren: oldChildren,
+                excessDomChildren: excessDomChildren,
+                newDom: newDom,
+                oldDom: filteredOldDom
+            });
             // Browsers will infer an option's `value` from `textContent` when
             // no value is present. This essentially bypasses our code to set it
             // later in `diff()`. It works fine in all browsers except for IE11
@@ -143,7 +150,8 @@ export function diffChildren(arg) {
             unmount(oldChildren[i], oldChildren[i]);
     }
 }
-export function placeChild(parentDom, childVNode, oldVNode, oldChildren, excessDomChildren, newDom, oldDom) {
+export function placeChild(arg) {
+    var parentDom = arg.parentDom, childVNode = arg.childVNode, oldVNode = arg.oldVNode, oldChildren = arg.oldChildren, excessDomChildren = arg.excessDomChildren, newDom = arg.newDom, oldDom = arg.oldDom;
     var nextDom;
     if (childVNode._nextDom !== undefined) {
         // Only Fragments or components that return Fragment like VNodes will

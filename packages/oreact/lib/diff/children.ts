@@ -9,7 +9,6 @@ type DiffChildrenArgType = {
 	renderResult: ComponentChildren[];
 	newParentVNode: VNode;
 	oldParentVNode: VNode;
-	globalContext: Object;
 	excessDomChildren: PreactElement;
 	commitQueue: Component[];
 	oldDom: Element | Text | typeof EMPTY_OBJ;
@@ -39,7 +38,6 @@ export function diffChildren(arg: DiffChildrenArgType) {
 		renderResult,
 		newParentVNode,
 		oldParentVNode,
-		globalContext,
 		excessDomChildren,
 		commitQueue,
 		oldDom
@@ -156,7 +154,6 @@ export function diffChildren(arg: DiffChildrenArgType) {
 			parentDom: parentDom,
 			newVNode: childVNode,
 			oldVNode: oldVNode,
-			globalContext: globalContext,
 			excessDomChildren: excessDomChildren,
 			commitQueue: commitQueue,
 			oldDom: filteredOldDom

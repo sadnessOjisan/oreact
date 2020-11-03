@@ -19,7 +19,6 @@ import { removeNode } from '../util';
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
 export function diff(arg) {
-    console.log('<diff> fire', arguments);
     var parentDom = arg.parentDom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, globalContext = arg.globalContext, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
     var tmp, newType = newVNode.type;
     // When passing through createElement it assigns the object
@@ -47,7 +46,6 @@ export function diff(arg) {
             c.props = newProps;
             if (!c.state)
                 c.state = {};
-            c._globalContext = globalContext;
             isNew = c._dirty = true;
             c._renderCallbacks = [];
         }
@@ -85,7 +83,6 @@ export function diff(arg) {
             renderResult: Array.isArray(renderResult) ? renderResult : [renderResult],
             newParentVNode: newVNode,
             oldParentVNode: oldVNode,
-            globalContext: globalContext,
             excessDomChildren: excessDomChildren,
             commitQueue: commitQueue,
             oldDom: oldDom
@@ -108,7 +105,6 @@ export function diff(arg) {
             dom: oldVNode._dom,
             newVNode: newVNode,
             oldVNode: oldVNode,
-            globalContext: globalContext,
             excessDomChildren: excessDomChildren,
             commitQueue: commitQueue
         });
@@ -142,7 +138,7 @@ export function commitRoot(commitQueue) {
  * @returns {import('../internal').PreactElement}
  */
 function diffElementNodes(arg) {
-    var dom = arg.dom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, globalContext = arg.globalContext, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue;
+    var dom = arg.dom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue;
     var i;
     var oldProps = oldVNode.props;
     var newProps = newVNode.props;
@@ -172,7 +168,6 @@ function diffElementNodes(arg) {
             renderResult: Array.isArray(i) ? i : [i],
             newParentVNode: newVNode,
             oldParentVNode: oldVNode,
-            globalContext: globalContext,
             excessDomChildren: excessDomChildren,
             commitQueue: commitQueue,
             oldDom: EMPTY_OBJ
