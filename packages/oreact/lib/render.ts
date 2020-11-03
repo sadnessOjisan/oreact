@@ -33,7 +33,6 @@ export function render(vnode: ComponentChild, parentDom: PreactElement) {
 		parentDom: parentDom,
 		newVNode: initialVnode,
 		oldVNode: EMPTY_OBJ,
-		globalContext: EMPTY_OBJ,
 		excessDomChildren: EMPTY_ARR.slice.call(parentDom.childNodes),
 		commitQueue: commitQueue,
 		oldDom: EMPTY_OBJ

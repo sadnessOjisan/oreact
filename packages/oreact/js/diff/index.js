@@ -19,7 +19,7 @@ import { removeNode } from '../util';
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
 export function diff(arg) {
-    var parentDom = arg.parentDom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, globalContext = arg.globalContext, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
+    var parentDom = arg.parentDom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
     var tmp, newType = newVNode.type;
     // When passing through createElement it assigns the object
     // constructor as undefined. This to prevent JSON-injection.

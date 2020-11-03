@@ -15,7 +15,6 @@ type DiffArgType = {
 	parentDom: PreactElement;
 	newVNode: VNode<PropsType>;
 	oldVNode: VNode<PropsType> | typeof EMPTY_OBJ;
-	globalContext: typeof EMPTY_OBJ;
 	excessDomChildren: PreactElement[];
 	commitQueue: ComponentType[];
 	oldDom: Element | Text | typeof EMPTY_OBJ;
@@ -40,7 +39,6 @@ export function diff(arg: DiffArgType) {
 		parentDom,
 		newVNode,
 		oldVNode,
-		globalContext,
 		excessDomChildren,
 		commitQueue,
 		oldDom
