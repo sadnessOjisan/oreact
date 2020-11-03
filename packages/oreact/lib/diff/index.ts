@@ -11,6 +11,16 @@ import {
 	VNode
 } from '../type';
 
+type DiffArgType = {
+	parentDom: PreactElement;
+	newVNode: VNode<PropsType>;
+	oldVNode: VNode<PropsType> | typeof EMPTY_OBJ;
+	globalContext: typeof EMPTY_OBJ;
+	excessDomChildren: PreactElement[];
+	commitQueue: ComponentType[];
+	oldDom: Element | Text | typeof EMPTY_OBJ;
+};
+
 /**
  * Diff two virtual nodes and apply proper changes to the DOM
  * @param {import('../internal').PreactElement} parentDom The parent of the DOM element
@@ -25,15 +35,17 @@ import {
  * render (except when hydrating). Can be a sibling DOM element when diffing
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
-export function diff(
-	parentDom: PreactElement,
-	newVNode: VNode<PropsType>,
-	oldVNode: VNode<PropsType> | typeof EMPTY_OBJ,
-	globalContext: typeof EMPTY_OBJ,
-	excessDomChildren: PreactElement[],
-	commitQueue: ComponentType[],
-	oldDom: Element | Text | typeof EMPTY_OBJ
-) {
+export function diff(arg: DiffArgType) {
+	console.log('<diff> fire', arguments);
+	let {
+		parentDom,
+		newVNode,
+		oldVNode,
+		globalContext,
+		excessDomChildren,
+		commitQueue,
+		oldDom
+	} = arg;
 	let tmp,
 		newType = newVNode.type;
 

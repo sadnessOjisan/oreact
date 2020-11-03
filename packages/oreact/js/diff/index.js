@@ -18,7 +18,9 @@ import { removeNode } from '../util';
  * render (except when hydrating). Can be a sibling DOM element when diffing
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
-export function diff(parentDom, newVNode, oldVNode, globalContext, excessDomChildren, commitQueue, oldDom) {
+export function diff(arg) {
+    console.log('<diff> fire', arguments);
+    var parentDom = arg.parentDom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, globalContext = arg.globalContext, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
     var tmp, newType = newVNode.type;
     // When passing through createElement it assigns the object
     // constructor as undefined. This to prevent JSON-injection.

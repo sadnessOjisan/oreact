@@ -32,6 +32,7 @@ export function diffChildren(
 	commitQueue: Component[],
 	oldDom: Element | Text | typeof EMPTY_OBJ
 ) {
+	console.log('<diffChildren> fire', arguments);
 	let i,
 		j,
 		oldVNode,
@@ -140,15 +141,15 @@ export function diffChildren(
 		oldVNode = oldVNode || EMPTY_OBJ;
 
 		// Morph the old element into the new one, but don't append it to the dom yet
-		newDom = diff(
-			parentDom,
-			childVNode,
-			oldVNode,
-			globalContext,
-			excessDomChildren,
-			commitQueue,
-			filteredOldDom
-		);
+		newDom = diff({
+			parentDom: parentDom,
+			newVNode: childVNode,
+			oldVNode: oldVNode,
+			globalContext: globalContext,
+			excessDomChildren: excessDomChildren,
+			commitQueue: commitQueue,
+			oldDom: filteredOldDom
+		});
 
 		if (newDom != null) {
 			if (firstChildDom == null) {

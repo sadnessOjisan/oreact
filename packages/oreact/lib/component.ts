@@ -101,15 +101,16 @@ function renderComponent(component: ComponentType) {
 		const oldVNode = assign({}, vnode) as VNode;
 		oldVNode._original = oldVNode;
 
-		let newDom = diff(
-			parentDom,
-			vnode,
-			oldVNode,
-			component._globalContext,
-			null,
-			commitQueue,
-			oldDom == null ? getDomSibling(vnode, undefined) : oldDom
-		);
+		let newDom = diff({
+			parentDom: parentDom,
+			newVNode: vnode,
+			oldVNode: oldVNode,
+			globalContext: component._globalContext,
+			excessDomChildren: null,
+			commitQueue: commitQueue,
+			oldDom: oldDom == null ? getDomSibling(vnode, undefined) : oldDom
+		});
+
 		commitRoot(commitQueue);
 
 		if (newDom != oldDom) {
@@ -122,6 +123,7 @@ function renderComponent(component: ComponentType) {
  * @param {import('./internal').VNode} vnode
  */
 function updateParentDomPointers(vnode: VNode) {
+	console.log('<updateParentDomPointers> fire', arguments);
 	if ((vnode = vnode._parent) != null && vnode._component != null) {
 		vnode._dom = vnode._component.base = null;
 		for (let i = 0; i < vnode._children.length; i++) {

@@ -21,6 +21,7 @@ import { getDomSibling } from '../component';
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
 export function diffChildren(parentDom, renderResult, newParentVNode, oldParentVNode, globalContext, excessDomChildren, commitQueue, oldDom) {
+    console.log('<diffChildren> fire', arguments);
     var i, j, oldVNode, childVNode, newDom, firstChildDom, filteredOldDom;
     // This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
     // as EMPTY_OBJ._children should be `undefined`.
@@ -95,7 +96,15 @@ export function diffChildren(parentDom, renderResult, newParentVNode, oldParentV
         }
         oldVNode = oldVNode || EMPTY_OBJ;
         // Morph the old element into the new one, but don't append it to the dom yet
-        newDom = diff(parentDom, childVNode, oldVNode, globalContext, excessDomChildren, commitQueue, filteredOldDom);
+        newDom = diff({
+            parentDom: parentDom,
+            newVNode: childVNode,
+            oldVNode: oldVNode,
+            globalContext: globalContext,
+            excessDomChildren: excessDomChildren,
+            commitQueue: commitQueue,
+            oldDom: filteredOldDom
+        });
         if (newDom != null) {
             if (firstChildDom == null) {
                 firstChildDom = newDom;

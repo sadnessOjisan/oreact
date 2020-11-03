@@ -18,7 +18,15 @@ export function render(vnode, parentDom) {
     // List of effects that need to be called after diffing.
     var commitQueue = [];
     parentDom._children = initialVnode;
-    diff(parentDom, initialVnode, EMPTY_OBJ, EMPTY_OBJ, EMPTY_ARR.slice.call(parentDom.childNodes), commitQueue, EMPTY_OBJ);
+    diff({
+        parentDom: parentDom,
+        newVNode: initialVnode,
+        oldVNode: EMPTY_OBJ,
+        globalContext: EMPTY_OBJ,
+        excessDomChildren: EMPTY_ARR.slice.call(parentDom.childNodes),
+        commitQueue: commitQueue,
+        oldDom: EMPTY_OBJ
+    });
     // Flush all queued effects
     commitRoot(commitQueue);
 }
