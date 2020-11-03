@@ -3,22 +3,7 @@ import { createVNode, Fragment } from '../create-element';
 import { EMPTY_OBJ, EMPTY_ARR } from '../constants';
 import { getDomSibling } from '../component';
 /**
- * Diff the children of a virtual node
- * @param {import('../internal').PreactElement} parentDom The DOM element whose
- * children are being diffed
- * @param {import('../index').ComponentChildren[]} renderResult
- * @param {import('../internal').VNode} newParentVNode The new virtual
- * node whose children should be diff'ed against oldParentVNode
- * @param {import('../internal').VNode} oldParentVNode The old virtual
- * node whose children should be diff'ed against newParentVNode
- * @param {object} globalContext The current context object - modified by getChildContext
- * @param {Array<import('../internal').PreactElement>} excessDomChildren
- * @param {Array<import('../internal').Component>} commitQueue List of components
- * which have callbacks to invoke in commitRoot
- * @param {Node | Text} oldDom The current attached DOM
- * element any new dom elements should be placed around. Likely `null` on first
- * render (except when hydrating). Can be a sibling DOM element when diffing
- * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
+ * VNodeのchildren比較を行う
  */
 export function diffChildren(arg) {
     var parentDom = arg.parentDom, renderResult = arg.renderResult, newParentVNode = arg.newParentVNode, oldParentVNode = arg.oldParentVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
@@ -39,15 +24,13 @@ export function diffChildren(arg) {
             filteredOldDom = null;
         }
     }
+    // renderResult から newVNode として扱いたい childVNode を作り出し、それを配列に詰め込んで newParentVNode._children を作り出す
     newParentVNode._children = [];
     for (i = 0; i < renderResult.length; i++) {
         childVNode = renderResult[i];
         if (childVNode == null || typeof childVNode == 'boolean') {
             childVNode = newParentVNode._children[i] = null;
         }
-        // If this newVNode is being reused (e.g. <div>{reuse}{reuse}</div>) in the same diff,
-        // or we are rendering a component (e.g. setState) copy the oldVNodes so it can have
-        // it's own DOM & etc. pointers
         else if (typeof childVNode == 'string' || typeof childVNode == 'number') {
             childVNode = newParentVNode._children[i] = createVNode(null, childVNode, null, null, childVNode);
         }
@@ -104,6 +87,7 @@ export function diffChildren(arg) {
             commitQueue: commitQueue,
             oldDom: filteredOldDom
         });
+        // 新しいDOMがあれば挿入する
         if (newDom != null) {
             if (firstChildDom == null) {
                 firstChildDom = newDom;
@@ -136,6 +120,10 @@ export function diffChildren(arg) {
             unmount(oldChildren[i], oldChildren[i]);
     }
 }
+/**
+ * parentDOMにnewDOMを挿入する関数
+ * @param arg
+ */
 export function placeChild(arg) {
     var parentDom = arg.parentDom, childVNode = arg.childVNode, oldVNode = arg.oldVNode, oldChildren = arg.oldChildren, excessDomChildren = arg.excessDomChildren, newDom = arg.newDom, oldDom = arg.oldDom;
     var nextDom;

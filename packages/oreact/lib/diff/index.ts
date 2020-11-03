@@ -46,7 +46,7 @@ export function diff(arg: DiffArgType) {
 
 	if (typeof newType == 'function') {
 		// newVNode がコンポーネントの時の分岐
-		let c, isNew, oldProps;
+		let c, isNew, oldProps, oldState;
 		let newProps = newVNode.props;
 
 		let componentContext = EMPTY_OBJ;

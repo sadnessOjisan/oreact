@@ -5,18 +5,7 @@ import { diffChildren } from './children';
 import { diffProps } from './props';
 import { removeNode } from '../util';
 /**
- * Diff two virtual nodes and apply proper changes to the DOM
- * @param {import('../internal').PreactElement} parentDom The parent of the DOM element
- * @param {import('../internal').VNode} newVNode The new virtual node
- * @param {import('../internal').VNode} oldVNode The old virtual node
- * @param {object} globalContext The current context object. Modified by getChildContext
- * @param {Array<import('../internal').PreactElement>} excessDomChildren 初回レンダリングで[script]が入る、それ以降はnull
- * @param {Array<import('../internal').Component>} commitQueue List of components
- * which have callbacks to invoke in commitRoot
- * @param {Element | Text} oldDom The current attached DOM
- * element any new dom elements should be placed around. Likely `null` on first
- * render (except when hydrating). Can be a sibling DOM element when diffing
- * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
+ * 与えられた新旧VNodeの差分をとって、その差分DOMに適用してそのDOMを返す関数
  */
 export function diff(arg) {
     var parentDom = arg.parentDom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
@@ -26,6 +15,7 @@ export function diff(arg) {
     if (newVNode.constructor !== undefined)
         return null;
     if (typeof newType == 'function') {
+        // newVNode がコンポーネントの時の分岐
         var c = void 0, isNew = void 0, oldProps = void 0, oldState = void 0;
         var newProps = newVNode.props;
         var componentContext = EMPTY_OBJ;
@@ -101,6 +91,7 @@ export function diff(arg) {
         newVNode._dom = oldVNode._dom;
     }
     else {
+        // newVNode が Element の時の分岐
         newVNode._dom = diffElementNodes({
             dom: oldVNode._dom,
             newVNode: newVNode,
@@ -112,9 +103,8 @@ export function diff(arg) {
     return newVNode._dom;
 }
 /**
- * @param {Array<import('../internal').Component>} commitQueue List of components
- * which have callbacks to invoke in commitRoot
- * @param {import('../internal').VNode} root
+ * commitQueueを実行する関数
+ * @param commitQueue コールバックリストを持ったcomponentのリスト
  */
 export function commitRoot(commitQueue) {
     commitQueue.some(function (c) {
@@ -126,16 +116,8 @@ export function commitRoot(commitQueue) {
     });
 }
 /**
- * Diff two virtual nodes representing DOM element
- * @param {import('../internal').PreactElement} dom The DOM element representing
- * the virtual nodes being diffed
- * @param {import('../internal').VNode} newVNode The new virtual node
- * @param {import('../internal').VNode} oldVNode The old virtual node
- * @param {object} globalContext The current context object
- * @param {*} excessDomChildren
- * @param {Array<import('../internal').Component>} commitQueue List of components
- * which have callbacks to invoke in commitRoot
- * @returns {import('../internal').PreactElement}
+ * newVNode と oldVNode を比較して dom に反映する。
+ * ツリーではなくDOM Node のプロパティ比較が責務。
  */
 function diffElementNodes(arg) {
     var dom = arg.dom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue;
@@ -161,8 +143,10 @@ function diffElementNodes(arg) {
     }
     else {
         var props = oldVNode.props || EMPTY_OBJ;
+        // VNodeの差分を取る
         diffProps(dom, newProps, props);
         i = newVNode.props.children;
+        // newVNodeがComponentの入れ子でなくてもElementの入れ子の可能性があるので、childrenの比較も行う
         diffChildren({
             parentDom: dom,
             renderResult: Array.isArray(i) ? i : [i],
@@ -176,12 +160,10 @@ function diffElementNodes(arg) {
     return dom;
 }
 /**
- * Unmount a virtual node from the tree and apply DOM changes
- * @param {import('../internal').VNode} vnode The virtual node to unmount
- * @param {import('../internal').VNode} parentVNode The parent of the VNode that
- * initiated the unmount
- * @param {boolean} [skipRemove] Flag that indicates that a parent node of the
- * current element is already detached from the DOM.
+ * componentWillUnmount の実行と、DOMツリーからNodeをremoveする
+ * @param vnode
+ * @param parentVNode
+ * @param skipRemove
  */
 export function unmount(vnode, parentVNode, skipRemove) {
     var r;
