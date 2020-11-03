@@ -167,15 +167,15 @@ export function diffChildren(arg: DiffChildrenArgType) {
 				firstChildDom = newDom;
 			}
 
-			filteredOldDom = placeChild(
-				parentDom,
-				childVNode,
-				oldVNode,
-				oldChildren,
-				excessDomChildren,
-				newDom,
-				filteredOldDom
-			);
+			filteredOldDom = placeChild({
+				parentDom: parentDom,
+				childVNode: childVNode,
+				oldVNode: oldVNode,
+				oldChildren: oldChildren,
+				excessDomChildren: excessDomChildren,
+				newDom: newDom,
+				oldDom: filteredOldDom
+			});
 
 			// Browsers will infer an option's `value` from `textContent` when
 			// no value is present. This essentially bypasses our code to set it
@@ -211,15 +211,27 @@ export function diffChildren(arg: DiffChildrenArgType) {
 	}
 }
 
-export function placeChild(
-	parentDom: PreactElement,
-	childVNode: VNode,
-	oldVNode: VNode,
-	oldChildren: ComponentChildren,
-	excessDomChildren: ComponentChildren,
-	newDom: Node | Text,
-	oldDom: Node | Text
-): PreactElement {
+type PlaceChildArgType = {
+	parentDom: PreactElement;
+	childVNode: VNode;
+	oldVNode: VNode;
+	oldChildren: ComponentChildren;
+	excessDomChildren: ComponentChildren;
+	newDom: Node | Text;
+	oldDom: Node | Text;
+};
+
+export function placeChild(arg: PlaceChildArgType): PreactElement {
+	let {
+		parentDom,
+		childVNode,
+		oldVNode,
+		oldChildren,
+		excessDomChildren,
+		newDom,
+		oldDom
+	} = arg;
+
 	let nextDom;
 	if (childVNode._nextDom !== undefined) {
 		// Only Fragments or components that return Fragment like VNodes will
