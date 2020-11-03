@@ -2,7 +2,7 @@ import { EMPTY_OBJ } from '../constants';
 import { Component } from '../component';
 import { Fragment } from '../create-element';
 import { diffChildren } from './children';
-import { diffProps, setProperty } from './props';
+import { diffProps } from './props';
 import { removeNode } from '../util';
 import {
 	Component as ComponentType,
@@ -36,7 +36,6 @@ type DiffArgType = {
  * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
  */
 export function diff(arg: DiffArgType) {
-	console.log('<diff> fire', arguments);
 	let {
 		parentDom,
 		newVNode,
