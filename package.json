@@ -5,7 +5,7 @@
 		"lerna": "^3.22.1"
 	},
 	"scripts": {
-		"build-lib": "npx lerna run --scope=oreact build",
+		"build-lib": "npx lerna run --scope=oreact tsc && npx lerna run --scope=oreact build:core",
 		"build": "npx lerna run --scope=example build"
 	}
 }
