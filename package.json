@@ -5,6 +5,6 @@
 		"lerna": "^3.22.1"
 	},
 	"scripts": {
-		"build": "lerna run --scope=example build"
+		"build": "npx lerna run --scope=example build"
 	}
 }
