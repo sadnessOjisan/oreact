@@ -16,8 +16,10 @@ jobs:
       - name: npm install
         run: |
           npm install
+      - name: Build oreact
+        run: lerna run --scope=oreact tsc && lerna run --scope=oreact build:core
       - name: Build App
-        run: npm run build
+        run: lerna run --scope=example build
       - name: ls
         run: ls ./
       - name: ls

@@ -1,7 +1,7 @@
 {
-  "name": "oreact",
-  "version": "0.1.0",
-  "description": "preact を再実装する -俺の react-",
+	"name": "oreact",
+	"version": "0.1.0",
+	"description": "preact を再実装する -俺の react-",
 	"main": "dist/preact.js",
 	"module": "dist/preact.module.js",
 	"umd:main": "dist/preact.umd.js",
@@ -24,7 +24,7 @@
 		"dist"
 	],
 	"scripts": {
-		"tsc": "tsc",
+		"tsc": "tsc --noEmit",
 		"build:core": "microbundle build --raw",
 		"build:core-min": "microbundle build --raw -f iife js/cjs.js -o dist/preact.min.js",
 		"dev": "microbundle watch --raw --format cjs",
@@ -40,8 +40,8 @@
 		"url": "https://github.com/sadnessOjisan/oreact/issues"
 	},
 	"homepage": "https://github.com/sadnessOjisan/oreact#readme",
-  "devDependencies": {
-    "microbundle": "^0.12.4",
-    "typescript": "^4.0.3"
-  }
+	"devDependencies": {
+		"microbundle": "^0.12.4",
+		"typescript": "^4.0.3"
+	}
 }
