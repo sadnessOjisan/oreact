@@ -2,19 +2,13 @@ import { EMPTY_OBJ, EMPTY_ARR } from './constants';
 import { commitRoot, diff } from './diff/index';
 import { createElement, Fragment } from './create-element';
 /**
- * Render a Preact virtual node into a DOM element
- * @param {import('./index').ComponentChild} vnode The virtual node to render
- * @param {import('./internal').PreactElement} parentDom The DOM element to
- * render into
+ * renderエンドポイント. VNodeからDOMを構築する.
+ * @param vnode 対象となるVNode（Element or Component）
+ * @param parentDom マウントの対象
  */
 export function render(vnode, parentDom) {
-    // To be able to support calling `render()` multiple times on the same
-    // DOM node, we need to obtain a reference to the previous tree. We do
-    // this by assigning a new `_children` property to DOM nodes which points
-    // to the last rendered tree. By default this property is not present, which
-    // means that we are mounting a new tree for the first time.
     var initialVnode = createElement(Fragment, null, [vnode]);
-    // List of effects that need to be called after diffing.
+    // 差分更新後の副作用を管理するリスト
     var commitQueue = [];
     parentDom._children = initialVnode;
     diff({
@@ -25,6 +19,6 @@ export function render(vnode, parentDom) {
         commitQueue: commitQueue,
         oldDom: EMPTY_OBJ
     });
-    // Flush all queued effects
+    // commitQueueにある副作用を実行
     commitRoot(commitQueue);
 }

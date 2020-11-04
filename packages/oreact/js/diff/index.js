@@ -5,36 +5,27 @@ import { diffChildren } from './children';
 import { diffProps } from './props';
 import { removeNode } from '../util';
 /**
- * Diff two virtual nodes and apply proper changes to the DOM
- * @param {import('../internal').PreactElement} parentDom The parent of the DOM element
- * @param {import('../internal').VNode} newVNode The new virtual node
- * @param {import('../internal').VNode} oldVNode The old virtual node
- * @param {object} globalContext The current context object. Modified by getChildContext
- * @param {Array<import('../internal').PreactElement>} excessDomChildren 初回レンダリングで[script]が入る、それ以降はnull
- * @param {Array<import('../internal').Component>} commitQueue List of components
- * which have callbacks to invoke in commitRoot
- * @param {Element | Text} oldDom The current attached DOM
- * element any new dom elements should be placed around. Likely `null` on first
- * render (except when hydrating). Can be a sibling DOM element when diffing
- * Fragments that have siblings. In most cases, it starts out as `oldChildren[0]._dom`.
+ * 与えられた新旧VNodeの差分をとって、その差分DOMに適用してそのDOMを返す関数
  */
 export function diff(arg) {
+    console.log('diff', arguments);
     var parentDom = arg.parentDom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
     var tmp, newType = newVNode.type;
-    // When passing through createElement it assigns the object
-    // constructor as undefined. This to prevent JSON-injection.
+    // createElement は constructor を undefined で設定するtので、そこ経由で作られたことを保証する。
     if (newVNode.constructor !== undefined)
         return null;
+    // newVNode がコンポーネントかエレメントかで処理が分岐
     if (typeof newType == 'function') {
+        // newVNode がコンポーネントの時の分岐
         var c = void 0, isNew = void 0, oldProps = void 0, oldState = void 0;
         var newProps = newVNode.props;
         var componentContext = EMPTY_OBJ;
-        // Get component and set it to `c`
+        // コンポーネントオブジェクトの作成
         if (oldVNode._component) {
+            // すでにコンポーネントがある時（例えばsetStateのとき）
             c = newVNode._component = oldVNode._component;
         }
         else {
-            // Instantiate the new component
             if ('prototype' in newType && newType.prototype.render) {
                 newVNode._component = c = new newType(newProps);
             }
@@ -55,7 +46,7 @@ export function diff(arg) {
         }
         oldProps = c.props;
         oldState = c.state;
-        // Invoke pre-render lifecycle methods
+        // 差分更新前(diff中)に呼び出されるライフサイクルイベントを実行
         if (isNew) {
             if (c.componentDidMount != null) {
                 c._renderCallbacks.push(c.componentDidMount);
@@ -87,6 +78,7 @@ export function diff(arg) {
             commitQueue: commitQueue,
             oldDom: oldDom
         });
+        // FIXME: 消しても問題ない
         c.base = newVNode._dom;
         // We successfully rendered this VNode, unset any stored hydration/bailout state:
         newVNode._hydrating = null;
@@ -97,10 +89,12 @@ export function diff(arg) {
     }
     else if (excessDomChildren == null &&
         newVNode._original === oldVNode._original) {
+        // FIXME: このブロックも消して問題ない
         newVNode._children = oldVNode._children;
         newVNode._dom = oldVNode._dom;
     }
     else {
+        // newVNode が Element の時の分岐
         newVNode._dom = diffElementNodes({
             dom: oldVNode._dom,
             newVNode: newVNode,
@@ -112,9 +106,8 @@ export function diff(arg) {
     return newVNode._dom;
 }
 /**
- * @param {Array<import('../internal').Component>} commitQueue List of components
- * which have callbacks to invoke in commitRoot
- * @param {import('../internal').VNode} root
+ * commitQueueを実行する関数
+ * @param commitQueue コールバックリストを持ったcomponentのリスト
  */
 export function commitRoot(commitQueue) {
     commitQueue.some(function (c) {
@@ -126,16 +119,8 @@ export function commitRoot(commitQueue) {
     });
 }
 /**
- * Diff two virtual nodes representing DOM element
- * @param {import('../internal').PreactElement} dom The DOM element representing
- * the virtual nodes being diffed
- * @param {import('../internal').VNode} newVNode The new virtual node
- * @param {import('../internal').VNode} oldVNode The old virtual node
- * @param {object} globalContext The current context object
- * @param {*} excessDomChildren
- * @param {Array<import('../internal').Component>} commitQueue List of components
- * which have callbacks to invoke in commitRoot
- * @returns {import('../internal').PreactElement}
+ * newVNode と oldVNode を比較して dom に反映する。
+ * ツリーではなくDOM Node のプロパティ比較が責務。
  */
 function diffElementNodes(arg) {
     var dom = arg.dom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue;
@@ -143,26 +128,33 @@ function diffElementNodes(arg) {
     var oldProps = oldVNode.props;
     var newProps = newVNode.props;
     if (dom == null) {
+        // oldVNode._dom は 初回レンダリングはnullなのでこの分岐
         if (newVNode.type === null) {
             // primitive値であることが保証されているのでキャストする
             // 3 も '3' も '3' として扱う
             var value = String(newProps);
             return document.createTextNode(value);
         }
+        // 初回レンダリングでDOMツリーを作る
         dom = document.createElement(newVNode.type, newProps.is && { is: newProps.is });
-        // we created a new parent, so none of the previously attached children can be reused:
+        // 新しく親を作ったので既存の子は使いまわさない
         excessDomChildren = null;
     }
     if (newVNode.type === null) {
+        // newVNode が primitive の場合
         var textNodeProps = newProps;
         if (oldProps !== newProps && dom.data !== textNodeProps) {
             dom.data = textNodeProps;
         }
     }
     else {
+        // newVNode が element の場合
         var props = oldVNode.props || EMPTY_OBJ;
+        // VNodeの差分を取る。domは破壊的操作がされる
         diffProps(dom, newProps, props);
+        // VNode の children に diff を取るためにchildrenを抽出
         i = newVNode.props.children;
+        // newVNodeがComponentの入れ子でなくてもElementの入れ子の可能性があるので、childrenの比較も行う
         diffChildren({
             parentDom: dom,
             renderResult: Array.isArray(i) ? i : [i],
@@ -176,12 +168,10 @@ function diffElementNodes(arg) {
     return dom;
 }
 /**
- * Unmount a virtual node from the tree and apply DOM changes
- * @param {import('../internal').VNode} vnode The virtual node to unmount
- * @param {import('../internal').VNode} parentVNode The parent of the VNode that
- * initiated the unmount
- * @param {boolean} [skipRemove] Flag that indicates that a parent node of the
- * current element is already detached from the DOM.
+ * componentWillUnmount の実行と、DOMツリーからNodeをremoveする
+ * @param vnode
+ * @param parentVNode
+ * @param skipRemove
  */
 export function unmount(vnode, parentVNode, skipRemove) {
     var r;
