@@ -2,7 +2,7 @@
 	"name": "example",
 	"version": "1.0.0",
 	"private": true,
-	"description": "svg animation の練習",
+	"description": "oreact の例",
 	"main": "index.js",
 	"scripts": {
 		"dev": "webpack-dev-server",
