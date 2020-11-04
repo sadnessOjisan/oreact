@@ -3,7 +3,7 @@ name: DEV
 on:
   push:
     branches:
-      - "*"
+      - "fix/deploy"
 jobs:
   build:
     runs-on: ubuntu-latest
