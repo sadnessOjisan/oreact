@@ -3,5 +3,5 @@
 const example = require('..');
 
 describe('example', () => {
-    it('needs tests');
+	it('needs tests');
 });

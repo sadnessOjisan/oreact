@@ -2,10 +2,12 @@
 	"name": "root",
 	"private": true,
 	"devDependencies": {
-		"lerna": "^3.22.1"
+		"lerna": "^3.22.1",
+		"prettier": "^2.1.2"
 	},
 	"scripts": {
 		"build-lib": "npx lerna run --scope=oreact tsc && npx lerna run --scope=oreact build:core",
-		"build": "npx lerna run --scope=example build"
+		"build": "npx lerna run --scope=example build",
+		"format": "prettier --write 'packages/**'"
 	}
 }

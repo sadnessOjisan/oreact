@@ -6,12 +6,12 @@
  * @returns {O & P}
  */
 export function assign(obj, props) {
-  for (let i in props) obj[i] = props[i];
+	for (let i in props) obj[i] = props[i];
 
-  return (
-    /** @type {O & P} */
-    obj
-  );
+	return (
+		/** @type {O & P} */
+		obj
+	);
 }
 /**
  * Remove a child node from its parent if attached. This is a workaround for
@@ -21,6 +21,6 @@ export function assign(obj, props) {
  */
 
 export function removeNode(node) {
-  let parentNode = node.parentNode;
-  if (parentNode) parentNode.removeChild(node);
+	let parentNode = node.parentNode;
+	if (parentNode) parentNode.removeChild(node);
 }

@@ -1,0 +1,3 @@
+packages/oreact/js/**
+packages/oreact/dist/**
+**/.DS_Store
