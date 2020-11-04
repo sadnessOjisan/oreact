@@ -16,6 +16,9 @@ jobs:
       - name: npm install
         run: |
           npm install
+      - name: bootstrap
+        run: |
+          npx lerna bootstrap
       - name: Build oreact
         run: npx lerna run --scope=oreact tsc && npx lerna run --scope=oreact build:core
       - name: Build App
