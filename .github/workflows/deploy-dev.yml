@@ -22,7 +22,7 @@ jobs:
       - name: Build oreact
         run: npx lerna run --scope=oreact tsc && npx lerna run --scope=oreact build:core
       - name: Build App
-        run: lerna run --scope=example build
+        run: npx lerna run --scope=example build
       - name: ls
         run: ls ./
       - name: ls
