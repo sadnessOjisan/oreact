@@ -2,10 +2,9 @@ import { EMPTY_OBJ, EMPTY_ARR } from './constants';
 import { commitRoot, diff } from './diff/index';
 import { createElement, Fragment } from './create-element';
 /**
- * Render a Preact virtual node into a DOM element
- * @param {import('./index').ComponentChild} vnode The virtual node to render
- * @param {import('./internal').PreactElement} parentDom The DOM element to
- * render into
+ * renderエンドポイント. VNodeからDOMを構築する.
+ * @param vnode 対象となるVNode（Element or Component）
+ * @param parentDom マウントの対象
  */
 export function render(vnode, parentDom) {
     var initialVnode = createElement(Fragment, null, [vnode]);

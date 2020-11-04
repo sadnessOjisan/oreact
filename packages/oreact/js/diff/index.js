@@ -22,10 +22,10 @@ export function diff(arg) {
         var componentContext = EMPTY_OBJ;
         // コンポーネントオブジェクトの作成
         if (oldVNode._component) {
+            // すでにコンポーネントがある時（例えばsetStateのとき）
             c = newVNode._component = oldVNode._component;
         }
         else {
-            // Instantiate the new component
             if ('prototype' in newType && newType.prototype.render) {
                 newVNode._component = c = new newType(newProps);
             }
@@ -123,18 +123,19 @@ export function commitRoot(commitQueue) {
  * ツリーではなくDOM Node のプロパティ比較が責務。
  */
 function diffElementNodes(arg) {
-    console.log('diffElementNodes', arguments);
     var dom = arg.dom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue;
     var i;
     var oldProps = oldVNode.props;
     var newProps = newVNode.props;
     if (dom == null) {
+        // oldVNode._dom は 初回レンダリングはnullなのでこの分岐
         if (newVNode.type === null) {
             // primitive値であることが保証されているのでキャストする
             // 3 も '3' も '3' として扱う
             var value = String(newProps);
             return document.createTextNode(value);
         }
+        // 初回レンダリングでDOMツリーを作る
         dom = document.createElement(newVNode.type, newProps.is && { is: newProps.is });
         // 新しく親を作ったので既存の子は使いまわさない
         excessDomChildren = null;
