@@ -1,8 +1,7 @@
-import { h, render, Component, Fragment } from 'oreact';
+import { h, render, Component } from 'oreact';
 
 class App extends Component {
 	constructor() {
-		super();
 		this.state = {
 			count: 10000000,
 			data: []
@@ -113,9 +112,9 @@ class ListItem extends Component {
 
 	render() {
 		return h(
-			Fragment,
+			'li',
 			null,
-			h('li', null, this.props.name),
+			h('span', null, this.props.name),
 			h(
 				'button',
 				{
