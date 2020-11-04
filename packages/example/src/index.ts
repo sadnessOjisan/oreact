@@ -1,4 +1,4 @@
-import { h, render, Component } from 'oreact';
+import { h, render, Component } from '../../oreact/dist/preact';
 
 class App extends Component {
 	constructor() {
