@@ -1,4 +1,4 @@
-name: Deploy
+name: DEPLOY
 
 on:
   push:
@@ -16,8 +16,13 @@ jobs:
       - name: npm install
         run: |
           npm install
+      - name: bootstrap
+        run: |
+          npx lerna bootstrap
+      - name: Build oreact
+        run: npx lerna run --scope=oreact tsc && npx lerna run --scope=oreact build:core
       - name: Build App
-        run: npm run build
+        run: npx lerna run --scope=example build
       - name: App Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
