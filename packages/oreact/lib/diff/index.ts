@@ -14,7 +14,7 @@ import {
 type DiffArgType = {
 	/** マウント対象のDOM. このうえにVNodeを反映させていく. 初回実行では render から渡されたものが入るが、diff 自体は再帰的に呼ばれ parentDom も置き換えられたりするので様々な値が入りうる。 */
 	parentDom: PreactElement;
-	/** 置き換えに使うvnode, renderから呼ばれるときは事前にcreateElementされている */
+	/** 置き換えに使うvnode, renderから呼ばれるときは事前にcreateElementされている。diffCHildrenから呼ばれるときはchildNode(つまり一つ階層を降っている) */
 	newVNode: VNode<PropsType>;
 	/** 初回実行ならnullが渡されれる(hydrateされていないなら) */
 	oldVNode: VNode<PropsType> | typeof EMPTY_OBJ;
@@ -29,6 +29,7 @@ type DiffArgType = {
  * 与えられた新旧VNodeの差分をとって、その差分DOMに適用してそのDOMを返す関数
  */
 export function diff(arg: DiffArgType) {
+	console.log('diff', arguments);
 	let {
 		parentDom,
 		newVNode,
@@ -40,10 +41,10 @@ export function diff(arg: DiffArgType) {
 	let tmp,
 		newType = newVNode.type;
 
-	// When passing through createElement it assigns the object
-	// constructor as undefined. This to prevent JSON-injection.
+	// createElement は constructor を undefined で設定するtので、そこ経由で作られたことを保証する。
 	if (newVNode.constructor !== undefined) return null;
 
+	// newVNode がコンポーネントかエレメントかで処理が分岐
 	if (typeof newType == 'function') {
 		// newVNode がコンポーネントの時の分岐
 		let c, isNew, oldProps, oldState;
@@ -51,11 +52,11 @@ export function diff(arg: DiffArgType) {
 
 		let componentContext = EMPTY_OBJ;
 
-		// Get component and set it to `c`
+		// コンポーネントオブジェクトの作成
 		if (oldVNode._component) {
+			// すでにコンポーネントがある時（例えばsetStateのとき）
 			c = newVNode._component = oldVNode._component;
 		} else {
-			// Instantiate the new component
 			if ('prototype' in newType && newType.prototype.render) {
 				newVNode._component = c = new newType(newProps);
 			} else {
@@ -78,7 +79,7 @@ export function diff(arg: DiffArgType) {
 		oldProps = c.props;
 		oldState = c.state;
 
-		// Invoke pre-render lifecycle methods
+		// 差分更新前(diff中)に呼び出されるライフサイクルイベントを実行
 		if (isNew) {
 			if (c.componentDidMount != null) {
 				c._renderCallbacks.push(c.componentDidMount);
@@ -119,6 +120,7 @@ export function diff(arg: DiffArgType) {
 			oldDom: oldDom
 		});
 
+		// FIXME: 消しても問題ない
 		c.base = newVNode._dom;
 
 		// We successfully rendered this VNode, unset any stored hydration/bailout state:
@@ -133,12 +135,13 @@ export function diff(arg: DiffArgType) {
 		excessDomChildren == null &&
 		newVNode._original === oldVNode._original
 	) {
+		// FIXME: このブロックも消して問題ない
 		newVNode._children = oldVNode._children;
 		newVNode._dom = oldVNode._dom;
 	} else {
 		// newVNode が Element の時の分岐
 		newVNode._dom = diffElementNodes({
-			dom: oldVNode._dom,
+			dom: oldVNode._dom, // この分岐に入るとparentDomではなくoldVNode._domを見るようになる。(階層を下る)
 			newVNode: newVNode,
 			oldVNode: oldVNode,
 			excessDomChildren: excessDomChildren,
@@ -164,6 +167,7 @@ export function commitRoot(commitQueue: ComponentType<any, any>[]) {
 }
 
 type DiffElementArgType = {
+	/** diffのoldVNode._domが渡される */
 	dom: PreactElement;
 	newVNode: VNode<PropsType>;
 	oldVNode: VNode<PropsType>;
@@ -182,6 +186,7 @@ function diffElementNodes(arg: DiffElementArgType) {
 	let newProps = newVNode.props;
 
 	if (dom == null) {
+		// oldVNode._dom は 初回レンダリングはnullなのでこの分岐
 		if (newVNode.type === null) {
 			// primitive値であることが保証されているのでキャストする
 			// 3 も '3' も '3' として扱う
@@ -189,26 +194,30 @@ function diffElementNodes(arg: DiffElementArgType) {
 			return document.createTextNode(value);
 		}
 
+		// 初回レンダリングでDOMツリーを作る
 		dom = document.createElement(
 			newVNode.type,
 			newProps.is && { is: newProps.is }
 		);
-		// we created a new parent, so none of the previously attached children can be reused:
+		// 新しく親を作ったので既存の子は使いまわさない
 		excessDomChildren = null;
 	}
 
 	if (newVNode.type === null) {
+		// newVNode が primitive の場合
 		const textNodeProps = (newProps as any) as string | number;
 		if (oldProps !== newProps && dom.data !== textNodeProps) {
 			dom.data = textNodeProps;
 		}
 	} else {
+		// newVNode が element の場合
 		const props: Partial<VNode<PropsType>['props']> =
 			oldVNode.props || EMPTY_OBJ;
 
-		// VNodeの差分を取る
+		// VNodeの差分を取る。domは破壊的操作がされる
 		diffProps(dom, newProps, props);
 
+		// VNode の children に diff を取るためにchildrenを抽出
 		i = newVNode.props.children;
 
 		// newVNodeがComponentの入れ子でなくてもElementの入れ子の可能性があるので、childrenの比較も行う

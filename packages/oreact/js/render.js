@@ -8,13 +8,8 @@ import { createElement, Fragment } from './create-element';
  * render into
  */
 export function render(vnode, parentDom) {
-    // To be able to support calling `render()` multiple times on the same
-    // DOM node, we need to obtain a reference to the previous tree. We do
-    // this by assigning a new `_children` property to DOM nodes which points
-    // to the last rendered tree. By default this property is not present, which
-    // means that we are mounting a new tree for the first time.
     var initialVnode = createElement(Fragment, null, [vnode]);
-    // List of effects that need to be called after diffing.
+    // 差分更新後の副作用を管理するリスト
     var commitQueue = [];
     parentDom._children = initialVnode;
     diff({
@@ -25,6 +20,6 @@ export function render(vnode, parentDom) {
         commitQueue: commitQueue,
         oldDom: EMPTY_OBJ
     });
-    // Flush all queued effects
+    // commitQueueにある副作用を実行
     commitRoot(commitQueue);
 }

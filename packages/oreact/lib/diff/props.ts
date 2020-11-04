@@ -2,11 +2,11 @@ import { IS_NON_DIMENSIONAL } from '../constants';
 import { PreactElement, PropsType } from '../type';
 
 /**
- * Diff the old and new properties of a VNode and apply changes to the DOM node
- * @param {import('../internal').PreactElement} dom The DOM node to apply
- * changes to
- * @param {object} newProps The new props
- * @param {object} oldProps The old props
+ * props の diff を取る。
+ * children は無視してくれる。
+ * @param dom
+ * @param newProps
+ * @param oldProps
  */
 export function diffProps(
 	dom: PreactElement,

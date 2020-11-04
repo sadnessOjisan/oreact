@@ -44,6 +44,7 @@ export function createElement(
 		}
 	}
 
+	// key がなければ undefined のまま入る
 	return createVNode(
 		type,
 		normalizedProps as { children: ComponentChildren },

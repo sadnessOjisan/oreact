@@ -8,18 +8,19 @@ import { removeNode } from '../util';
  * 与えられた新旧VNodeの差分をとって、その差分DOMに適用してそのDOMを返す関数
  */
 export function diff(arg) {
+    console.log('diff', arguments);
     var parentDom = arg.parentDom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
     var tmp, newType = newVNode.type;
-    // When passing through createElement it assigns the object
-    // constructor as undefined. This to prevent JSON-injection.
+    // createElement は constructor を undefined で設定するtので、そこ経由で作られたことを保証する。
     if (newVNode.constructor !== undefined)
         return null;
+    // newVNode がコンポーネントかエレメントかで処理が分岐
     if (typeof newType == 'function') {
         // newVNode がコンポーネントの時の分岐
         var c = void 0, isNew = void 0, oldProps = void 0, oldState = void 0;
         var newProps = newVNode.props;
         var componentContext = EMPTY_OBJ;
-        // Get component and set it to `c`
+        // コンポーネントオブジェクトの作成
         if (oldVNode._component) {
             c = newVNode._component = oldVNode._component;
         }
@@ -45,7 +46,7 @@ export function diff(arg) {
         }
         oldProps = c.props;
         oldState = c.state;
-        // Invoke pre-render lifecycle methods
+        // 差分更新前(diff中)に呼び出されるライフサイクルイベントを実行
         if (isNew) {
             if (c.componentDidMount != null) {
                 c._renderCallbacks.push(c.componentDidMount);
@@ -77,6 +78,7 @@ export function diff(arg) {
             commitQueue: commitQueue,
             oldDom: oldDom
         });
+        // FIXME: 消しても問題ない
         c.base = newVNode._dom;
         // We successfully rendered this VNode, unset any stored hydration/bailout state:
         newVNode._hydrating = null;
@@ -87,6 +89,7 @@ export function diff(arg) {
     }
     else if (excessDomChildren == null &&
         newVNode._original === oldVNode._original) {
+        // FIXME: このブロックも消して問題ない
         newVNode._children = oldVNode._children;
         newVNode._dom = oldVNode._dom;
     }
@@ -120,6 +123,7 @@ export function commitRoot(commitQueue) {
  * ツリーではなくDOM Node のプロパティ比較が責務。
  */
 function diffElementNodes(arg) {
+    console.log('diffElementNodes', arguments);
     var dom = arg.dom, newVNode = arg.newVNode, oldVNode = arg.oldVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue;
     var i;
     var oldProps = oldVNode.props;
@@ -132,19 +136,22 @@ function diffElementNodes(arg) {
             return document.createTextNode(value);
         }
         dom = document.createElement(newVNode.type, newProps.is && { is: newProps.is });
-        // we created a new parent, so none of the previously attached children can be reused:
+        // 新しく親を作ったので既存の子は使いまわさない
         excessDomChildren = null;
     }
     if (newVNode.type === null) {
+        // newVNode が primitive の場合
         var textNodeProps = newProps;
         if (oldProps !== newProps && dom.data !== textNodeProps) {
             dom.data = textNodeProps;
         }
     }
     else {
+        // newVNode が element の場合
         var props = oldVNode.props || EMPTY_OBJ;
-        // VNodeの差分を取る
+        // VNodeの差分を取る。domは破壊的操作がされる
         diffProps(dom, newProps, props);
+        // VNode の children に diff を取るためにchildrenを抽出
         i = newVNode.props.children;
         // newVNodeがComponentの入れ子でなくてもElementの入れ子の可能性があるので、childrenの比較も行う
         diffChildren({

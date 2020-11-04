@@ -35,6 +35,7 @@ export function createElement(type, props, children) {
             }
         }
     }
+    // key がなければ undefined のまま入る
     return createVNode(type, normalizedProps, key, undefined, null);
 }
 /**

@@ -6,16 +6,12 @@ import { getDomSibling } from '../component';
  * VNodeのchildren比較を行う
  */
 export function diffChildren(arg) {
+    console.log('diffChildren', arguments);
     var parentDom = arg.parentDom, renderResult = arg.renderResult, newParentVNode = arg.newParentVNode, oldParentVNode = arg.oldParentVNode, excessDomChildren = arg.excessDomChildren, commitQueue = arg.commitQueue, oldDom = arg.oldDom;
     var i, j, oldVNode, childVNode, newDom, firstChildDom, filteredOldDom;
-    // This is a compression of oldParentVNode!=null && oldParentVNode != EMPTY_OBJ && oldParentVNode._children || EMPTY_ARR
-    // as EMPTY_OBJ._children should be `undefined`.
     var oldChildren = (oldParentVNode && oldParentVNode._children) || EMPTY_ARR;
     var oldChildrenLength = oldChildren.length;
-    // Only in very specific places should this logic be invoked (top level `render` and `diffElementNodes`).
-    // I'm using `EMPTY_OBJ` to signal when `diffChildren` is invoked in these situations. I can't use `null`
-    // for this purpose, because `null` is a valid value for `oldDom` which can mean to skip to this logic
-    // (e.g. if mounting a new tree in which the old DOM should be ignored (usually for Fragments).
+    // top level の render か Fragmentかの識別
     if (oldDom == EMPTY_OBJ) {
         if (oldChildrenLength) {
             filteredOldDom = getDomSibling(oldParentVNode, 0);
