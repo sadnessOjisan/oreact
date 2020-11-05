@@ -6,8 +6,8 @@
  * @returns {O & P}
  */
 export function assign(obj: Object, props: Object) {
-	for (let i in props) obj[i] = props[i];
-	return /** @type {O & P} */ obj;
+  for (let i in props) obj[i] = props[i];
+  return /** @type {O & P} */ obj;
 }
 
 /**
@@ -17,6 +17,6 @@ export function assign(obj: Object, props: Object) {
  * @param {Node} node The node to remove
  */
 export function removeNode(node: Node) {
-	let parentNode = node.parentNode;
-	if (parentNode) parentNode.removeChild(node);
+  let parentNode = node.parentNode;
+  if (parentNode) parentNode.removeChild(node);
 }

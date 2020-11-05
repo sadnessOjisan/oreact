@@ -1,11 +1,9 @@
-# `example`
+# example
 
-> TODO: description
+oreact の実装例
 
 ## Usage
 
 ```
-const example = require('example');
-
-// TODO: DEMONSTRATE API
+npx webpack serve
 ```

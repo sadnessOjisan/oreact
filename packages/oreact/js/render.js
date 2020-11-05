@@ -8,18 +8,18 @@ import { createElement, Fragment } from './create-element';
  * @param parentDom マウントの対象
  */
 export function render(vnode, parentDom) {
-  const initialVnode = createElement(Fragment, null, [vnode]); // 差分更新後の副作用を管理するリスト
+	const initialVnode = createElement(Fragment, null, [vnode]); // 差分更新後の副作用を管理するリスト
 
-  let commitQueue = [];
-  parentDom._children = initialVnode;
-  diff({
-    parentDom: parentDom,
-    newVNode: initialVnode,
-    oldVNode: EMPTY_OBJ,
-    excessDomChildren: EMPTY_ARR.slice.call(parentDom.childNodes),
-    commitQueue: commitQueue,
-    oldDom: EMPTY_OBJ
-  }); // commitQueueにある副作用を実行
+	let commitQueue = [];
+	parentDom._children = initialVnode;
+	diff({
+		parentDom: parentDom,
+		newVNode: initialVnode,
+		oldVNode: EMPTY_OBJ,
+		excessDomChildren: EMPTY_ARR.slice.call(parentDom.childNodes),
+		commitQueue: commitQueue,
+		oldDom: EMPTY_OBJ
+	}); // commitQueueにある副作用を実行
 
-  commitRoot(commitQueue);
+	commitRoot(commitQueue);
 }
