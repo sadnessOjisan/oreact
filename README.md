@@ -11,13 +11,11 @@ slide: https://speakerdeck.com/sadnessojisan/preactfalseshi-zu-miwoli-jie-suruqi
 ## dev
 
 ```sh
-lerna run --scope=oreact build:core
+# dev
+sh scripts/dev.sh
 ```
 
-```sh
-# consoleには見えないけどwebpack-dev-serverが起動している
-lerna run --scope=example dev
-```
+example: https://sadnessojisan.github.io/oreact/
 
 ```tsx
 import { h, render, Component } from "oreact";
@@ -149,12 +147,6 @@ class ListItem extends Component {
 }
 
 render(h(App, null, null), document.body);
-```
-
-## dev
-
-```sh
-npm publish --access=public
 ```
 
 ## 意図的に消したもの
