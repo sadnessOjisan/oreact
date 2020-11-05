@@ -2,6 +2,8 @@
 
 preact を再実装する -俺の react-
 
+slide: https://speakerdeck.com/sadnessojisan/preactfalseshi-zu-miwoli-jie-suruqing-liang-ban-jiao-yu-yong-preactwozuo-tuteruhua
+
 ## abst
 
 教育用 preact です。state を書き換えると再レンダリングがされるというコアの部分だけを抜き出しています。
