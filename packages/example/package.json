@@ -1,29 +1,29 @@
 {
-	"name": "example",
-	"version": "1.0.0",
-	"private": true,
-	"description": "oreact の例",
-	"main": "index.js",
-	"scripts": {
-		"dev": "webpack-dev-server",
-		"build": "NODE_ENV='production' webpack"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/ojisan-toybox/svganimation.git"
-	},
-	"author": "",
-	"license": "ISC",
-	"bugs": {
-		"url": "https://github.com/ojisan-toybox/svganimation/issues"
-	},
-	"homepage": "https://github.com/ojisan-toybox/svganimation#readme",
-	"devDependencies": {
-		"html-webpack-plugin": "^4.5.0",
-		"ts-loader": "^8.0.8",
-		"typescript": "^4.0.5",
-		"webpack": "4",
-		"webpack-cli": "^4.1.0",
-		"webpack-dev-server": "^3.11.0"
-	}
+  "name": "example",
+  "version": "1.0.0",
+  "private": true,
+  "description": "oreact の例",
+  "main": "index.js",
+  "scripts": {
+    "dev": "webpack-dev-server",
+    "build": "NODE_ENV='production' webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ojisan-toybox/svganimation.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ojisan-toybox/svganimation/issues"
+  },
+  "homepage": "https://github.com/ojisan-toybox/svganimation#readme",
+  "devDependencies": {
+    "html-webpack-plugin": "^4.5.0",
+    "ts-loader": "^8.0.8",
+    "typescript": "^4.0.5",
+    "webpack": "4",
+    "webpack-cli": "^4.1.0",
+    "webpack-dev-server": "^3.11.0"
+  }
 }

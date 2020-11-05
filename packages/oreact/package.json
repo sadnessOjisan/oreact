@@ -1,50 +1,50 @@
 {
-	"name": "oreact",
-	"version": "0.1.0",
-	"description": "preact を再実装する -俺の react-",
-	"main": "dist/preact.js",
-	"module": "dist/preact.module.js",
-	"umd:main": "dist/preact.umd.js",
-	"unpkg": "dist/preact.min.js",
-	"source": "js/index.js",
-	"exports": {
-		".": {
-			"browser": "./dist/preact.module.js",
-			"umd": "./dist/preact.umd.js",
-			"import": "./dist/preact.mjs",
-			"require": "./dist/preact.js"
-		},
-		"./package.json": "./package.json",
-		"./": "./"
-	},
-	"types": "src/index.d.ts",
-	"files": [
-		"src",
-		"js",
-		"dist"
-	],
-	"scripts": {
-		"tsc": "babel --extensions '.ts' ./lib -d js/",
-		"build:core": "microbundle build --raw",
-		"build:core-min": "microbundle build --raw -f iife js/cjs.js -o dist/preact.min.js",
-		"dev": "microbundle watch --raw --format cjs",
-		"lint": "eslint src"
-	},
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/sadnessOjisan/oreact.git"
-	},
-	"author": "",
-	"license": "MIT",
-	"bugs": {
-		"url": "https://github.com/sadnessOjisan/oreact/issues"
-	},
-	"homepage": "https://github.com/sadnessOjisan/oreact#readme",
-	"devDependencies": {
-		"@babel/cli": "^7.12.1",
-		"@babel/core": "^7.12.3",
-		"@babel/preset-typescript": "^7.12.1",
-		"microbundle": "^0.12.4",
-		"typescript": "^4.0.3"
-	}
+  "name": "oreact",
+  "version": "0.1.0",
+  "description": "preact を再実装する -俺の react-",
+  "main": "dist/preact.js",
+  "module": "dist/preact.module.js",
+  "umd:main": "dist/preact.umd.js",
+  "unpkg": "dist/preact.min.js",
+  "source": "js/index.js",
+  "exports": {
+    ".": {
+      "browser": "./dist/preact.module.js",
+      "umd": "./dist/preact.umd.js",
+      "import": "./dist/preact.mjs",
+      "require": "./dist/preact.js"
+    },
+    "./package.json": "./package.json",
+    "./": "./"
+  },
+  "types": "src/index.d.ts",
+  "files": [
+    "src",
+    "js",
+    "dist"
+  ],
+  "scripts": {
+    "tsc": "babel --extensions '.ts' ./lib -d js/",
+    "build:core": "microbundle build --raw",
+    "build:core-min": "microbundle build --raw -f iife js/cjs.js -o dist/preact.min.js",
+    "dev": "microbundle watch --raw --format cjs",
+    "lint": "eslint src"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sadnessOjisan/oreact.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sadnessOjisan/oreact/issues"
+  },
+  "homepage": "https://github.com/sadnessOjisan/oreact#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.12.1",
+    "@babel/core": "^7.12.3",
+    "@babel/preset-typescript": "^7.12.1",
+    "microbundle": "^0.12.4",
+    "typescript": "^4.0.3"
+  }
 }
