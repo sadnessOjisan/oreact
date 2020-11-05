@@ -5,7 +5,7 @@
   "description": "oreact の例",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack-dev-server",
+    "dev": "webpack serve",
     "build": "NODE_ENV='production' webpack"
   },
   "repository": {
