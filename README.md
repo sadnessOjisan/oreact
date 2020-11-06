@@ -9,13 +9,26 @@ preact を再実装する -俺の react-
 ## dev
 
 ```sh
-lerna run --scope=oreact build:core
+npm install
+
+npx lerna bootstrap
+
+npm run dev
 ```
 
-```sh
-# consoleには見えないけどwebpack-dev-serverが起動している
-lerna run --scope=example dev
-```
+ビルド対象のコード例.
+jsx -> h への変換は[こちら](https://github.com/ojisan-toybox/preact-h-babel)から.
+
+例では、
+
+- props 更新
+- state 更新
+- ライフサイクル
+- スタイリング
+
+をサポートしています。
+
+URL: https://sadnessojisan.github.io/oreact/
 
 ```tsx
 import { h, render, Component } from "oreact";
@@ -149,7 +162,7 @@ class ListItem extends Component {
 render(h(App, null, null), document.body);
 ```
 
-## dev
+## publish
 
 ```sh
 npm publish --access=public

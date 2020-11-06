@@ -1,6 +1,6 @@
 {
-  "name": "oreact",
-  "version": "0.1.0",
+  "name": "@sadness.ojisan/oreact",
+  "version": "1.0.0",
   "description": "preact を再実装する -俺の react-",
   "main": "dist/preact.js",
   "module": "dist/preact.module.js",
