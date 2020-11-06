@@ -11,20 +11,12 @@ slide: https://speakerdeck.com/sadnessojisan/preactfalseshi-zu-miwoli-jie-suruqi
 ## dev
 
 ```sh
-<<<<<<< HEAD
 npm install
 
 npx lerna bootstrap
 
 npm run dev
 ```
-=======
-# dev
-sh scripts/dev.sh
-```
-
-example: https://sadnessojisan.github.io/oreact/
->>>>>>> main
 
 ビルド対象のコード例.
 jsx -> h への変換は[こちら](https://github.com/ojisan-toybox/preact-h-babel)から.
@@ -172,15 +164,6 @@ class ListItem extends Component {
 render(h(App, null, null), document.body);
 ```
 
-<<<<<<< HEAD
-## publish
-
-```sh
-npm publish --access=public
-```
-
-=======
->>>>>>> main
 ## 意図的に消したもの
 
 - createContext
