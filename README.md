@@ -11,11 +11,26 @@ slide: https://speakerdeck.com/sadnessojisan/preactfalseshi-zu-miwoli-jie-suruqi
 ## dev
 
 ```sh
-# dev
-sh scripts/dev.sh
+npm install
+
+npx lerna bootstrap
+
+npm run dev
 ```
 
-example: https://sadnessojisan.github.io/oreact/
+ビルド対象のコード例.
+jsx -> h への変換は[こちら](https://github.com/ojisan-toybox/preact-h-babel)から.
+
+例では、
+
+- props 更新
+- state 更新
+- ライフサイクル
+- スタイリング
+
+をサポートしています。
+
+URL: https://sadnessojisan.github.io/oreact/
 
 ```tsx
 import { h, render, Component } from "oreact";
