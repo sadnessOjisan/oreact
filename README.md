@@ -2,6 +2,8 @@
 
 preact を再実装する -俺の react-
 
+slide: https://speakerdeck.com/sadnessojisan/preactfalseshi-zu-miwoli-jie-suruqing-liang-ban-jiao-yu-yong-preactwozuo-tuteruhua
+
 ## abst
 
 教育用 preact です。state を書き換えると再レンダリングがされるというコアの部分だけを抜き出しています。
@@ -9,12 +11,20 @@ preact を再実装する -俺の react-
 ## dev
 
 ```sh
+<<<<<<< HEAD
 npm install
 
 npx lerna bootstrap
 
 npm run dev
 ```
+=======
+# dev
+sh scripts/dev.sh
+```
+
+example: https://sadnessojisan.github.io/oreact/
+>>>>>>> main
 
 ビルド対象のコード例.
 jsx -> h への変換は[こちら](https://github.com/ojisan-toybox/preact-h-babel)から.
@@ -162,12 +172,15 @@ class ListItem extends Component {
 render(h(App, null, null), document.body);
 ```
 
+<<<<<<< HEAD
 ## publish
 
 ```sh
 npm publish --access=public
 ```
 
+=======
+>>>>>>> main
 ## 意図的に消したもの
 
 - createContext
